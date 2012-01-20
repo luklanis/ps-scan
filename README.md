@@ -1,7 +1,7 @@
 #es-scan
 * * *
 
-An experimental app for Android that reads the code row of a orange (swiss) payment slip using the device camera.
+An experimental app for Android that reads the code row of an orange (swiss) payment slip using the device camera.
 
 Runs the Tesseract 3.01 OCR engine using a fork of Tesseract Tools for Android.
 
@@ -22,7 +22,7 @@ License
 This project is licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html)
 
     /*
-     * Copyright 2011 Robert Theis
+     * Copyright 2012 Lukas Landis
      *
      * Licensed under the Apache License, Version 2.0 (the "License");
      * you may not use this file except in compliance with the License.
