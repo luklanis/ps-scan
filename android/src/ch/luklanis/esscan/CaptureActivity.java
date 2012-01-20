@@ -31,6 +31,7 @@ import ch.luklanis.esscan.language.LanguageCodeHelper;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -41,12 +42,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.text.ClipboardManager;
+import android.content.ClipboardManager;
 import android.text.SpannableStringBuilder;
 import android.text.style.CharacterStyle;
 import android.text.style.ForegroundColorSpan;
@@ -152,7 +152,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   
   // Options menu, for copy to clipboard
   private static final int OPTIONS_COPY_RECOGNIZED_TEXT_ID = Menu.FIRST;
-  private static final int OPTIONS_COPY_TRANSLATED_TEXT_ID = Menu.FIRST + 1;
 
   private CameraManager cameraManager;
   private CaptureActivityHandler handler;
@@ -839,9 +838,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     super.onCreateContextMenu(menu, v, menuInfo);
     if (v.equals(ocrResultView)) {
       menu.add(Menu.NONE, OPTIONS_COPY_RECOGNIZED_TEXT_ID, Menu.NONE, "Copy recognized text");
-    } else if (v.equals(translationView)){
-      menu.add(Menu.NONE, OPTIONS_COPY_TRANSLATED_TEXT_ID, Menu.NONE, "Copy translated text");
-    }
+    } 
   }
 
   @Override
@@ -850,15 +847,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     switch (item.getItemId()) {
 
     case OPTIONS_COPY_RECOGNIZED_TEXT_ID:
-        clipboardManager.setText(ocrResultView.getText());
-      if (clipboardManager.hasText()) {
-        Toast toast = Toast.makeText(this, "Text copied.", Toast.LENGTH_LONG);
-        toast.setGravity(Gravity.BOTTOM, 0, 0);
-        toast.show();
-      }
-      return true;
-    case OPTIONS_COPY_TRANSLATED_TEXT_ID:
-        clipboardManager.setText(translationView.getText());
+        clipboardManager.setPrimaryClip(ClipData.newPlainText("ocrResult", ocrResultView.getText()));
       if (clipboardManager.hasText()) {
         Toast toast = Toast.makeText(this, "Text copied.", Toast.LENGTH_LONG);
         toast.setGravity(Gravity.BOTTOM, 0, 0);
