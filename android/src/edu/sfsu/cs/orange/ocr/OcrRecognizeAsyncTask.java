@@ -104,12 +104,12 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
 //        Log.e("OcrRecognizeAsyncTask", "thresholding completed. converting to bmp. size:" + bitmap.getWidth() + "x" + bitmap.getHeight());
 //        bitmap = WriteFile.writeBitmap(thresholdedImage);
 //      }
-      Log.e("OcrRecognizeAsyncTask", "converted to bitmap. doing setImage()...");
+      Log.i("OcrRecognizeAsyncTask", "converted to bitmap. doing setImage()...");
       baseApi.setImage(bitmap);
       
-      Log.e("OcrRecognizeAsyncTask", "setImage() completed");
+      Log.i("OcrRecognizeAsyncTask", "setImage() completed");
       textResult = baseApi.getUTF8Text();
-      Log.e("OcrRecognizeAsyncTask", "getUTF8Text() completed");
+      Log.i("OcrRecognizeAsyncTask", "getUTF8Text() completed");
       wordConfidences = baseApi.wordConfidences();
       overallConf = baseApi.meanConfidence();
       end = System.currentTimeMillis();

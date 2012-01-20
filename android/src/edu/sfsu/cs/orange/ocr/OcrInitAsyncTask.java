@@ -254,7 +254,7 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
             + ".zip) in application assets...");
         // Check for "osd.traineddata.zip"
         osdInstallSuccess = installFromAssets(CaptureActivity.OSD_FILENAME_BASE + ".zip", 
-            tessdataDir, new File(CaptureActivity.OSD_FILENAME));
+            tessdataDir, new File(tessdataDir, CaptureActivity.OSD_FILENAME_BASE));
       } catch (IOException e) {
         Log.e(TAG, "IOException", e);
       } catch (Exception e) {
@@ -275,17 +275,16 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
           Log.e(TAG, "IOException received in doInBackground. Is a network connection available?");
           return false;
         }
-      }
 
-      // Untar the OSD tar file
-      try {
-        untar(new File(tessdataDir.toString() + File.separator + CaptureActivity.OSD_FILENAME), 
-            tessdataDir);
-      } catch (IOException e) {
-        Log.e(TAG, "Untar failed");
-        return false;
+        // Untar the OSD tar file
+        try {
+          untar(new File(tessdataDir.toString() + File.separator + CaptureActivity.OSD_FILENAME), 
+              tessdataDir);
+        } catch (IOException e) {
+          Log.e(TAG, "Untar failed");
+          return false;
+        }
       }
-
     } else {
       Log.d(TAG, "OSD file already present in " + tessdataDir.toString());
       osdInstallSuccess = true;
@@ -626,7 +625,7 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
       FileNotFoundException {
     // Attempt to open the zip archive
     publishProgress("Uncompressing data for " + languageName + "...", "0");
-    ZipInputStream inputStream = new ZipInputStream(context.getAssets().open(sourceFilename));
+    ZipInputStream inputStream = new ZipInputStream(context.getAssets().open("languages/" + sourceFilename));
 
     // Loop through all the files and folders in the zip archive (but there should just be one)
     for (ZipEntry entry = inputStream.getNextEntry(); entry != null; entry = inputStream

@@ -30,26 +30,6 @@
 			
 	</PreferenceCategory>
 
-	<!-- TRANSLATION SETTINGS -->
-	<PreferenceCategory android:title="Translation settings">
-
-		<CheckBoxPreference android:key="preference_translation_toggle_translation"
-			android:title="Translate"/>
-
-		<ListPreference android:key="targetLanguageCodeTranslationPref"  
-			android:title="Translate to"
-			android:dependency="preference_translation_toggle_translation"
-			android:entries="@array/translationtargetlanguagenames_google" 
-			android:entryValues="@array/translationtargetiso6391_google" />
-			
-		<ListPreference android:key="preference_translator" 
-			android:title="Translator"
-		    android:dependency="preference_translation_toggle_translation"
-			android:entries="@array/translators" 
-			android:entryValues="@array/translators" />
-						
-	</PreferenceCategory>
-
 	<!-- ADVANCED SETTINGS -->
 	<PreferenceCategory android:title="Advanced settings">
 

@@ -27,7 +27,6 @@ import edu.sfsu.cs.orange.ocr.HelpActivity;
 import edu.sfsu.cs.orange.ocr.OcrResult;
 import edu.sfsu.cs.orange.ocr.PreferencesActivity;
 import edu.sfsu.cs.orange.ocr.language.LanguageCodeHelper;
-import edu.sfsu.cs.orange.ocr.language.TranslateAsyncTask;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -87,31 +86,22 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   // Note: These constants will be overridden by any default values defined in preferences.xml.
   
   /** ISO 639-3 language code indicating the default recognition language. */
-  public static final String DEFAULT_SOURCE_LANGUAGE_CODE = "eng";
-  
-  /** ISO 639-1 language code indicating the default target language for translation. */
-  public static final String DEFAULT_TARGET_LANGUAGE_CODE = "es";
-  
-  /** The default online machine translation service to use. */
-  public static final String DEFAULT_TRANSLATOR = "Bing Translator";
+  public static final String DEFAULT_SOURCE_LANGUAGE_CODE = "deu";
   
   /** The default OCR engine to use. */
   public static final String DEFAULT_OCR_ENGINE_MODE = "Tesseract";
   
   /** The default page segmentation mode to use. */
-  public static final String DEFAULT_PAGE_SEGMENTATION_MODE = "Auto";
+  public static final String DEFAULT_PAGE_SEGMENTATION_MODE = "Single line";
   
   /** Whether to beep by default when the shutter button is pressed. */
   public static final boolean DEFAULT_TOGGLE_BEEP = true;
   
   /** Whether to initially show a looping, real-time OCR display. */
-  public static final boolean DEFAULT_TOGGLE_CONTINUOUS = false;
+  public static final boolean DEFAULT_TOGGLE_CONTINUOUS = true;
   
   /** Whether to initially reverse the image returned by the camera. */
   public static final boolean DEFAULT_TOGGLE_REVERSED_IMAGE = false;
-  
-  /** Whether to enable the use of online translation services be default. */
-  public static final boolean DEFAULT_TOGGLE_TRANSLATION = true;
   
   /** Whether the light should be initially activated by default. */
   public static final boolean DEFAULT_TOGGLE_LIGHT = false;
@@ -191,8 +181,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private String characterBlacklist;
   private String characterWhitelist;
   private ShutterButton shutterButton;
-//  private ToggleButton torchButton;
-  private boolean isTranslationActive; // Whether we want to show translations
+
   private boolean isContinuousModeActive; // Whether we are doing OCR in continuous mode
   private SharedPreferences prefs;
   private OnSharedPreferenceChangeListener listener;
@@ -246,8 +235,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
    
     ocrResultView = (TextView) findViewById(R.id.ocr_result_text_view);
     registerForContextMenu(ocrResultView);
-    translationView = (TextView) findViewById(R.id.translation_text_view);
-    registerForContextMenu(translationView);
     
     progressView = (View) findViewById(R.id.indeterminate_progress_indicator_view);
 
@@ -582,13 +569,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     return true;
   }
 
-  /** Sets the necessary language code values for the translation target language. */
-  private boolean setTargetLanguage(String languageCode) {
-    targetLanguageCodeTranslation = languageCode;
-    targetLanguageReadable = LanguageCodeHelper.getTranslationLanguageName(this, languageCode);
-    return true;
-  }
-
   /** Finds the proper location on the SD card where we can save files. */
   private File getStorageDirectory() {
     //Log.d(TAG, "getStorageDirectory(): API level is " + Integer.valueOf(android.os.Build.VERSION.SDK_INT));
@@ -755,31 +735,9 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     int scaledSize = Math.max(22, 32 - ocrResult.getText().length() / 4);
     ocrResultTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledSize);
 
-    TextView translationLanguageLabelTextView = (TextView) findViewById(R.id.translation_language_label_text_view);
-    TextView translationLanguageTextView = (TextView) findViewById(R.id.translation_language_text_view);
-    TextView translationTextView = (TextView) findViewById(R.id.translation_text_view);
-    if (isTranslationActive) {
-      // Handle translation text fields
-      translationLanguageLabelTextView.setVisibility(View.VISIBLE);
-      translationLanguageTextView.setText(targetLanguageReadable);
-      translationLanguageTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL), Typeface.NORMAL);
-      translationLanguageTextView.setVisibility(View.VISIBLE);
-
-      // Activate/re-activate the indeterminate progress indicator
-      translationTextView.setVisibility(View.GONE);
-      progressView.setVisibility(View.VISIBLE);
-      setProgressBarVisibility(true);
+	progressView.setVisibility(View.GONE);
+	setProgressBarVisibility(false);
       
-      // Get the translation asynchronously
-      new TranslateAsyncTask(this, sourceLanguageCodeTranslation, targetLanguageCodeTranslation, 
-          ocrResult.getText()).execute();
-    } else {
-      translationLanguageLabelTextView.setVisibility(View.GONE);
-      translationLanguageTextView.setVisibility(View.GONE);
-      translationTextView.setVisibility(View.GONE);
-      progressView.setVisibility(View.GONE);
-      setProgressBarVisibility(false);
-    }
     return true;
   }
   
@@ -1076,8 +1034,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       // Retrieve from preferences, and set in this Activity, the language preferences
       PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
       setSourceLanguage(prefs.getString(PreferencesActivity.KEY_SOURCE_LANGUAGE_PREFERENCE, CaptureActivity.DEFAULT_SOURCE_LANGUAGE_CODE));
-      setTargetLanguage(prefs.getString(PreferencesActivity.KEY_TARGET_LANGUAGE_PREFERENCE, CaptureActivity.DEFAULT_TARGET_LANGUAGE_CODE));
-      isTranslationActive = prefs.getBoolean(PreferencesActivity.KEY_TOGGLE_TRANSLATION, false);
       
       // Retrieve from preferences, and set in this Activity, the capture mode preference
       if (prefs.getBoolean(PreferencesActivity.KEY_CONTINUOUS_PREVIEW, CaptureActivity.DEFAULT_TOGGLE_CONTINUOUS)) {
@@ -1138,15 +1094,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
     // Recognition language
     prefs.edit().putString(PreferencesActivity.KEY_SOURCE_LANGUAGE_PREFERENCE, CaptureActivity.DEFAULT_SOURCE_LANGUAGE_CODE).commit();
-
-    // Translation
-    prefs.edit().putBoolean(PreferencesActivity.KEY_TOGGLE_TRANSLATION, CaptureActivity.DEFAULT_TOGGLE_TRANSLATION).commit();
-
-    // Translation target language
-    prefs.edit().putString(PreferencesActivity.KEY_TARGET_LANGUAGE_PREFERENCE, CaptureActivity.DEFAULT_TARGET_LANGUAGE_CODE).commit();
-
-    // Translator
-    prefs.edit().putString(PreferencesActivity.KEY_TRANSLATOR, CaptureActivity.DEFAULT_TRANSLATOR).commit();
 
     // OCR Engine
     prefs.edit().putString(PreferencesActivity.KEY_OCR_ENGINE_MODE, CaptureActivity.DEFAULT_OCR_ENGINE_MODE).commit();

@@ -156,7 +156,7 @@ public class OcrCharacterHelper {
     else if (languageCode.equals("eng")) { return "!?@#$%()<>_-+=/.,:;'\"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; } // English
     else if (languageCode.equals("fin")) { return ""; } // Finnish
     else if (languageCode.equals("fra")) { return ""; } // French
-    else if (languageCode.equals("deu")) { return ""; } // German
+    else if (languageCode.equals("deu")) { return ">+0123456789"; } // German
     else if (languageCode.equals("ell")) { return ""; } // Greek
     else if (languageCode.equals("heb")) { return ""; } // Hebrew
     else if (languageCode.equals("hin")) { return ""; } // Hindi
