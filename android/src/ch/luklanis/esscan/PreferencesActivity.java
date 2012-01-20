@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package edu.sfsu.cs.orange.ocr;
+package ch.luklanis.esscan;
 
-import edu.sfsu.cs.orange.ocr.language.LanguageCodeHelper;
+import ch.luklanis.esscan.language.LanguageCodeHelper;
 
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;

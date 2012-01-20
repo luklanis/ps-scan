@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package edu.sfsu.cs.orange.ocr;
+package ch.luklanis.esscan;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ import com.googlecode.leptonica.android.ReadFile;
 import com.googlecode.leptonica.android.WriteFile;
 import com.googlecode.tesseract.android.TessBaseAPI;
 
-//import edu.sfsu.cs.orange.ocr.language.PseudoTranslator;
+//import ch.luklanis.esscan.language.PseudoTranslator;
 
 import android.app.ProgressDialog;
 import android.graphics.Bitmap;

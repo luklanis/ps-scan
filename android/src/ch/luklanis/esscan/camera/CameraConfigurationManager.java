@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package edu.sfsu.cs.orange.ocr.camera;
+package ch.luklanis.esscan.camera;
 
 
 import android.content.Context;
@@ -27,7 +27,7 @@ import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
-import edu.sfsu.cs.orange.ocr.PreferencesActivity;
+import ch.luklanis.esscan.PreferencesActivity;
 
 import java.util.Collection;
 

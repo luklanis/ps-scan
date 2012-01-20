@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package edu.sfsu.cs.orange.ocr;
+package ch.luklanis.esscan;
 
-import edu.sfsu.cs.orange.ocr.BeepManager;
+import ch.luklanis.esscan.BeepManager;
 import com.googlecode.tesseract.android.TessBaseAPI;
 
-import edu.sfsu.cs.orange.ocr.CaptureActivity;
-import edu.sfsu.cs.orange.ocr.OcrRecognizeAsyncTask;
-import edu.sfsu.cs.orange.ocr.R;
+import ch.luklanis.esscan.CaptureActivity;
+import ch.luklanis.esscan.OcrRecognizeAsyncTask;
+import ch.luklanis.esscan.R;
 
 import android.app.ProgressDialog;
 import android.os.Handler;

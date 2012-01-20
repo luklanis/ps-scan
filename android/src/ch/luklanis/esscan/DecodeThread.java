@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-package edu.sfsu.cs.orange.ocr;
+package ch.luklanis.esscan;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
 
-import edu.sfsu.cs.orange.ocr.CaptureActivity;
+import ch.luklanis.esscan.CaptureActivity;
 import android.os.Handler;
 import android.os.Looper;
 import java.util.concurrent.CountDownLatch;

@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package edu.sfsu.cs.orange.ocr;
+package ch.luklanis.esscan;
 
 import java.util.List;
 
-import edu.sfsu.cs.orange.ocr.R;
-import edu.sfsu.cs.orange.ocr.camera.CameraManager;
+import ch.luklanis.esscan.R;
+import ch.luklanis.esscan.camera.CameraManager;
 
 import android.content.Context;
 import android.content.res.Resources;

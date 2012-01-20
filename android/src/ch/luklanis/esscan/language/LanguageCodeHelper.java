@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package edu.sfsu.cs.orange.ocr.language;
+package ch.luklanis.esscan.language;
 
 import android.content.Context;
 import android.content.res.Resources;
 import android.util.Log;
 
-import edu.sfsu.cs.orange.ocr.PreferencesActivity;
-import edu.sfsu.cs.orange.ocr.R;
+import ch.luklanis.esscan.PreferencesActivity;
+import ch.luklanis.esscan.R;
 
 /**
  * Class for handling functions relating to converting between standard language

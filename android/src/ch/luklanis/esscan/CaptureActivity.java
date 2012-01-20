@@ -15,18 +15,18 @@
  * limitations under the License.
  */
 
-package edu.sfsu.cs.orange.ocr;
+package ch.luklanis.esscan;
 
-import edu.sfsu.cs.orange.ocr.BeepManager;
+import ch.luklanis.esscan.BeepManager;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
 
-import edu.sfsu.cs.orange.ocr.camera.CameraManager;
-import edu.sfsu.cs.orange.ocr.camera.ShutterButton;
-import edu.sfsu.cs.orange.ocr.HelpActivity;
-import edu.sfsu.cs.orange.ocr.OcrResult;
-import edu.sfsu.cs.orange.ocr.PreferencesActivity;
-import edu.sfsu.cs.orange.ocr.language.LanguageCodeHelper;
+import ch.luklanis.esscan.camera.CameraManager;
+import ch.luklanis.esscan.camera.ShutterButton;
+import ch.luklanis.esscan.HelpActivity;
+import ch.luklanis.esscan.OcrResult;
+import ch.luklanis.esscan.PreferencesActivity;
+import ch.luklanis.esscan.language.LanguageCodeHelper;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -597,7 +597,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       
       //        } else {
       //          // For Android 2.1 and below, explicitly give the path as, for example,
-      //          // "/mnt/sdcard/Android/data/edu.sfsu.cs.orange.ocr/files/"
+      //          // "/mnt/sdcard/Android/data/ch.luklanis.esscan/files/"
       //          return new File(Environment.getExternalStorageDirectory().toString() + File.separator + 
       //                  "Android" + File.separator + "data" + File.separator + getPackageName() + 
       //                  File.separator + "files" + File.separator);
