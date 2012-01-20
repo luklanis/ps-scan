@@ -1,22 +1,20 @@
-#android-ocr
+#es-scan
 * * *
 
-An experimental app for Android that performs optical character recognition (OCR) on images captured using the device camera.
+An experimental app for Android that reads the code row of an orange (swiss) payment slip using the device camera.
 
 Runs the Tesseract 3.01 OCR engine using a fork of Tesseract Tools for Android.
 
-Most of the code making up the core structure of this project has been adapted from the ZXing Barcode Scanner. Along with Tesseract-OCR and Tesseract Tools for Android (tesseract-android-tools), several open source projects have been used in this project, including google-api-translate-java, microsoft-translator-java-api, and jtar.
+Most of the code making up the core structure of this project has been adapted from android-ocr (Thanks to Robert Theis). Along with Tesseract-OCR and Tesseract Tools for Android (tesseract-android-tools), several open source projects have been used in this project, including jtar.
 
 ## Requires
 
 * Installation of [tess-two](https://github.com/rmtheis/tess-two) as a library project, to act as the OCR engine.
-* A [Bing API key](http://www.bing.com/developers/appids.aspx).
-* A [Google Translate API key](https://code.google.com/apis/console/?api=translate).
 
 Installing the APK
 ==================
 
-The APK is available for download to an Android device from Android Market [here](https://market.android.com/details?id=edu.sfsu.cs.orange.ocr).
+There is no apk at the moment. You have to build it by yourself.
 
 License
 =======
@@ -24,7 +22,7 @@ License
 This project is licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html)
 
     /*
-     * Copyright 2011 Robert Theis
+     * Copyright 2012 Lukas Landis
      *
      * Licensed under the Apache License, Version 2.0 (the "License");
      * you may not use this file except in compliance with the License.
@@ -39,4 +37,4 @@ This project is licensed under the [Apache License, Version 2.0](http://www.apac
      * limitations under the License.
      */
 
-One of the jar files in the android/libs directory (google-api-translate-java-0.98-fork.jar) is licensed under the [GNU Lesser GPL](http://www.gnu.org/licenses/lgpl.html).
+One of the jar files in the android/libs directory is licensed under the [GNU Lesser GPL](http://www.gnu.org/licenses/lgpl.html).
