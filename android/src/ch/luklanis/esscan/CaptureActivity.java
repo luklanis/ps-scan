@@ -155,6 +155,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   // Options menu, for copy to clipboard
   private static final int OPTIONS_COPY_RECOGNIZED_TEXT_ID = Menu.FIRST;
 
+  private static final int OPTIONS_SHARE_RECOGNIZED_TEXT_ID = Menu.FIRST + 1;
+
   private CameraManager cameraManager;
   private CaptureActivityHandler handler;
   private ViewfinderView viewfinderView;
@@ -848,6 +850,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     super.onCreateContextMenu(menu, v, menuInfo);
     if (v.equals(ocrResultView)) {
       menu.add(Menu.NONE, OPTIONS_COPY_RECOGNIZED_TEXT_ID, Menu.NONE, "Copy recognized text");
+      menu.add(Menu.NONE, OPTIONS_SHARE_RECOGNIZED_TEXT_ID, Menu.NONE, "Share recognized text");
     } 
   }
 
@@ -867,6 +870,14 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     		toast.show();
     	}
       return true;
+    case OPTIONS_SHARE_RECOGNIZED_TEXT_ID:
+    	Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+    	sharingIntent.setType("text/plain");
+    	sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "ESR code");
+    	sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, ocrResultView.getText());
+    	
+    	startActivity(Intent.createChooser(sharingIntent, "Share via"));
+    	return true;
     default:
       return super.onContextItemSelected(item);
     }
