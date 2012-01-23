@@ -27,12 +27,13 @@ import ch.luklanis.esscan.HelpActivity;
 import ch.luklanis.esscan.OcrResult;
 import ch.luklanis.esscan.PreferencesActivity;
 import ch.luklanis.esscan.language.LanguageCodeHelper;
+import ch.luklanis.esscan.validation.EsrValidation;
+import ch.luklanis.esscan.validation.PsValidation;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ClipData;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -46,7 +47,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.content.ClipboardManager;
+//import android.content.ClipboardManager;
+import android.text.ClipboardManager;
 import android.text.SpannableStringBuilder;
 import android.text.style.CharacterStyle;
 import android.text.style.ForegroundColorSpan;
@@ -111,7 +113,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private static final boolean CONTINUOUS_DISPLAY_RECOGNIZED_TEXT = true;
   
   /** Flag to display recognition-related statistics on the scanning screen. */
-  private static final boolean CONTINUOUS_DISPLAY_METADATA = true;
+  private static final boolean CONTINUOUS_DISPLAY_METADATA = false;
   
   /** Flag to enable display of the on-screen shutter button. */
   private static final boolean DISPLAY_SHUTTER_BUTTON = true;
@@ -189,6 +191,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private boolean isEngineReady;
   private boolean isPaused;
   private static boolean isFirstLaunch; // True if this is the first time the app is being run
+  
+  private PsValidation psValidation;
 
   Handler getHandler() {
     return handler;
@@ -196,6 +200,10 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
   CameraManager getCameraManager() {
     return cameraManager;
+  }
+  
+  public PsValidation getValidation(){
+	  return psValidation;
   }
   
   @Override
@@ -225,6 +233,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     lastResult = null;
     hasSurface = false;
     beepManager = new BeepManager(this);
+    psValidation = new EsrValidation();
     
     // Camera shutter button
     if (DISPLAY_SHUTTER_BUTTON) {
@@ -328,6 +337,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   protected void onResume() {
     super.onResume();   
     resetStatusView();
+    psValidation.gotoBeginning();
     
     String previousSourceLanguageCodeOcr = sourceLanguageCodeOcr;
     int previousOcrEngineMode = ocrEngineMode;
@@ -750,14 +760,14 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     lastResult = ocrResult;
     
     // Send an OcrResultText object to the ViewfinderView for text rendering
-    viewfinderView.addResultText(new OcrResultText(ocrResult.getText(), 
-                                                   ocrResult.getWordConfidences(),
-                                                   ocrResult.getMeanConfidence(),
-                                                   ocrResult.getBitmapDimensions(),
-                                                   ocrResult.getCharacterBoundingBoxes(),
-                                                   ocrResult.getWordBoundingBoxes(),
-                                                   ocrResult.getTextlineBoundingBoxes(),
-                                                   ocrResult.getRegionBoundingBoxes()));
+//    viewfinderView.addResultText(new OcrResultText(ocrResult.getText(), 
+//                                                   ocrResult.getWordConfidences(),
+//                                                   ocrResult.getMeanConfidence(),
+//                                                   ocrResult.getBitmapDimensions(),
+//                                                   ocrResult.getCharacterBoundingBoxes(),
+//                                                   ocrResult.getWordBoundingBoxes(),
+//                                                   ocrResult.getTextlineBoundingBoxes(),
+//                                                   ocrResult.getRegionBoundingBoxes()));
 
     Integer meanConfidence = ocrResult.getMeanConfidence();
     
@@ -788,10 +798,10 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
    */
   void handleOcrContinuousDecode(OcrResultFailure obj) {
     lastResult = null;
-    viewfinderView.removeResultText();
+    // viewfinderView.removeResultText();
     
     // Reset the text in the recognized text box.
-    statusViewTop.setText("");
+    // statusViewTop.setText("");
 
     if (CONTINUOUS_DISPLAY_METADATA) {
       // Color text delimited by '-' as red.
@@ -843,16 +853,19 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
   @Override
   public boolean onContextItemSelected(MenuItem item) {
-    ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
     switch (item.getItemId()) {
 
     case OPTIONS_COPY_RECOGNIZED_TEXT_ID:
-        clipboardManager.setPrimaryClip(ClipData.newPlainText("ocrResult", ocrResultView.getText()));
-      if (clipboardManager.hasText()) {
-        Toast toast = Toast.makeText(this, "Text copied.", Toast.LENGTH_LONG);
-        toast.setGravity(Gravity.BOTTOM, 0, 0);
-        toast.show();
-      }
+    	ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        
+//        clipboardManager.setPrimaryClip(ClipData.newPlainText("ocrResult", ocrResultView.getText()));
+//      if (clipboardManager.hasPrimaryClip()) {
+    	clipboardManager.setText(ocrResultView.getText());
+    	if(clipboardManager.hasText()){
+    		Toast toast = Toast.makeText(this, "Text copied.", Toast.LENGTH_LONG);
+    		toast.setGravity(Gravity.BOTTOM, 0, 0);
+    		toast.show();
+    	}
       return true;
     default:
       return super.onContextItemSelected(item);

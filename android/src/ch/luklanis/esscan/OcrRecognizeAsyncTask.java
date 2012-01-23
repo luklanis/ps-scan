@@ -17,6 +17,9 @@ package ch.luklanis.esscan;
 
 import java.util.List;
 
+import ch.luklanis.esscan.validation.EsrValidation;
+import ch.luklanis.esscan.validation.PsValidation;
+
 import com.googlecode.eyesfree.textdetect.Thresholder;
 import com.googlecode.leptonica.android.Binarize;
 import com.googlecode.leptonica.android.Pix;
@@ -52,7 +55,6 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
   private Bitmap bitmap;
   private OcrResult ocrResult;
   private OcrResultFailure ocrResultFailure;
-  private boolean isContinuous;
   private ProgressDialog indeterminateDialog;
   private long start;
   private long end;
@@ -64,7 +66,6 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
     this.baseApi = baseApi;
     this.indeterminateDialog = indeterminateDialog;
     this.bitmap = bitmap;
-    isContinuous = false;
   }
 
   // Constructor for continuous recognition mode
@@ -72,7 +73,6 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
     this.activity = activity;
     this.baseApi = baseApi;
     this.bitmap = bitmap;
-    isContinuous = true;
   }
   
   @Override
@@ -140,6 +140,13 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
 //    if (PERFORM_PSEUDOTRANSLATION) {
 //      textResult = PseudoTranslator.translate(textResult);
 //    }
+    
+    if(!activity.getValidation().validate(textResult)){
+    	return false;
+    }
+    
+	textResult = activity.getValidation().getCompleteCode();
+	activity.getValidation().nextStep();
       
     ocrResult = new OcrResult(bitmap, textResult, wordConfidences, overallConf, characterBoxes, 
         textlineBoxes, wordBoxes, regionBoxes, (end - start));
@@ -151,7 +158,7 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
     super.onPostExecute(result);
 
     Handler handler = activity.getHandler();
-    if (!isContinuous && handler != null) {
+    if (activity.getValidation().finished() && handler != null) {
       // Send results for single-shot mode recognition.
       if (result) {
         Message message = Message.obtain(handler, R.id.ocr_decode_succeeded, ocrResult);
@@ -161,7 +168,10 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
         Message message = Message.obtain(handler, R.id.ocr_decode_failed, ocrResult);
         message.sendToTarget();
       }
-      indeterminateDialog.dismiss();
+      
+      if(indeterminateDialog != null){
+    	  indeterminateDialog.dismiss();
+      }
     } else  if (handler != null) {
       // Send results for continuous mode recognition.
       if (result) {
