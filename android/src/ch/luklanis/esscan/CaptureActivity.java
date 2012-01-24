@@ -762,14 +762,14 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     lastResult = ocrResult;
     
     // Send an OcrResultText object to the ViewfinderView for text rendering
-//    viewfinderView.addResultText(new OcrResultText(ocrResult.getText(), 
-//                                                   ocrResult.getWordConfidences(),
-//                                                   ocrResult.getMeanConfidence(),
-//                                                   ocrResult.getBitmapDimensions(),
-//                                                   ocrResult.getCharacterBoundingBoxes(),
-//                                                   ocrResult.getWordBoundingBoxes(),
-//                                                   ocrResult.getTextlineBoundingBoxes(),
-//                                                   ocrResult.getRegionBoundingBoxes()));
+    viewfinderView.addResultText(new OcrResultText(ocrResult.getText(), 
+                                                   ocrResult.getWordConfidences(),
+                                                   ocrResult.getMeanConfidence(),
+                                                   ocrResult.getBitmapDimensions(),
+                                                   ocrResult.getCharacterBoundingBoxes(),
+                                                   ocrResult.getWordBoundingBoxes(),
+                                                   ocrResult.getTextlineBoundingBoxes(),
+                                                   ocrResult.getRegionBoundingBoxes()));
 
     Integer meanConfidence = ocrResult.getMeanConfidence();
     

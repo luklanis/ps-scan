@@ -19,9 +19,9 @@
 	<!-- GENERAL SETTINGS -->
 	<PreferenceCategory android:title="General settings">
 
-		<CheckBoxPreference android:key="preference_capture_continuous"
+		<!-- <CheckBoxPreference android:key="preference_capture_continuous"
 			android:title="Continuous preview"
-			android:entries="@array/capturemodes" />
+			android:entries="@array/capturemodes" /> -->
 
 		<ListPreference android:title="Recognize"
 			android:key="sourceLanguageCodeOcrPref"

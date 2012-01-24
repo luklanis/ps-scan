@@ -125,18 +125,12 @@ public class EsrValidation extends PsValidation {
 
 	@Override
 	public String getRelatedText() {
-		String text = "";
-		
-		return getRelatedText(text);
+		return relatedText;
 	}
 
 	@Override
-	public String getRelatedText(String text) {
-		if(text == null && relatedText != null){
-			return relatedText;
-		}
-		
-		if(text == null){
+	public String getRelatedText(String text) {		
+		if(text == null || text == ""){
 			return null;
 		}
 		
@@ -145,10 +139,10 @@ public class EsrValidation extends PsValidation {
 		int indexOfCurrentControlChar = relatedText.indexOf(String.valueOf(CONTROL_CHARS_IN_STEP[currentStep]));
 		
 		if(indexOfCurrentControlChar != -1 && indexOfCurrentControlChar != (relatedText.length() - 1)){
-			relatedText = relatedText.substring(0, indexOfCurrentControlChar);
+			relatedText = relatedText.substring(0, indexOfCurrentControlChar + 1);
 		}
 		
-		if(currentStep > 1){
+		if(currentStep > 0){
 			int indexOfControlCharBefore = text.indexOf(String.valueOf(CONTROL_CHARS_IN_STEP[currentStep-1]));
 			
 			if(indexOfControlCharBefore != -1 && indexOfControlCharBefore < (relatedText.length() - 1)){

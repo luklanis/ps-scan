@@ -136,17 +136,22 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
     List<Rect> characterBoxes = baseApi.getCharacters().getBoxRects();
     List<Rect> textlineBoxes = baseApi.getTextlines().getBoxRects();
     List<Rect> regionBoxes = baseApi.getRegions().getBoxRects();
-
-//    if (PERFORM_PSEUDOTRANSLATION) {
-//      textResult = PseudoTranslator.translate(textResult);
-//    }
     
-    if(!activity.getValidation().validate(textResult)){
-    	return false;
+    PsValidation validation = activity.getValidation();
+    
+    String relatedText = "";
+    
+    while(validation.validate(textResult)){
+    	if(!validation.nextStep()){
+    		break;
+    	}
     }
     
-	textResult = activity.getValidation().getCompleteCode();
-	activity.getValidation().nextStep();
+    if(!validation.finished()){
+    	relatedText = validation.getRelatedText();
+    }
+    
+	textResult = validation.getCompleteCode() + relatedText;
       
     ocrResult = new OcrResult(bitmap, textResult, wordConfidences, overallConf, characterBoxes, 
         textlineBoxes, wordBoxes, regionBoxes, (end - start));
