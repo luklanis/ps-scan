@@ -136,18 +136,18 @@ public class EsrValidation extends PsValidation {
 		
 		relatedText = text.replaceAll("\\s", "");
 		
-		int indexOfCurrentControlChar = relatedText.indexOf(String.valueOf(CONTROL_CHARS_IN_STEP[currentStep]));
-		
-		if(indexOfCurrentControlChar != -1 && indexOfCurrentControlChar != (relatedText.length() - 1)){
-			relatedText = relatedText.substring(0, indexOfCurrentControlChar + 1);
-		}
-		
 		if(currentStep > 0){
 			int indexOfControlCharBefore = text.indexOf(String.valueOf(CONTROL_CHARS_IN_STEP[currentStep-1]));
 			
 			if(indexOfControlCharBefore != -1 && indexOfControlCharBefore < (relatedText.length() - 1)){
 				relatedText = relatedText.substring(indexOfControlCharBefore + 1);
 			}
+		}
+		
+		int indexOfCurrentControlChar = relatedText.indexOf(String.valueOf(CONTROL_CHARS_IN_STEP[currentStep]));
+		
+		if(indexOfCurrentControlChar != -1 && indexOfCurrentControlChar != (relatedText.length() - 1)){
+			relatedText = relatedText.substring(0, indexOfCurrentControlChar + 1);
 		}
 		
 		return relatedText;
