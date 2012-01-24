@@ -79,7 +79,7 @@ final class CaptureActivityHandler extends Handler {
       // Display a "be patient" message while first recognition request is running
       activity.setStatusViewForContinuous();
       
-      //cameraManager.requestAutoFocus(this, R.id.auto_focus);
+      cameraManager.requestAutoFocus(this, R.id.auto_focus);
       restartOcrPreviewAndDecode();
     } else {
       state = State.SUCCESS;
@@ -311,7 +311,7 @@ final class CaptureActivityHandler extends Handler {
         //Log.d(TAG, "focusing now, so Requesting a new delayed autofocus");
         requestDelayedAutofocus(CaptureActivity.AUTOFOCUS_FAILURE_INTERVAL_MS, message);
       } else if (state == State.CONTINUOUS_FOCUSING && message == R.id.auto_focus) {
-        //requestDelayedAutofocus(CaptureActivity.AUTOFOCUS_FAILURE_INTERVAL_MS, message);
+        requestDelayedAutofocus(CaptureActivity.AUTOFOCUS_FAILURE_INTERVAL_MS, message);
       } else if (message == R.id.auto_focus) {
         isAutofocusLoopStarted = false;
       }
