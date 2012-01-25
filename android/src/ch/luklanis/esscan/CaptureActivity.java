@@ -50,6 +50,7 @@ import android.preference.PreferenceManager;
 //import android.content.ClipboardManager;
 import android.text.ClipboardManager;
 import android.text.SpannableStringBuilder;
+import android.text.method.ScrollingMovementMethod;
 import android.text.style.CharacterStyle;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
@@ -168,7 +169,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private TextView translationView;
   private View cameraButtonView;
   private View resultView;
-  private View progressView;
   private OcrResult lastResult;
   private Bitmap lastBitmap;
   private boolean hasSurface;
@@ -246,8 +246,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
    
     ocrResultView = (TextView) findViewById(R.id.ocr_result_text_view);
     registerForContextMenu(ocrResultView);
-    
-    progressView = (View) findViewById(R.id.indeterminate_progress_indicator_view);
 
     cameraManager = new CameraManager(getApplication());
     viewfinderView.setCameraManager(cameraManager);
@@ -751,15 +749,13 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     }
 
     // Display the recognized text
-//    TextView sourceLanguageTextView = (TextView) findViewById(R.id.source_language_text_view);
-//    sourceLanguageTextView.setText(sourceLanguageReadable);
     TextView ocrResultTextView = (TextView) findViewById(R.id.ocr_result_text_view);
     ocrResultTextView.setText(ocrResult.getText());
+    
     // Crudely scale betweeen 22 and 32 -- bigger font for shorter text
-    int scaledSize = Math.max(22, 32 - ocrResult.getText().length() / 4);
+    int scaledSize = Math.max(14, 32 - ocrResult.getText().length() / 4);
     ocrResultTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledSize);
 
-	progressView.setVisibility(View.GONE);
 	setProgressBarVisibility(false);
       
     return true;
