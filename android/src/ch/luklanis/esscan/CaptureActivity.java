@@ -26,6 +26,7 @@ import ch.luklanis.esscan.camera.ShutterButton;
 import ch.luklanis.esscan.HelpActivity;
 import ch.luklanis.esscan.OcrResult;
 import ch.luklanis.esscan.PreferencesActivity;
+import ch.luklanis.esscan.history.HistoryActivity;
 import ch.luklanis.esscan.language.LanguageCodeHelper;
 import ch.luklanis.esscan.validation.EsrValidation;
 import ch.luklanis.esscan.validation.PsValidation;
@@ -151,12 +152,15 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   
   // Context menu
   private static final int SETTINGS_ID = Menu.FIRST;
-  private static final int ABOUT_ID = Menu.FIRST + 1;
+  private static final int HISTORY_ID = Menu.FIRST + 1;
+  private static final int ABOUT_ID = Menu.FIRST + 2;
   
   // Options menu, for copy to clipboard
   private static final int OPTIONS_COPY_RECOGNIZED_TEXT_ID = Menu.FIRST;
 
   private static final int OPTIONS_SHARE_RECOGNIZED_TEXT_ID = Menu.FIRST + 1;
+  
+  public static final int HISTORY_REQUEST_CODE = 0x0000bacc;
 
   private CameraManager cameraManager;
   private CaptureActivityHandler handler;
@@ -542,27 +546,35 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     //    inflater.inflate(R.menu.options_menu, menu);
     super.onCreateOptionsMenu(menu);
     menu.add(0, SETTINGS_ID, 0, "Settings").setIcon(android.R.drawable.ic_menu_preferences);
+    menu.add(0, HISTORY_ID, 0, "History").setIcon(android.R.drawable.ic_menu_recent_history);
     menu.add(0, ABOUT_ID, 0, "About").setIcon(android.R.drawable.ic_menu_info_details);
     return true;
   }
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
-    Intent intent;
-    switch (item.getItemId()) {
-    case SETTINGS_ID: {
-      intent = new Intent().setClass(this, PreferencesActivity.class);
-      startActivity(intent);
-      break;
-    }
-    case ABOUT_ID: {
-      intent = new Intent(this, HelpActivity.class);
-      intent.putExtra(HelpActivity.REQUESTED_PAGE_KEY, HelpActivity.ABOUT_PAGE);
-      startActivity(intent);
-      break;
-    }
-    }
-    return super.onOptionsItemSelected(item);
+	  Intent intent;
+	  switch (item.getItemId()) {
+	  case SETTINGS_ID: {
+		  intent = new Intent().setClass(this, PreferencesActivity.class);
+		  startActivity(intent);
+		  break;
+	  }
+	  case HISTORY_ID: {
+	        intent = new Intent(Intent.ACTION_VIEW);
+	        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+	        intent.setClassName(this, HistoryActivity.class.getName());
+	        startActivityForResult(intent, HISTORY_REQUEST_CODE);
+		  break;
+	  }
+	  case ABOUT_ID: {
+		  intent = new Intent(this, HelpActivity.class);
+		  intent.putExtra(HelpActivity.REQUESTED_PAGE_KEY, HelpActivity.ABOUT_PAGE);
+		  startActivity(intent);
+		  break;
+	  }
+	  }
+	  return super.onOptionsItemSelected(item);
   }
 
   public void surfaceDestroyed(SurfaceHolder holder) {

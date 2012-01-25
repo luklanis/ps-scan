@@ -139,7 +139,7 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
     
     PsValidation validation = activity.getValidation();
     
-    String relatedText = "";
+//    String relatedText = "";
     
     while(validation.validate(textResult)){
     	if(!validation.nextStep()){
@@ -147,11 +147,12 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
     	}
     }
     
-    if(!validation.finished()){
-    	relatedText = validation.getRelatedText();
-    }
-    
-	textResult = validation.getCompleteCode() + relatedText;
+//    if(!validation.finished()){
+//    	relatedText = validation.getRelatedText();
+//    }
+//    
+//	textResult = validation.getCompleteCode() + relatedText;
+    textResult = validation.getCompleteCode();
       
     ocrResult = new OcrResult(bitmap, textResult, wordConfidences, overallConf, characterBoxes, 
         textlineBoxes, wordBoxes, regionBoxes, (end - start));
