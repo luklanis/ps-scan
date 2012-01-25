@@ -50,6 +50,7 @@ import android.preference.PreferenceManager;
 //import android.content.ClipboardManager;
 import android.text.ClipboardManager;
 import android.text.SpannableStringBuilder;
+import android.text.method.ScrollingMovementMethod;
 import android.text.style.CharacterStyle;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
@@ -116,7 +117,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private static final boolean CONTINUOUS_DISPLAY_METADATA = false;
   
   /** Flag to enable display of the on-screen shutter button. */
-  private static final boolean DISPLAY_SHUTTER_BUTTON = true;
+  private static final boolean DISPLAY_SHUTTER_BUTTON = false;
   
   /** Languages for which Cube data is available. */
   static final String[] CUBE_SUPPORTED_LANGUAGES = { 
@@ -168,7 +169,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private TextView translationView;
   private View cameraButtonView;
   private View resultView;
-  private View progressView;
   private OcrResult lastResult;
   private Bitmap lastBitmap;
   private boolean hasSurface;
@@ -184,6 +184,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private String characterBlacklist;
   private String characterWhitelist;
   private ShutterButton shutterButton;
+//private ToggleButton torchButton;
 
   private boolean isContinuousModeActive; // Whether we are doing OCR in continuous mode
   private SharedPreferences prefs;
@@ -245,8 +246,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
    
     ocrResultView = (TextView) findViewById(R.id.ocr_result_text_view);
     registerForContextMenu(ocrResultView);
-    
-    progressView = (View) findViewById(R.id.indeterminate_progress_indicator_view);
 
     cameraManager = new CameraManager(getApplication());
     viewfinderView.setCameraManager(cameraManager);
@@ -502,6 +501,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       // First check if we're paused in continuous mode, and if so, just unpause.
       if (isPaused) {
         Log.d(TAG, "only resuming continuous recognition, not quitting...");
+        psValidation.gotoBeginning();
         resumeContinuousDecoding();
         return true;
       }
@@ -720,8 +720,19 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       return false;
     }
     
+    if(psValidation.finished())
+    {
+    	if(handler != null)
+    	{
+    		handler.stop();
+    	    isPaused = true;
+    	}
+    }
+    
     // Turn off capture-related UI elements
-    shutterButton.setVisibility(View.GONE);
+    if(DISPLAY_SHUTTER_BUTTON){
+    	shutterButton.setVisibility(View.GONE);
+    }
     statusViewBottom.setVisibility(View.GONE);
     statusViewTop.setVisibility(View.GONE);
     cameraButtonView.setVisibility(View.GONE);
@@ -738,15 +749,13 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     }
 
     // Display the recognized text
-    TextView sourceLanguageTextView = (TextView) findViewById(R.id.source_language_text_view);
-    sourceLanguageTextView.setText(sourceLanguageReadable);
     TextView ocrResultTextView = (TextView) findViewById(R.id.ocr_result_text_view);
     ocrResultTextView.setText(ocrResult.getText());
+    
     // Crudely scale betweeen 22 and 32 -- bigger font for shorter text
-    int scaledSize = Math.max(22, 32 - ocrResult.getText().length() / 4);
+    int scaledSize = Math.max(14, 32 - ocrResult.getText().length() / 4);
     ocrResultTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledSize);
 
-	progressView.setVisibility(View.GONE);
 	setProgressBarVisibility(false);
       
     return true;
@@ -762,14 +771,14 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     lastResult = ocrResult;
     
     // Send an OcrResultText object to the ViewfinderView for text rendering
-//    viewfinderView.addResultText(new OcrResultText(ocrResult.getText(), 
-//                                                   ocrResult.getWordConfidences(),
-//                                                   ocrResult.getMeanConfidence(),
-//                                                   ocrResult.getBitmapDimensions(),
-//                                                   ocrResult.getCharacterBoundingBoxes(),
-//                                                   ocrResult.getWordBoundingBoxes(),
-//                                                   ocrResult.getTextlineBoundingBoxes(),
-//                                                   ocrResult.getRegionBoundingBoxes()));
+    viewfinderView.addResultText(new OcrResultText(ocrResult.getText(), 
+                                                   ocrResult.getWordConfidences(),
+                                                   ocrResult.getMeanConfidence(),
+                                                   ocrResult.getBitmapDimensions(),
+                                                   ocrResult.getCharacterBoundingBoxes(),
+                                                   ocrResult.getWordBoundingBoxes(),
+                                                   ocrResult.getTextlineBoundingBoxes(),
+                                                   ocrResult.getRegionBoundingBoxes()));
 
     Integer meanConfidence = ocrResult.getMeanConfidence();
     
@@ -941,7 +950,10 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
    * @param clickable True if the button should accept a click
    */
   void setShutterButtonClickable(boolean clickable) {
-    shutterButton.setClickable(clickable);
+	  if(DISPLAY_SHUTTER_BUTTON)
+	  {
+		  shutterButton.setClickable(clickable);
+	  }
   }
 
   /** Request the viewfinder to be invalidated. */

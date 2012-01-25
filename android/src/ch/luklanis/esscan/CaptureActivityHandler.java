@@ -79,7 +79,7 @@ final class CaptureActivityHandler extends Handler {
       // Display a "be patient" message while first recognition request is running
       activity.setStatusViewForContinuous();
       
-      //cameraManager.requestAutoFocus(this, R.id.auto_focus);
+      cameraManager.requestAutoFocus(this, R.id.auto_focus);
       restartOcrPreviewAndDecode();
     } else {
       state = State.SUCCESS;
@@ -137,7 +137,7 @@ final class CaptureActivityHandler extends Handler {
         restartOcrPreview();
         break;
       case R.id.ocr_continuous_decode_failed:
-        DecodeHandler.resetDecodeState();        
+        DecodeHandler.resetDecodeState();
         try {
           activity.handleOcrContinuousDecode((OcrResultFailure) message.obj);
         } catch (NullPointerException e) {
@@ -166,6 +166,7 @@ final class CaptureActivityHandler extends Handler {
         state = State.SUCCESS;
         activity.setShutterButtonClickable(true);
         activity.handleOcrDecode((OcrResult) message.obj);
+        DecodeHandler.resetDecodeState();
         break;
       case R.id.ocr_decode_failed:
         state = State.PREVIEW;
@@ -296,8 +297,7 @@ final class CaptureActivityHandler extends Handler {
    * @param message The message to deliver
    */
   private void requestAutofocus(int message) {
-//    if (state == State.PREVIEW || state == State.CONTINUOUS){
-    if (state == State.PREVIEW){
+    if (state == State.PREVIEW || state == State.CONTINUOUS){
       if (state == State.PREVIEW) {
         state = State.PREVIEW_FOCUSING;
       } else if (state == State.CONTINUOUS){
@@ -311,7 +311,7 @@ final class CaptureActivityHandler extends Handler {
         //Log.d(TAG, "focusing now, so Requesting a new delayed autofocus");
         requestDelayedAutofocus(CaptureActivity.AUTOFOCUS_FAILURE_INTERVAL_MS, message);
       } else if (state == State.CONTINUOUS_FOCUSING && message == R.id.auto_focus) {
-        //requestDelayedAutofocus(CaptureActivity.AUTOFOCUS_FAILURE_INTERVAL_MS, message);
+        requestDelayedAutofocus(CaptureActivity.AUTOFOCUS_FAILURE_INTERVAL_MS, message);
       } else if (message == R.id.auto_focus) {
         isAutofocusLoopStarted = false;
       }

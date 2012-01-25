@@ -125,35 +125,29 @@ public class EsrValidation extends PsValidation {
 
 	@Override
 	public String getRelatedText() {
-		String text = "";
-		
-		return getRelatedText(text);
+		return relatedText;
 	}
 
 	@Override
-	public String getRelatedText(String text) {
-		if(text == null && relatedText != null){
-			return relatedText;
-		}
-		
-		if(text == null){
+	public String getRelatedText(String text) {		
+		if(text == null || text == ""){
 			return null;
 		}
 		
 		relatedText = text.replaceAll("\\s", "");
 		
-		int indexOfCurrentControlChar = relatedText.indexOf(String.valueOf(CONTROL_CHARS_IN_STEP[currentStep]));
-		
-		if(indexOfCurrentControlChar != -1 && indexOfCurrentControlChar != (relatedText.length() - 1)){
-			relatedText = relatedText.substring(0, indexOfCurrentControlChar);
-		}
-		
-		if(currentStep > 1){
+		if(currentStep > 0){
 			int indexOfControlCharBefore = text.indexOf(String.valueOf(CONTROL_CHARS_IN_STEP[currentStep-1]));
 			
 			if(indexOfControlCharBefore != -1 && indexOfControlCharBefore < (relatedText.length() - 1)){
 				relatedText = relatedText.substring(indexOfControlCharBefore + 1);
 			}
+		}
+		
+		int indexOfCurrentControlChar = relatedText.indexOf(String.valueOf(CONTROL_CHARS_IN_STEP[currentStep]));
+		
+		if(indexOfCurrentControlChar != -1 && indexOfCurrentControlChar != (relatedText.length() - 1)){
+			relatedText = relatedText.substring(0, indexOfCurrentControlChar + 1);
 		}
 		
 		return relatedText;
@@ -170,5 +164,16 @@ public class EsrValidation extends PsValidation {
 		}
 		
 		return result;
+	}
+
+	@Override
+	public void resetCompleteCode() {
+		if(completeCode == null){
+			return;
+		}
+		
+		for(int i = 0; i < completeCode.length; i++){
+			completeCode[i] = null;
+		}
 	}
 }

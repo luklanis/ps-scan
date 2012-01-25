@@ -696,7 +696,7 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
     if (result) {
       // Restart recognition
       activity.resumeOCR();
-      activity.showLanguageName();
+      // activity.showLanguageName();
     } else {
       activity.showErrorMessage("Error", "Network is unreachable - cannot download language data. "
           + "Please enable network access and restart this app.");
