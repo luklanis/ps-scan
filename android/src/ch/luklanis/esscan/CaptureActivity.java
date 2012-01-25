@@ -184,6 +184,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private String characterBlacklist;
   private String characterWhitelist;
   private ShutterButton shutterButton;
+//private ToggleButton torchButton;
 
   private boolean isContinuousModeActive; // Whether we are doing OCR in continuous mode
   private SharedPreferences prefs;

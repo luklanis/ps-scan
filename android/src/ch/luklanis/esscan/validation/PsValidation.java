@@ -51,6 +51,7 @@ public abstract class PsValidation {
 		currentStep = 0;
 		finished = false;
 		relatedText = null;
+		resetCompleteCode();
 	}
 	
 	public boolean finished(){
@@ -79,5 +80,7 @@ public abstract class PsValidation {
 	
 	public abstract String getRelatedText(String text);
 	
-	public abstract String getCompleteCode();	
+	public abstract String getCompleteCode();
+	
+	public abstract void resetCompleteCode();	
 }

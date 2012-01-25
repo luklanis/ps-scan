@@ -165,4 +165,15 @@ public class EsrValidation extends PsValidation {
 		
 		return result;
 	}
+
+	@Override
+	public void resetCompleteCode() {
+		if(completeCode == null){
+			return;
+		}
+		
+		for(int i = 0; i < completeCode.length; i++){
+			completeCode[i] = null;
+		}
+	}
 }
