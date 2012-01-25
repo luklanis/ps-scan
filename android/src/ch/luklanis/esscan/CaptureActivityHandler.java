@@ -296,8 +296,7 @@ final class CaptureActivityHandler extends Handler {
    * @param message The message to deliver
    */
   private void requestAutofocus(int message) {
-//    if (state == State.PREVIEW || state == State.CONTINUOUS){
-    if (state == State.PREVIEW){
+    if (state == State.PREVIEW || state == State.CONTINUOUS){
       if (state == State.PREVIEW) {
         state = State.PREVIEW_FOCUSING;
       } else if (state == State.CONTINUOUS){
