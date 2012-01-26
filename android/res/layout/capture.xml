@@ -2,6 +2,7 @@
 <!--
  Copyright (C) 2008 ZXing authors
  Copyright 2011 Robert Theis
+ Copyright 2012 Lukas Landis
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -51,8 +52,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:orientation="vertical"
-                android:padding="12dip" >
+                android:orientation="vertical" >
 
                 <ImageView
                     android:id="@+id/image_view"
@@ -87,12 +87,11 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="4dip" >
+                    android:orientation="horizontal" >
 
                     <TextView
                         android:id="@+id/esr_result_currency"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/result_text"
                         android:textColorLink="@color/result_text"
@@ -100,7 +99,7 @@
 
                     <TextView
                         android:id="@+id/esr_result_amount"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/result_text"
                         android:textColorLink="@color/result_text"
@@ -108,7 +107,7 @@
                 </LinearLayout>
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/esr_result_reference_number"
                     android:textColor="@color/result_text"
@@ -117,7 +116,7 @@
 
                 <TextView
                     android:id="@+id/esr_result_reference_number"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/result_text"
                     android:textColorLink="@color/result_text"

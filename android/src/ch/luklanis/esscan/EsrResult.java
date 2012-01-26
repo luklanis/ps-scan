@@ -81,7 +81,7 @@ public final class EsrResult {
 	  
 	  int beforePoint = Integer.parseInt(text.substring(2, 10));
 	  
-	  return String.valueOf(beforePoint) + "." + text.substring(9, 11);
+	  return String.valueOf(beforePoint) + "." + text.substring(10, 12);
   }
   
   public String getCurrency(){
