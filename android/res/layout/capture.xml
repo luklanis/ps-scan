@@ -50,13 +50,10 @@
 
             <ImageView
                 android:id="@+id/image_view"
-                android:layout_width="320dip"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="4dip"
-                android:adjustViewBounds="true"
-                android:maxHeight="80dip"
-                android:maxWidth="320dip"
-                android:scaleType="centerInside" />
+                android:adjustViewBounds="true"/>
 
             <TextView
                 android:id="@+id/ocr_result_text_view"
@@ -112,22 +109,6 @@
             android:text=""
             android:textColor="@color/status_text"
             android:textSize="14sp" />
-
-        <!--
-          <ToggleButton android:id="@+id/torch_button"
-		      android:layout_width="wrap_content" 
-		      android:layout_height="wrap_content"
-		      android:background="@drawable/torch_button"
-		      android:clickable="true" 
-		      android:focusable="true"
-		      android:textOff=""
-		      android:textOn=""
-		      android:layout_alignParentRight="true" 
-		      android:layout_alignParentBottom="true"
-		      android:layout_marginRight="8dip" 
-		      android:layout_marginBottom="8dip"
-		      android:scaleType="center" />
-        -->
 
     </RelativeLayout>
 

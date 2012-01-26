@@ -28,10 +28,5 @@ public final class HistoryItem {
 
   public EsrResult getResult() {
     return result;
-  }
-
-  public String getDisplayAndDetails() {
-    return result.getText();
-  }
-  
+  }  
 }

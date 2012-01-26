@@ -15,31 +15,43 @@
  */
 package ch.luklanis.esscan;
 
-import java.util.List;
-
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Paint.Style;
-import android.graphics.Point;
-import android.graphics.Rect;
-
 /**
  * Encapsulates the result of OCR.
  */
 public final class EsrResult {
   private final String text;
+  private final String address;
   
   private final long timestamp;
+  
+  private long paid;
   
   public EsrResult(String text) {
     this.text = text;
     this.timestamp = System.currentTimeMillis();
+    this.address = null;
+    this.paid = 0;
   }
   
   public EsrResult(String text, long timestamp) {
     this.text = text;
     this.timestamp = timestamp;
+    this.address = null;
+    this.paid = 0;
+  }
+  
+  public EsrResult(String text, long timestamp, String address) {
+    this.text = text;
+    this.timestamp = timestamp;
+    this.address = address;
+    this.paid = 0;
+  }
+  
+  public EsrResult(String text, long timestamp, String address, long paid) {
+    this.text = text;
+    this.timestamp = timestamp;
+    this.address = address;
+    this.paid = paid;
   }
   
   public String getText() {
@@ -48,6 +60,18 @@ public final class EsrResult {
   
   public long getTimestamp() {
     return timestamp;
+  }
+  
+  public String getAddress() {
+    return address;
+  }
+  
+  public long getPaid() {
+    return paid;
+  }
+  
+  public void setPaidNow() {
+	  paid = System.currentTimeMillis();
   }
   
   @Override

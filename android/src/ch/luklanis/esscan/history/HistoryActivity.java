@@ -62,7 +62,7 @@ public final class HistoryActivity extends ListActivity {
       adapter.add(item);
     }
     if (adapter.isEmpty()) {
-      adapter.add(new HistoryItem(null, null, null));
+      adapter.add(new HistoryItem(null));
     }
   }
 
@@ -145,5 +145,4 @@ public final class HistoryActivity extends ListActivity {
     }
     return true;
   }
-
 }

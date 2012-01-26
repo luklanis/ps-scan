@@ -30,10 +30,9 @@ final class DBHelper extends SQLiteOpenHelper {
   static final String TABLE_NAME = "history";
   static final String ID_COL = "id";
   static final String TEXT_COL = "text";
-  static final String FORMAT_COL = "format";
-  static final String DISPLAY_COL = "display";
   static final String TIMESTAMP_COL = "timestamp";
-  static final String DETAILS_COL = "details";
+  static final String ADDRESS_COL = "address";
+  static final String PAID_COL = "buyed";
 
   DBHelper(Context context) {
     super(context, DB_NAME, null, DB_VERSION);
@@ -45,10 +44,9 @@ final class DBHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + TABLE_NAME + " (" +
             ID_COL + " INTEGER PRIMARY KEY, " +
             TEXT_COL + " TEXT, " +
-            FORMAT_COL + " TEXT, " +
-            DISPLAY_COL + " TEXT, " +
             TIMESTAMP_COL + " INTEGER, " +
-            DETAILS_COL + " TEXT);");
+            ADDRESS_COL + " TEXT, " +
+            PAID_COL + " INTEGER);");
   }
 
   @Override

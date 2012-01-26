@@ -15,11 +15,7 @@
  */
 package ch.luklanis.esscan.validation;
 
-import java.util.Currency;
-
 import android.util.Log;
-
-import com.googlecode.leptonica.android.Convert;
 
 public class EsrValidation extends PsValidation {
 	private static final String TAG = "ESR Validation";

@@ -17,14 +17,8 @@ package ch.luklanis.esscan;
 
 import java.util.List;
 
-import ch.luklanis.esscan.validation.EsrValidation;
 import ch.luklanis.esscan.validation.PsValidation;
 
-import com.googlecode.eyesfree.textdetect.Thresholder;
-import com.googlecode.leptonica.android.Binarize;
-import com.googlecode.leptonica.android.Pix;
-import com.googlecode.leptonica.android.ReadFile;
-import com.googlecode.leptonica.android.WriteFile;
 import com.googlecode.tesseract.android.TessBaseAPI;
 
 //import ch.luklanis.esscan.language.PseudoTranslator;
@@ -167,13 +161,9 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
     if (activity.getValidation().finished() && handler != null) {
       // Send results for single-shot mode recognition.
       if (result) {
-        Message message = Message.obtain(handler, R.id.ocr_decode_succeeded, ocrResult);
+        Message message = Message.obtain(handler, R.id.esr_decode_succeeded, new EsrResult(ocrResult.getText()));
         message.sendToTarget();
-      } else {
-        bitmap.recycle();
-        Message message = Message.obtain(handler, R.id.ocr_decode_failed, ocrResult);
-        message.sendToTarget();
-      }
+      } 
       
       if(indeterminateDialog != null){
     	  indeterminateDialog.dismiss();

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2009 ZXing authors
+ * Copyright (C) 2012 Lukas Landis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,17 +18,14 @@
 package ch.luklanis.esscan.history;
 
 import ch.luklanis.esscan.EsrResult;
-import ch.luklanis.esscan.PreferencesActivity;
 
 import android.app.Activity;
 import android.content.ContentValues;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.io.File;
@@ -53,16 +51,16 @@ public final class HistoryManager {
 
   private static final String[] COLUMNS = {
       DBHelper.TEXT_COL,
-      DBHelper.DISPLAY_COL,
-      DBHelper.FORMAT_COL,
       DBHelper.TIMESTAMP_COL,
-      DBHelper.DETAILS_COL,
+      DBHelper.ADDRESS_COL,
+      DBHelper.PAID_COL
   };
 
   private static final String[] COUNT_COLUMN = { "COUNT(1)" };
 
   private static final String[] ID_COL_PROJECTION = { DBHelper.ID_COL };
-  private static final String[] ID_DETAIL_COL_PROJECTION = { DBHelper.ID_COL, DBHelper.DETAILS_COL };
+  private static final String[] ID_ADDRESS_COL_PROJECTION = { DBHelper.ID_COL, DBHelper.ADDRESS_COL };
+  private static final String[] ID_PAID_COL_PROJECTION = { DBHelper.ID_COL, DBHelper.PAID_COL };
   private static final DateFormat EXPORT_DATE_TIME_FORMAT = DateFormat.getDateTimeInstance();
 
   private final Activity activity;
@@ -94,12 +92,12 @@ public final class HistoryManager {
       db = helper.getReadableDatabase();
       cursor = db.query(DBHelper.TABLE_NAME, COLUMNS, null, null, null, null, DBHelper.TIMESTAMP_COL + " DESC");
       while (cursor.moveToNext()) {
-        String text = cursor.getString(0);
-        long timestamp = cursor.getLong(1);
-        String display = cursor.getString(2);
-        String details = cursor.getString(3);
-        EsrResult result = new EsrResult(text, timestamp);
-        items.add(new HistoryItem(result));
+    	  String text = cursor.getString(0);
+    	  long timestamp = cursor.getLong(1);
+    	  String address = cursor.getString(2);
+    	  long paid = cursor.getLong(3);
+    	  EsrResult result = new EsrResult(text, timestamp, address, paid);
+    	  items.add(new HistoryItem(result));
       }
     } finally {
       close(cursor, db);
@@ -117,7 +115,9 @@ public final class HistoryManager {
       cursor.move(number + 1);
       String text = cursor.getString(0);
       long timestamp = cursor.getLong(1);
-      EsrResult result = new EsrResult(text, timestamp);
+      String address = cursor.getString(2);
+      long paid = cursor.getLong(3);
+      EsrResult result = new EsrResult(text, timestamp, address, paid);
       return new HistoryItem(result);
     } finally {
       close(cursor, db);
@@ -155,7 +155,9 @@ public final class HistoryManager {
 
     ContentValues values = new ContentValues();
     values.put(DBHelper.TEXT_COL, result.getText());
-    values.put(DBHelper.TIMESTAMP_COL, System.currentTimeMillis());
+    values.put(DBHelper.TIMESTAMP_COL, result.getTimestamp());
+    values.put(DBHelper.ADDRESS_COL, result.getAddress());
+    values.put(DBHelper.PAID_COL, result.getPaid());
 
     SQLiteOpenHelper helper = new DBHelper(activity);
     SQLiteDatabase db = null;
@@ -168,7 +170,7 @@ public final class HistoryManager {
     }
   }
 
-  public void addHistoryItemDetails(String itemID, String itemDetails) {
+  public void addHistoryItemAddress(String itemID, String itemAddress) {
     // As we're going to do an update only we don't need need to worry
     // about the preferences; if the item wasn't saved it won't be udpated
     SQLiteOpenHelper helper = new DBHelper(activity);
@@ -177,7 +179,7 @@ public final class HistoryManager {
     try {
       db = helper.getWritableDatabase();
       cursor = db.query(DBHelper.TABLE_NAME,
-                        ID_DETAIL_COL_PROJECTION,
+                        ID_ADDRESS_COL_PROJECTION,
                         DBHelper.TEXT_COL + "=?",
                         new String[] { itemID },
                         null,
@@ -185,15 +187,47 @@ public final class HistoryManager {
                         DBHelper.TIMESTAMP_COL + " DESC",
                         "1");
       String oldID = null;
-      String oldDetails = null;
+      String oldAddress = null;
       if (cursor.moveToNext()) {
         oldID = cursor.getString(0);
-        oldDetails = cursor.getString(1);
+        oldAddress = cursor.getString(1);
       }
 
-      String newDetails = oldDetails == null ? itemDetails : oldDetails + " : " + itemDetails;
+//      String newAddress = oldAddress == null ? itemAddress : oldAddress + " : " + itemAddress;
       ContentValues values = new ContentValues();
-      values.put(DBHelper.DETAILS_COL, newDetails);
+//      values.put(DBHelper.ADDRESS_COL, newAddress);
+      values.put(DBHelper.ADDRESS_COL, itemAddress);
+
+      db.update(DBHelper.TABLE_NAME, values, DBHelper.ID_COL + "=?", new String[] { oldID });
+
+    } finally {
+      close(cursor, db);
+    }
+  }
+
+  public void updateHistoryItemPaid(String itemID, long itemPaid) {
+    // As we're going to do an update only we don't need need to worry
+    // about the preferences; if the item wasn't saved it won't be udpated
+    SQLiteOpenHelper helper = new DBHelper(activity);
+    SQLiteDatabase db = null;    
+    Cursor cursor = null;
+    try {
+      db = helper.getWritableDatabase();
+      cursor = db.query(DBHelper.TABLE_NAME,
+                        ID_PAID_COL_PROJECTION,
+                        DBHelper.TEXT_COL + "=?",
+                        new String[] { itemID },
+                        null,
+                        null,
+                        DBHelper.TIMESTAMP_COL + " DESC",
+                        "1");
+      String oldID = null;
+      if (cursor.moveToNext()) {
+        oldID = cursor.getString(0);
+      }
+
+      ContentValues values = new ContentValues();
+      values.put(DBHelper.PAID_COL, itemPaid);
 
       db.update(DBHelper.TABLE_NAME, values, DBHelper.ID_COL + "=?", new String[] { oldID });
 
@@ -239,11 +273,10 @@ public final class HistoryManager {
    * double-quotes. The fields output are:</p>
    *
    * <ul>
-   *  <li>Raw text</li>
-   *  <li>Display text</li>
-   *  <li>Format (e.g. QR_CODE)</li>
-   *  <li>Timestamp</li>
+   *  <li>Code row</li>
    *  <li>Formatted version of timestamp</li>
+   *  <li>Address text</li>
+   *  <li>Paid timespamp</li>
    * </ul>
    */
   CharSequence buildHistory() {
@@ -260,19 +293,25 @@ public final class HistoryManager {
 
       while (cursor.moveToNext()) {
 
-        historyText.append('"').append(massageHistoryField(cursor.getString(0))).append("\",");
-        historyText.append('"').append(massageHistoryField(cursor.getString(1))).append("\",");
-        historyText.append('"').append(massageHistoryField(cursor.getString(2))).append("\",");
-        historyText.append('"').append(massageHistoryField(cursor.getString(3))).append("\",");
-
-        // Add timestamp again, formatted
-        long timestamp = cursor.getLong(3);
-        historyText.append('"').append(massageHistoryField(
+        historyText.append('"').append(messageHistoryField(cursor.getString(0))).append("\",");
+        
+        // Add timestamp, formatted
+        long timestamp = cursor.getLong(1);
+        historyText.append('"').append(messageHistoryField(
             EXPORT_DATE_TIME_FORMAT.format(new Date(timestamp)))).append("\",");
-
-        // Above we're preserving the old ordering of columns which had formatted data in position 5
-
-        historyText.append('"').append(massageHistoryField(cursor.getString(4))).append("\"\r\n");
+        
+        historyText.append('"').append(messageHistoryField(cursor.getString(2))).append("\",");
+        
+        // Add paid, formatted
+        long paid = cursor.getLong(3);
+        
+        if(paid != 0){
+        historyText.append('"').append(messageHistoryField(
+            EXPORT_DATE_TIME_FORMAT.format(new Date(paid)))).append("\"\r\n");
+        }
+        else{
+            historyText.append('"').append(messageHistoryField("")).append("\"\r\n");
+        }
       }
       return historyText;
     } finally {
@@ -318,7 +357,7 @@ public final class HistoryManager {
     }
   }
 
-  private static String massageHistoryField(String value) {
+  private static String messageHistoryField(String value) {
     return value == null ? "" : value.replace("\"","\"\"");
   }
   

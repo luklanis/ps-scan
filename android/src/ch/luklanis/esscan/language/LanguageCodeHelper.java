@@ -19,7 +19,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.util.Log;
 
-import ch.luklanis.esscan.PreferencesActivity;
 import ch.luklanis.esscan.R;
 
 /**

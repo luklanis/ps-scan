@@ -162,18 +162,19 @@ final class CaptureActivityHandler extends Handler {
           state = State.CONTINUOUS_WAITING_FOR_AUTOFOCUS_TO_FINISH;
         }
         break;
-      case R.id.ocr_decode_succeeded:
+      case R.id.esr_decode_succeeded:
+      case R.id.esr_show_history_item:
         state = State.SUCCESS;
         activity.setShutterButtonClickable(true);
-        activity.handleOcrDecode((OcrResult) message.obj);
+        
+        EsrResult result = (EsrResult) message.obj;
+        
+        if(message.what == R.id.esr_decode_succeeded){
+        	activity.saveInHistory(result);
+        }
+
+        activity.showResult(result);
         DecodeHandler.resetDecodeState();
-        break;
-      case R.id.ocr_decode_failed:
-        state = State.PREVIEW;
-        activity.setShutterButtonClickable(true);
-        Toast toast = Toast.makeText(activity.getBaseContext(), "OCR failed. Please try again.", Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.TOP, 0, 0);
-        toast.show();
         break;
     }
   }

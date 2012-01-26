@@ -53,20 +53,18 @@ final class HistoryItemAdapter extends ArrayAdapter<HistoryItem> {
     EsrResult result = item.getResult();
 
     String title;
-    String detail;
+    String address;
     if (result != null) {
       title = result.getText();
-      detail = item.getDisplayAndDetails();      
+      address = item.getResult().getAddress();      
     } else {
       Resources resources = getContext().getResources();
-//      title = resources.getString(R.string.history_empty);
-//      detail = resources.getString(R.string.history_empty_detail);
-      title = "empty";
-      detail = "detail";
+      title = resources.getString(R.string.history_empty);
+      address = resources.getString(R.string.history_empty_detail);
     }
 
     ((TextView) layout.findViewById(R.id.history_title)).setText(title);    
-    ((TextView) layout.findViewById(R.id.history_detail)).setText(detail);
+    ((TextView) layout.findViewById(R.id.history_detail)).setText(address);
 
     return layout;
   }

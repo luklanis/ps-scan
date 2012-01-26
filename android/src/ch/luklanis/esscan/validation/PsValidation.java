@@ -15,8 +15,6 @@
  */
 package ch.luklanis.esscan.validation;
 
-import java.io.IOException;
-
 public abstract class PsValidation {
     private static final int STEP_COUNT = 1;  
 	protected int currentStep;
