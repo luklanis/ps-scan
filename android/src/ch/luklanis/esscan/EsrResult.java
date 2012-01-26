@@ -74,6 +74,61 @@ public final class EsrResult {
 	  paid = System.currentTimeMillis();
   }
   
+  public String getAmount(){
+	  if(text.indexOf('>') <= 3){
+		  return "";
+	  }
+	  
+	  int beforePoint = Integer.parseInt(text.substring(2, 10));
+	  
+	  return String.valueOf(beforePoint) + "." + text.substring(9, 11);
+  }
+  
+  public String getCurrency(){
+	  int esrType = Integer.parseInt(text.substring(0, 2));
+
+	  switch(esrType){
+	  case 1:
+	  case 3:
+	  case 4:
+	  case 11:
+	  case 14:
+		  return "CHF";
+	  case 21:
+	  case 23:
+	  case 31:
+	  case 33:
+		  return "EUR";
+	  default: return "?";
+	  }
+  }
+  
+  public String getAccount(){
+	  int indexOfSpace = text.indexOf(' ');
+	  
+	  if(indexOfSpace < 0){
+		  return "?";
+	  }
+	  
+	  String tempSubString = text.substring((indexOfSpace + 3), (indexOfSpace + 9));
+	  
+	  int indentureNumber = Integer.parseInt(tempSubString);
+	  
+	  return text.substring((indexOfSpace + 1), (indexOfSpace + 3)) + "-" + String.valueOf(indentureNumber) + "-"
+			  + text.substring((indexOfSpace + 9), (indexOfSpace + 10));
+  }
+  
+  public String getReference(){
+	  int indexOfSpecialChar = text.indexOf('>');
+	  int indexOfPlus = text.indexOf('+');
+	  
+	  if(indexOfSpecialChar < 0 || indexOfPlus < indexOfSpecialChar){
+		  return "?";
+	  }
+	  
+	  return text.substring(indexOfSpecialChar, indexOfSpecialChar);
+  }
+  
   @Override
   public String toString() {
     return text;

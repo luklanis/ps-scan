@@ -26,8 +26,6 @@ import ch.luklanis.esscan.OcrResult;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.Gravity;
-import android.widget.Toast;
 
 /**
  * This class handles all the messaging which comprises the state machine for capture.

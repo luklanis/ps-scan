@@ -41,7 +41,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Rect;
@@ -171,19 +170,14 @@ ShutterButton.OnShutterButtonListener {
 	private TextView statusViewBottom;
 	private TextView statusViewTop;
 	private TextView ocrResultView;
-	private TextView translationView;
 	private View cameraButtonView;
 	private View resultView;
 	private EsrResult lastResult;
-	private Bitmap lastBitmap;
 	private boolean hasSurface;
 	private BeepManager beepManager;
 	private TessBaseAPI baseApi; // Java interface for the Tesseract OCR engine
 	private String sourceLanguageCodeOcr; // ISO 639-3 language code
 	private String sourceLanguageReadable; // Language name, for example, "English"
-	private String sourceLanguageCodeTranslation; // ISO 639-1 language code
-	private String targetLanguageCodeTranslation; // ISO 639-1 language code
-	private String targetLanguageReadable; // Language name, for example, "English"
 	private int pageSegmentationMode = TessBaseAPI.PSM_AUTO;
 	private int ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
 	private String characterBlacklist;
@@ -584,8 +578,6 @@ ShutterButton.OnShutterButtonListener {
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		if(resultCode == RESULT_OK && requestCode == HISTORY_REQUEST_CODE){
-			Bundle extras = intent.getExtras();
-
 			int position = intent.getIntExtra(Intents.History.ITEM_NUMBER, -1);
 
 			HistoryItem item = historyManager.buildHistoryItem(position);
@@ -605,7 +597,6 @@ ShutterButton.OnShutterButtonListener {
 	/** Sets the necessary language code values for the given OCR language. */
 	private boolean setSourceLanguage(String languageCode) {
 		sourceLanguageCodeOcr = languageCode;
-		sourceLanguageCodeTranslation = LanguageCodeHelper.mapLanguageCode(languageCode);
 		sourceLanguageReadable = LanguageCodeHelper.getOcrLanguageName(this, languageCode);
 		return true;
 	}
@@ -780,6 +771,18 @@ ShutterButton.OnShutterButtonListener {
 		// Crudely scale betweeen 22 and 32 -- bigger font for shorter text
 		int scaledSize = Math.max(14, 32 - esrResult.getText().length() / 4);
 		ocrResultTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledSize);
+		
+		TextView accountTextView = (TextView) findViewById(R.id.esr_result_account);
+		accountTextView.setText(esrResult.getAccount());
+		
+		TextView amountTextView = (TextView) findViewById(R.id.esr_result_amount);
+		amountTextView.setText(esrResult.getAmount());
+		
+		TextView currencyTextView = (TextView) findViewById(R.id.esr_result_currency);
+		currencyTextView.setText(esrResult.getCurrency());
+		
+		TextView referenceTextView = (TextView) findViewById(R.id.esr_result_reference_number);
+		referenceTextView.setText(esrResult.getReference());
 
 		setProgressBarVisibility(false);
 

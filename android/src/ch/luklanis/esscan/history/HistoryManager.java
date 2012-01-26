@@ -187,10 +187,8 @@ public final class HistoryManager {
                         DBHelper.TIMESTAMP_COL + " DESC",
                         "1");
       String oldID = null;
-      String oldAddress = null;
       if (cursor.moveToNext()) {
         oldID = cursor.getString(0);
-        oldAddress = cursor.getString(1);
       }
 
 //      String newAddress = oldAddress == null ? itemAddress : oldAddress + " : " + itemAddress;
@@ -207,7 +205,7 @@ public final class HistoryManager {
 
   public void updateHistoryItemPaid(String itemID, long itemPaid) {
     // As we're going to do an update only we don't need need to worry
-    // about the preferences; if the item wasn't saved it won't be udpated
+    // about the preferences; if the item wasn't saved it won't be updated
     SQLiteOpenHelper helper = new DBHelper(activity);
     SQLiteDatabase db = null;    
     Cursor cursor = null;
@@ -236,7 +234,8 @@ public final class HistoryManager {
     }
   }
 
-  private void deletePrevious(String text) {
+  @SuppressWarnings("unused")
+private void deletePrevious(String text) {
     SQLiteOpenHelper helper = new DBHelper(activity);
     SQLiteDatabase db = null;
     try {
