@@ -576,6 +576,12 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 	  }
 	  return super.onOptionsItemSelected(item);
   }
+  
+  @Override
+  public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+	  if(resultCode == RESULT_OK && requestCode == HISTORY_REQUEST_CODE){
+	  }
+  }
 
   public void surfaceDestroyed(SurfaceHolder holder) {
     hasSurface = false;
