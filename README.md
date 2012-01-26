@@ -1,4 +1,4 @@
-#es-scan
+#ps-scan
 * * *
 
 An experimental app for Android that reads the code row of an orange (swiss) payment slip using the device camera.
