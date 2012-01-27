@@ -154,7 +154,7 @@ public final class HistoryManager {
 //	  }
 
     ContentValues values = new ContentValues();
-    values.put(DBHelper.TEXT_COL, result.getText());
+    values.put(DBHelper.TEXT_COL, result.getCompleteCode());
     values.put(DBHelper.TIMESTAMP_COL, result.getTimestamp());
     values.put(DBHelper.ADDRESS_COL, result.getAddress());
     values.put(DBHelper.PAID_COL, result.getPaid());

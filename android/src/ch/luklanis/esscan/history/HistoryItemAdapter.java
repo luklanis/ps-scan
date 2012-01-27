@@ -55,7 +55,7 @@ final class HistoryItemAdapter extends ArrayAdapter<HistoryItem> {
     String title;
     String address;
     if (result != null) {
-      title = result.getText();
+      title = result.getCompleteCode();
       address = item.getResult().getAddress();      
     } else {
       Resources resources = getContext().getResources();

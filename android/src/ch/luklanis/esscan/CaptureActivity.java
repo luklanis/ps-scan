@@ -68,6 +68,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -246,8 +247,8 @@ ShutterButton.OnShutterButtonListener {
 			shutterButton.setOnShutterButtonListener(this);
 		}
 
-		ocrResultView = (TextView) findViewById(R.id.ocr_result_text_view);
-		registerForContextMenu(ocrResultView);
+//		ocrResultView = (TextView) findViewById(R.id.ocr_result_text_view);
+//		registerForContextMenu(ocrResultView);
 
 		cameraManager = new CameraManager(getApplication());
 		viewfinderView.setCameraManager(cameraManager);
@@ -333,6 +334,37 @@ ShutterButton.OnShutterButtonListener {
 			}
 		});
 
+		Button resultCopy = (Button)findViewById(R.id.button_copy_code_row);
+		resultCopy.setOnClickListener(new Button.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+
+				//        clipboardManager.setPrimaryClip(ClipData.newPlainText("ocrResult", ocrResultView.getText()));
+				//      if (clipboardManager.hasPrimaryClip()) {
+				clipboardManager.setText(lastResult.getCompleteCode());
+			}
+		});
+		
+		Button resultShare = (Button)findViewById(R.id.button_share_code_row);
+		resultShare.setOnClickListener(new Button.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+				sharingIntent.setType("text/plain");
+				sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "ESR code");
+				
+				String text = lastResult.getAccount() 
+						+ "\r\n" + lastResult.getCurrency() 
+						+ " " + lastResult.getAmount()
+						+ "\r\n\r\n" + lastResult.getCompleteCode();
+				
+				sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, text);
+
+				startActivity(Intent.createChooser(sharingIntent, "Share via"));
+			}
+		});
+		
 		isEngineReady = false;
 	}
 
@@ -732,7 +764,7 @@ ShutterButton.OnShutterButtonListener {
 
 		try {
 			// Test whether the result is null
-			esrResult.getText();
+			esrResult.getCompleteCode();
 		} catch (NullPointerException e) {
 			Toast toast = Toast.makeText(this, "OCR failed. Please try again.", Toast.LENGTH_SHORT);
 			toast.setGravity(Gravity.TOP, 0, 0);
@@ -765,12 +797,12 @@ ShutterButton.OnShutterButtonListener {
 				R.drawable.ez_or));
 
 		// Display the recognized text
-		TextView ocrResultTextView = (TextView) findViewById(R.id.ocr_result_text_view);
-		ocrResultTextView.setText(esrResult.getText());
+//		TextView ocrResultTextView = (TextView) findViewById(R.id.ocr_result_text_view);
+//		ocrResultTextView.setText(esrResult.getCompleteCode());
 
 		// Crudely scale betweeen 22 and 32 -- bigger font for shorter text
-		int scaledSize = Math.max(14, 32 - esrResult.getText().length() / 4);
-		ocrResultTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledSize);
+//		int scaledSize = Math.max(14, 32 - esrResult.getCompleteCode().length() / 4);
+//		ocrResultTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledSize);
 		
 		TextView accountTextView = (TextView) findViewById(R.id.esr_result_account);
 		accountTextView.setText(esrResult.getAccount());

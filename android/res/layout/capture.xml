@@ -41,98 +41,136 @@
         android:padding="4dip"
         android:visibility="gone" >
 
-        <LinearLayout
+        <!-- <LinearLayout
+            android:id="@+id/result_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:background="@color/result_view"
             android:orientation="vertical"
-            android:padding="12dip" >
+            android:padding="4dip" > -->
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical" >
-
-                <ImageView
-                    android:id="@+id/image_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dip"
-                    android:adjustViewBounds="true" />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="4dip" >
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/esr_result_account"
-                        android:textColor="@color/result_text"
-                        android:textColorLink="@color/result_text"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:id="@+id/esr_result_account"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/result_text"
-                        android:textColorLink="@color/result_text"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal" >
-
-                    <TextView
-                        android:id="@+id/esr_result_currency"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/result_text"
-                        android:textColorLink="@color/result_text"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:id="@+id/esr_result_amount"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/result_text"
-                        android:textColorLink="@color/result_text"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/esr_result_reference_number"
-                    android:textColor="@color/result_text"
-                    android:textColorLink="@color/result_text"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/esr_result_reference_number"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/result_text"
-                    android:textColorLink="@color/result_text"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/ocr_result_text_view"
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:autoLink="web"
-                android:paddingTop="12dip"
-                android:textColor="@color/result_text"
-                android:textColorLink="@color/result_text"
-                android:textSize="14sp" />
-        </LinearLayout>
+                android:gravity="right" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical" >
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal" >
+
+                        <ImageView
+                            android:id="@+id/image_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_marginRight="4dip"
+                            android:adjustViewBounds="true" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical" >
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal" >
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginRight="4dip"
+                                    android:text="@string/esr_result_account"
+                                    android:textColor="@color/result_text"
+                                    android:textColorLink="@color/result_text"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/esr_result_account"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="@color/result_text"
+                                    android:textColorLink="@color/result_text"
+                                    android:textSize="14sp" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal" >
+
+                                <TextView
+                                    android:id="@+id/esr_result_currency"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginRight="4dip"
+                                    android:textColor="@color/result_text"
+                                    android:textColorLink="@color/result_text"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/esr_result_amount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="@color/result_text"
+                                    android:textColorLink="@color/result_text"
+                                    android:textSize="14sp" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dip"
+                                android:text="@string/esr_result_reference_number"
+                                android:textColor="@color/result_text"
+                                android:textColorLink="@color/result_text"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/esr_result_reference_number"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/result_text"
+                                android:textColorLink="@color/result_text"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" 
+                    android:layout_alignParentBottom="true" 
+                    android:gravity="right">
+
+                    <Button
+                        android:id="@+id/button_copy_code_row"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/button_copy_code_row" />
+
+                    <Button
+                        android:id="@+id/button_share_code_row"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/button_share_code_row" />
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
     </LinearLayout>
 
     <RelativeLayout
