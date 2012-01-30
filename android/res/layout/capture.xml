@@ -177,8 +177,40 @@
         android:id="@+id/camera_button_view"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" >
+            
+        <LinearLayout
+            android:id="@+id/status_view_top"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true">
 
         <TextView
+            android:id="@+id/status_view_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0100003949753>"
+            android:textColor="@color/status_text"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/status_view_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="210000000003139471430009017+"
+            android:textColor="@color/status_text"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/status_view_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" 010001628>"
+            android:textColor="@color/status_text"
+            android:textSize="14sp" />
+            
+        </LinearLayout>
+
+        <!-- <TextView
             android:id="@+id/status_view_top"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -188,7 +220,7 @@
             android:clickable="true"
             android:text=""
             android:textColor="@color/status_text"
-            android:textSize="14sp" />
+            android:textSize="14sp" /> -->
 
         <ch.luklanis.esscan.camera.ShutterButton
             android:id="@+id/shutter_button"

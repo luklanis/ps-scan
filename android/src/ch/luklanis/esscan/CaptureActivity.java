@@ -44,6 +44,7 @@ import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -60,6 +61,7 @@ import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -151,11 +153,6 @@ ShutterButton.OnShutterButtonListener {
 	/** Length of time before the next autofocus request, if the last request failed. Used in CaptureActivityHandler. */
 	static final long AUTOFOCUS_FAILURE_INTERVAL_MS = 1000L;
 
-	// Context menu
-	private static final int SETTINGS_ID = Menu.FIRST;
-	private static final int HISTORY_ID = Menu.FIRST + 1;
-	private static final int ABOUT_ID = Menu.FIRST + 2;
-
 	// Options menu, for copy to clipboard
 	private static final int OPTIONS_COPY_RECOGNIZED_TEXT_ID = Menu.FIRST;
 
@@ -169,7 +166,8 @@ ShutterButton.OnShutterButtonListener {
 	private SurfaceView surfaceView;
 	private SurfaceHolder surfaceHolder;
 	private TextView statusViewBottom;
-	private TextView statusViewTop;
+	//private TextView statusViewTop;
+	private View statusViewTop;
 	private TextView ocrResultView;
 	private View cameraButtonView;
 	private View resultView;
@@ -227,11 +225,11 @@ ShutterButton.OnShutterButtonListener {
 		viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_view);
 		cameraButtonView = findViewById(R.id.camera_button_view);
 		resultView = findViewById(R.id.result_view);
+		
+		statusViewTop = findViewById(R.id.status_view_top);
 
 		statusViewBottom = (TextView) findViewById(R.id.status_view_bottom);
 		registerForContextMenu(statusViewBottom);
-		statusViewTop = (TextView) findViewById(R.id.status_view_top);
-		registerForContextMenu(statusViewTop);
 
 		handler = null;
 		lastResult = null;
@@ -339,10 +337,10 @@ ShutterButton.OnShutterButtonListener {
 			@Override
 			public void onClick(View v) {
 				ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+				clipboardManager.setText(lastResult.getCompleteCode());
 
 				//        clipboardManager.setPrimaryClip(ClipData.newPlainText("ocrResult", ocrResultView.getText()));
 				//      if (clipboardManager.hasPrimaryClip()) {
-				clipboardManager.setText(lastResult.getCompleteCode());
 			}
 		});
 		
@@ -572,12 +570,12 @@ ShutterButton.OnShutterButtonListener {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		//    MenuInflater inflater = getMenuInflater();
-		//    inflater.inflate(R.menu.options_menu, menu);
-		super.onCreateOptionsMenu(menu);
-		menu.add(0, SETTINGS_ID, 0, "Settings").setIcon(android.R.drawable.ic_menu_preferences);
-		menu.add(0, HISTORY_ID, 0, "History").setIcon(android.R.drawable.ic_menu_recent_history);
-		menu.add(0, ABOUT_ID, 0, "About").setIcon(android.R.drawable.ic_menu_info_details);
+		    MenuInflater inflater = getMenuInflater();
+		    inflater.inflate(R.menu.capture_menu, menu);
+//		super.onCreateOptionsMenu(menu);
+//		menu.add(0, SETTINGS_ID, 0, "Settings").setIcon(android.R.drawable.ic_menu_preferences);
+//		menu.add(0, HISTORY_ID, 0, "History").setIcon(android.R.drawable.ic_menu_recent_history);
+//		menu.add(0, ABOUT_ID, 0, "About").setIcon(android.R.drawable.ic_menu_info_details);
 		return true;
 	}
 
@@ -585,19 +583,19 @@ ShutterButton.OnShutterButtonListener {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		Intent intent;
 		switch (item.getItemId()) {
-		case SETTINGS_ID: {
+		case R.id.menu_settings: {
 			intent = new Intent().setClass(this, PreferencesActivity.class);
 			startActivity(intent);
 			break;
 		}
-		case HISTORY_ID: {
+		case R.id.menu_history: {
 			intent = new Intent(Intent.ACTION_PICK);
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
 			intent.setClassName(this, HistoryActivity.class.getName());
 			startActivityForResult(intent, HISTORY_REQUEST_CODE);
 			break;
 		}
-		case ABOUT_ID: {
+		case R.id.menu_about: {
 			intent = new Intent(this, HelpActivity.class);
 			intent.putExtra(HelpActivity.REQUESTED_PAGE_KEY, HelpActivity.ABOUT_PAGE);
 			startActivity(intent);
@@ -842,13 +840,15 @@ ShutterButton.OnShutterButtonListener {
 
 		if (CONTINUOUS_DISPLAY_RECOGNIZED_TEXT) {
 			// Display the recognized text on the screen
-			statusViewTop.setText(ocrResult.getText());
-			int scaledSize = Math.max(22, 32 - ocrResult.getText().length() / 4);
-			statusViewTop.setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledSize);
-			statusViewTop.setTextColor(Color.BLACK);
-			statusViewTop.setBackgroundResource(R.color.status_top_text_background);
-
-			statusViewTop.getBackground().setAlpha(meanConfidence * (255 / 100));
+//			statusViewTop.setText(ocrResult.getText());
+//			int scaledSize = Math.max(22, 32 - ocrResult.getText().length() / 4);
+//			statusViewTop.setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledSize);
+//			statusViewTop.setTextColor(Color.BLACK);
+//			statusViewTop.setBackgroundResource(R.color.status_top_text_background);
+//
+//			statusViewTop.getBackground().setAlpha(meanConfidence * (255 / 100));
+			refreshStatusView();
+			
 		}
 
 		if (CONTINUOUS_DISPLAY_METADATA) {
@@ -911,15 +911,15 @@ ShutterButton.OnShutterButtonListener {
 		return text;
 	}
 
-	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v,
-			ContextMenuInfo menuInfo) {
-		super.onCreateContextMenu(menu, v, menuInfo);
-		if (v.equals(ocrResultView)) {
-			menu.add(Menu.NONE, OPTIONS_COPY_RECOGNIZED_TEXT_ID, Menu.NONE, "Copy recognized text");
-			menu.add(Menu.NONE, OPTIONS_SHARE_RECOGNIZED_TEXT_ID, Menu.NONE, "Share recognized text");
-		} 
-	}
+//	@Override
+//	public void onCreateContextMenu(ContextMenu menu, View v,
+//			ContextMenuInfo menuInfo) {
+//		super.onCreateContextMenu(menu, v, menuInfo);
+//		if (v.equals(ocrResultView)) {
+//			menu.add(Menu.NONE, OPTIONS_COPY_RECOGNIZED_TEXT_ID, Menu.NONE, "Copy recognized text");
+//			menu.add(Menu.NONE, OPTIONS_SHARE_RECOGNIZED_TEXT_ID, Menu.NONE, "Share recognized text");
+//		} 
+//	}
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
@@ -927,10 +927,11 @@ ShutterButton.OnShutterButtonListener {
 
 		case OPTIONS_COPY_RECOGNIZED_TEXT_ID:
 			ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+			clipboardManager.setText(ocrResultView.getText());
 
 			//        clipboardManager.setPrimaryClip(ClipData.newPlainText("ocrResult", ocrResultView.getText()));
 			//      if (clipboardManager.hasPrimaryClip()) {
-			clipboardManager.setText(ocrResultView.getText());
+			
 			if(clipboardManager.hasText()){
 				Toast toast = Toast.makeText(this, "Text copied.", Toast.LENGTH_LONG);
 				toast.setGravity(Gravity.BOTTOM, 0, 0);
@@ -962,8 +963,9 @@ ShutterButton.OnShutterButtonListener {
 			statusViewBottom.setVisibility(View.VISIBLE);
 		}
 		if (CONTINUOUS_DISPLAY_RECOGNIZED_TEXT) {
-			statusViewTop.setText("");
-			statusViewTop.setTextSize(14);
+//			statusViewTop.setText("");
+//			statusViewTop.setTextSize(14);
+			refreshStatusView();
 			statusViewTop.setVisibility(View.VISIBLE);
 		}
 		viewfinderView.setVisibility(View.VISIBLE);
@@ -973,6 +975,31 @@ ShutterButton.OnShutterButtonListener {
 		}
 		lastResult = null;
 		viewfinderView.removeResultText();
+	}
+
+	private void refreshStatusView() {
+		TextView statusView1 = (TextView) findViewById(R.id.status_view_1);
+		TextView statusView2 = (TextView) findViewById(R.id.status_view_2);
+		TextView statusView3 = (TextView) findViewById(R.id.status_view_3);
+		
+		statusView1.setBackgroundResource(0);
+		statusView2.setBackgroundResource(0);
+		statusView3.setBackgroundResource(0);
+
+		switch (this.psValidation.getCurrentStep()) {
+		case 1:
+			statusView1.setBackgroundResource(R.drawable.status_view_background);
+			break;
+		case 2:
+			statusView2.setBackgroundResource(R.drawable.status_view_background);
+			break;
+		case 3:
+			statusView3.setBackgroundResource(R.drawable.status_view_background);
+			break;
+
+		default:
+			break;
+		}
 	}
 
 	/** Displays a pop-up message showing the name of the current OCR source language. */
