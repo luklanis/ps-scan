@@ -36,7 +36,7 @@
     <activity android:name=".CaptureActivity"
               android:screenOrientation="landscape"
               android:configChanges="keyboardHidden|orientation"
-              android:theme="@android:style/Theme.Holo.Light.DarkActionBar"
+              android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
               android:windowSoftInputMode="stateAlwaysHidden"              
               >
       <intent-filter>

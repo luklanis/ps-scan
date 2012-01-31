@@ -182,7 +182,8 @@
             android:id="@+id/status_view_top"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true">
+            android:layout_alignParentTop="true"
+            android:orientation="horizontal">
 
         <TextView
             android:id="@+id/status_view_1"

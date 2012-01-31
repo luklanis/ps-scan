@@ -117,9 +117,6 @@ ShutterButton.OnShutterButtonListener {
 	/** Flag to display the real-time recognition results at the top of the scanning screen. */
 	private static final boolean CONTINUOUS_DISPLAY_RECOGNIZED_TEXT = true;
 
-	/** Flag to display recognition-related statistics on the scanning screen. */
-	private static final boolean CONTINUOUS_DISPLAY_METADATA = false;
-
 	/** Flag to enable display of the on-screen shutter button. */
 	private static final boolean DISPLAY_SHUTTER_BUTTON = false;
 
@@ -839,24 +836,7 @@ ShutterButton.OnShutterButtonListener {
 		Integer meanConfidence = ocrResult.getMeanConfidence();
 
 		if (CONTINUOUS_DISPLAY_RECOGNIZED_TEXT) {
-			// Display the recognized text on the screen
-//			statusViewTop.setText(ocrResult.getText());
-//			int scaledSize = Math.max(22, 32 - ocrResult.getText().length() / 4);
-//			statusViewTop.setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledSize);
-//			statusViewTop.setTextColor(Color.BLACK);
-//			statusViewTop.setBackgroundResource(R.color.status_top_text_background);
-//
-//			statusViewTop.getBackground().setAlpha(meanConfidence * (255 / 100));
 			refreshStatusView();
-			
-		}
-
-		if (CONTINUOUS_DISPLAY_METADATA) {
-			// Display recognition-related metadata at the bottom of the screen
-			long recognitionTimeRequired = ocrResult.getRecognitionTimeRequired();
-			statusViewBottom.setTextSize(14);
-			statusViewBottom.setText("OCR: " + sourceLanguageReadable + " - Mean confidence: " + 
-					meanConfidence.toString() + " - Time required: " + recognitionTimeRequired + " ms");
 		}
 	}
 
@@ -867,18 +847,6 @@ ShutterButton.OnShutterButtonListener {
 	 */
 	void handleOcrContinuousDecode(OcrResultFailure obj) {
 		lastResult = null;
-		// viewfinderView.removeResultText();
-
-		// Reset the text in the recognized text box.
-		// statusViewTop.setText("");
-
-		if (CONTINUOUS_DISPLAY_METADATA) {
-			// Color text delimited by '-' as red.
-			statusViewBottom.setTextSize(14);
-			CharSequence cs = setSpanBetweenTokens("OCR: " + sourceLanguageReadable + " - OCR failed - Time required: " 
-					+ obj.getTimeRequired() + " ms", "-", new ForegroundColorSpan(0xFFFF0000));
-			statusViewBottom.setText(cs);
-		}
 	}
 
 	/**
@@ -956,23 +924,19 @@ ShutterButton.OnShutterButtonListener {
 	 */
 	private void resetStatusView() {
 		resultView.setVisibility(View.GONE);
-		if (CONTINUOUS_DISPLAY_METADATA) {
-			statusViewBottom.setText("");
-			statusViewBottom.setTextSize(14);
-			statusViewBottom.setTextColor(getResources().getColor(R.color.status_text));
-			statusViewBottom.setVisibility(View.VISIBLE);
-		}
+		
 		if (CONTINUOUS_DISPLAY_RECOGNIZED_TEXT) {
-//			statusViewTop.setText("");
-//			statusViewTop.setTextSize(14);
 			refreshStatusView();
 			statusViewTop.setVisibility(View.VISIBLE);
 		}
+		
 		viewfinderView.setVisibility(View.VISIBLE);
 		cameraButtonView.setVisibility(View.VISIBLE);
+		
 		if (DISPLAY_SHUTTER_BUTTON) {
 			shutterButton.setVisibility(View.VISIBLE);
 		}
+		
 		lastResult = null;
 		viewfinderView.removeResultText();
 	}
@@ -1015,9 +979,6 @@ ShutterButton.OnShutterButtonListener {
 	 */
 	void setStatusViewForContinuous() {
 		viewfinderView.removeResultText();
-		if (CONTINUOUS_DISPLAY_METADATA) {
-			statusViewBottom.setText("OCR: " + sourceLanguageReadable + " - waiting for OCR...");
-		}
 	}
 
 	@SuppressWarnings("unused")
