@@ -70,9 +70,6 @@ final class CaptureActivityHandler extends Handler {
     
     if (isContinuousModeActive) {
       state = State.CONTINUOUS;
-
-      // Show the shutter and torch buttons
-      activity.setButtonVisibility(true);
       
       // Display a "be patient" message while first recognition request is running
       activity.setStatusViewForContinuous();
@@ -81,9 +78,6 @@ final class CaptureActivityHandler extends Handler {
       restartOcrPreviewAndDecode();
     } else {
       state = State.SUCCESS;
-      
-      // Show the shutter and torch buttons
-      activity.setButtonVisibility(true);
       
       restartOcrPreview();
     }
@@ -163,15 +157,16 @@ final class CaptureActivityHandler extends Handler {
       case R.id.esr_decode_succeeded:
       case R.id.esr_show_history_item:
         state = State.SUCCESS;
-        activity.setShutterButtonClickable(true);
         
         EsrResult result = (EsrResult) message.obj;
         
+        boolean fromHistory = true;
         if(message.what == R.id.esr_decode_succeeded){
         	activity.saveInHistory(result);
+        	fromHistory = false;
         }
 
-        activity.showResult(result);
+        activity.showResult(result, fromHistory);
         DecodeHandler.resetDecodeState();
         break;
     }
@@ -185,7 +180,6 @@ final class CaptureActivityHandler extends Handler {
     state = State.CONTINUOUS_PAUSED;
     removeMessages(R.id.auto_focus);
     removeMessages(R.id.ocr_continuous_decode);
-    removeMessages(R.id.ocr_decode);
     removeMessages(R.id.ocr_continuous_decode_failed);
     removeMessages(R.id.ocr_continuous_decode_succeeded); // TODO are these removeMessages() calls doing anything?
     
@@ -226,7 +220,6 @@ final class CaptureActivityHandler extends Handler {
     // Be absolutely sure we don't send any queued up messages
     removeMessages(R.id.auto_focus);
     removeMessages(R.id.ocr_continuous_decode);
-    removeMessages(R.id.ocr_decode);
 
   }
 
@@ -235,7 +228,6 @@ final class CaptureActivityHandler extends Handler {
    */
   private void restartOcrPreview() {    
     // Display the shutter and torch buttons
-    activity.setButtonVisibility(true);
 
     if (state == State.SUCCESS) {
       state = State.PREVIEW;
@@ -261,33 +253,6 @@ final class CaptureActivityHandler extends Handler {
     // Continue requesting decode of images
     cameraManager.requestOcrDecode(decodeThread.getHandler(), R.id.ocr_continuous_decode);
     activity.drawViewfinder();    
-  }
-
-  /**
-   * Request OCR on the current preview frame. 
-   */
-  private void ocrDecode() {
-    state = State.PREVIEW_PAUSED;
-    cameraManager.requestOcrDecode(decodeThread.getHandler(), R.id.ocr_decode);
-  }
-
-  /**
-   * Request OCR when the hardware shutter button is clicked.
-   */
-  void hardwareShutterButtonClick() {
-    // Ensure that we're not in continuous recognition mode
-    if (state == State.PREVIEW || state == State.PREVIEW_FOCUSING) {
-      ocrDecode();
-    }
-  }
-  
-  /**
-   * Request OCR when the on-screen shutter button is clicked.
-   */
-  void shutterButtonClick() {
-    // Disable further clicks on this button until OCR request is finished
-    activity.setShutterButtonClickable(false);
-    ocrDecode();
   }
   
   /**

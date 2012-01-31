@@ -64,9 +64,9 @@ final class DecodeHandler extends Handler {
           ocrContinuousDecode((byte[]) message.obj, message.arg1, message.arg2);
         }
         break;
-      case R.id.ocr_decode:
-        ocrDecode((byte[]) message.obj, message.arg1, message.arg2);
-        break;
+//      case R.id.ocr_decode:
+//        ocrDecode((byte[]) message.obj, message.arg1, message.arg2);
+//        break;
       case R.id.quit:
         running = false;
         Looper.myLooper().quit();
@@ -76,37 +76,6 @@ final class DecodeHandler extends Handler {
   
   static void resetDecodeState() {
     isDecodePending = false;
-  }
-  
-  /**
-   *  Perform an OCR decode for single-shot mode.
-   *  
-   * @param data Image data
-   * @param width Image width
-   * @param height Image height
-   */
-  private void ocrDecode(byte[] data, int width, int height) {
-    //Log.d(TAG, "ocrDecode: Got R.id.ocr_decode message.");
-    //Log.d(TAG, "width: " + width + ", height: " + height);
- 
-    beepManager.playBeepSoundAndVibrate();
-    
-    // Set up the indeterminate progress dialog box
-    ProgressDialog indeterminateDialog = new ProgressDialog(activity);
-    indeterminateDialog.setTitle("Please wait");    		
-    String ocrEngineModeName = activity.getOcrEngineModeName();
-    if (ocrEngineModeName.equals("Both")) {
-      indeterminateDialog.setMessage("Performing OCR using Cube and Tesseract...");
-    } else {
-      indeterminateDialog.setMessage("Performing OCR using " + ocrEngineModeName + "...");
-    }
-    indeterminateDialog.setCancelable(false);
-    indeterminateDialog.show();
-    
-    // Asyncrhonously launch the OCR process
-    PlanarYUVLuminanceSource source = activity.getCameraManager().buildLuminanceSource(data, width, height);
-    new OcrRecognizeAsyncTask(activity, baseApi, indeterminateDialog, source.renderCroppedGreyscaleBitmap()).execute();
-
   }
   
   /**

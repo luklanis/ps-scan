@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2008 ZXing authors
  * Copyright 2011 Robert Theis
+ * Copyright 2012 Lukas Landis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +23,6 @@ import ch.luklanis.esscan.BeepManager;
 import com.googlecode.tesseract.android.TessBaseAPI;
 
 import ch.luklanis.esscan.camera.CameraManager;
-import ch.luklanis.esscan.camera.ShutterButton;
 import ch.luklanis.esscan.HelpActivity;
 import ch.luklanis.esscan.OcrResult;
 import ch.luklanis.esscan.PreferencesActivity;
@@ -42,9 +42,7 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -54,10 +52,7 @@ import android.preference.PreferenceManager;
 import android.text.ClipboardManager;
 import android.text.SpannableStringBuilder;
 import android.text.style.CharacterStyle;
-import android.text.style.ForegroundColorSpan;
 import android.util.Log;
-import android.util.TypedValue;
-import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -69,7 +64,6 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -85,16 +79,12 @@ import java.io.IOException;
  * 
  * The code for this class was adapted from the ZXing project: http://code.google.com/p/zxing/
  */
-public final class CaptureActivity extends Activity implements SurfaceHolder.Callback, 
-ShutterButton.OnShutterButtonListener {
+public final class CaptureActivity extends Activity implements SurfaceHolder.Callback {
 
 	private static final String TAG = CaptureActivity.class.getSimpleName();
 
 	/** The default OCR engine to use. */
 	public static final String DEFAULT_OCR_ENGINE_MODE = "Tesseract";
-
-	/** Flag to enable display of the on-screen shutter button. */
-	private static final boolean DISPLAY_SHUTTER_BUTTON = false;
 
 	/** Languages for which Cube data is available. */
 	static final String[] CUBE_SUPPORTED_LANGUAGES = { 
@@ -152,10 +142,7 @@ ShutterButton.OnShutterButtonListener {
 	private String sourceLanguageReadable; // Language name, for example, "English"
 	private int pageSegmentationMode = TessBaseAPI.PSM_AUTO;
 	private int ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
-	private String characterBlacklist;
 	private String characterWhitelist;
-	private ShutterButton shutterButton;
-	//private ToggleButton torchButton;
 
 	private boolean isContinuousModeActive; // Whether we are doing OCR in continuous mode
 	private SharedPreferences prefs;
@@ -194,7 +181,9 @@ ShutterButton.OnShutterButtonListener {
 		Window window = getWindow();
 		window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		
 		setContentView(R.layout.capture);
+		
 		viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_view);
 		cameraButtonView = findViewById(R.id.camera_button_view);
 		resultView = findViewById(R.id.result_view);
@@ -211,12 +200,6 @@ ShutterButton.OnShutterButtonListener {
 		psValidation = new EsrValidation();
 
 		historyManager = new HistoryManager(this);
-
-		// Camera shutter button
-		if (DISPLAY_SHUTTER_BUTTON) {
-			shutterButton = (ShutterButton) findViewById(R.id.shutter_button);
-			shutterButton.setOnShutterButtonListener(this);
-		}
 
 		//		ocrResultView = (TextView) findViewById(R.id.ocr_result_text_view);
 		//		registerForContextMenu(ocrResultView);
@@ -394,7 +377,7 @@ ShutterButton.OnShutterButtonListener {
 		}
 		if (baseApi != null) {
 			baseApi.setPageSegMode(pageSegmentationMode);
-			baseApi.setVariable(TessBaseAPI.VAR_CHAR_BLACKLIST, characterBlacklist);
+			baseApi.setVariable(TessBaseAPI.VAR_CHAR_BLACKLIST, "");
 			baseApi.setVariable(TessBaseAPI.VAR_CHAR_WHITELIST, characterWhitelist);
 		}
 
@@ -421,15 +404,11 @@ ShutterButton.OnShutterButtonListener {
 	}
 
 	/** Called to resume recognition after translation in continuous mode. */
-	@SuppressWarnings("unused")
 	void resumeContinuousDecoding() {
 		isPaused = false;
 		resetStatusView();
 		setStatusViewForContinuous();
 		handler.resetState();
-		if (shutterButton != null && DISPLAY_SHUTTER_BUTTON) {
-			shutterButton.setVisibility(View.VISIBLE);
-		}
 	}
 
 	@Override
@@ -524,13 +503,6 @@ ShutterButton.OnShutterButtonListener {
 				}
 				return true;
 			}
-		} else if (keyCode == KeyEvent.KEYCODE_CAMERA) {
-			if (isContinuousModeActive) {
-				onShutterButtonPressContinuous();
-			} else {
-				handler.hardwareShutterButtonClick();
-			}
-			return true;
 		} else if (keyCode == KeyEvent.KEYCODE_FOCUS) {      
 			// Only perform autofocus if user is not holding down the button.
 			if (event.getRepeatCount() == 0) {
@@ -720,12 +692,26 @@ ShutterButton.OnShutterButtonListener {
 
 	/**
 	 * Displays information relating to the result of OCR, and requests a translation if necessary.
-	 * 
 	 * @param ocrResult Object representing successful OCR results
 	 * @return True if a non-null result was received for OCR
 	 */
 	boolean showResult(EsrResult esrResult) {
+		return showResult(esrResult, false);
+	}
+
+	/**
+	 * Displays information relating to the result of OCR, and requests a translation if necessary.
+	 * @param fromHistory 
+	 * 
+	 * @param ocrResult Object representing successful OCR results
+	 * @return True if a non-null result was received for OCR
+	 */
+	boolean showResult(EsrResult esrResult, boolean fromHistory) {
 		lastResult = esrResult;
+		
+		if(!fromHistory){
+			beepManager.playBeepSoundAndVibrate();
+		}
 
 		try {
 			// Test whether the result is null
@@ -748,9 +734,6 @@ ShutterButton.OnShutterButtonListener {
 		}
 
 		// Turn off capture-related UI elements
-		if(DISPLAY_SHUTTER_BUTTON){
-			shutterButton.setVisibility(View.GONE);
-		}
 		statusViewBottom.setVisibility(View.GONE);
 		statusViewTop.setVisibility(View.GONE);
 		cameraButtonView.setVisibility(View.GONE);
@@ -802,8 +785,6 @@ ShutterButton.OnShutterButtonListener {
 				ocrResult.getWordBoundingBoxes(),
 				ocrResult.getTextlineBoundingBoxes(),
 				ocrResult.getRegionBoundingBoxes()));
-
-		Integer meanConfidence = ocrResult.getMeanConfidence();
 
 		refreshStatusView();
 	}
@@ -899,10 +880,6 @@ ShutterButton.OnShutterButtonListener {
 		viewfinderView.setVisibility(View.VISIBLE);
 		cameraButtonView.setVisibility(View.VISIBLE);
 
-		if (DISPLAY_SHUTTER_BUTTON) {
-			shutterButton.setVisibility(View.VISIBLE);
-		}
-
 		lastResult = null;
 		viewfinderView.removeResultText();
 	}
@@ -947,62 +924,9 @@ ShutterButton.OnShutterButtonListener {
 		viewfinderView.removeResultText();
 	}
 
-	@SuppressWarnings("unused")
-	void setButtonVisibility(boolean visible) {
-		if (shutterButton != null && visible == true && DISPLAY_SHUTTER_BUTTON) {
-			shutterButton.setVisibility(View.VISIBLE);
-		} else if (shutterButton != null) {
-			shutterButton.setVisibility(View.GONE);
-		}
-	}
-
-	/**
-	 * Enables/disables the shutter button to prevent double-clicks on the button.
-	 * 
-	 * @param clickable True if the button should accept a click
-	 */
-	void setShutterButtonClickable(boolean clickable) {
-		if(DISPLAY_SHUTTER_BUTTON)
-		{
-			shutterButton.setClickable(clickable);
-		}
-	}
-
 	/** Request the viewfinder to be invalidated. */
 	void drawViewfinder() {
 		viewfinderView.drawViewfinder();
-	}
-
-	@Override
-	public void onShutterButtonClick(ShutterButton b) {
-		if (isContinuousModeActive) {
-			onShutterButtonPressContinuous();
-		} else {
-			if (handler != null) {
-				handler.shutterButtonClick();
-			} else {
-				// Null handler. Why?
-				showErrorMessage("Null handler error", "Please report this error along with what type of device you are using.");
-			}
-		}
-	}
-
-	@Override
-	public void onShutterButtonFocus(ShutterButton b, boolean pressed) {
-		requestDelayedAutofocus();
-	}
-
-	/**
-	 * Requests autofocus after a 350 ms delay. This delay prevents requesting focus when the user 
-	 * just wants to click the shutter button without focusing. Quick button press/release will 
-	 * trigger onShutterButtonClick() before the focus kicks in.
-	 */
-	private void requestDelayedAutofocus() {
-		// Wait 350 ms before focusing to avoid interfering with quick button presses when
-		// the user just wants to take a picture without focusing.
-		if (handler != null) {
-			handler.requestDelayedAutofocus(350L, R.id.user_requested_auto_focus);
-		}
 	}
 
 	static boolean getFirstLaunch() {
