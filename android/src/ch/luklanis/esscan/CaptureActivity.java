@@ -90,32 +90,8 @@ ShutterButton.OnShutterButtonListener {
 
 	private static final String TAG = CaptureActivity.class.getSimpleName();
 
-	// Note: These constants will be overridden by any default values defined in preferences.xml.
-
-	/** ISO 639-3 language code indicating the default recognition language. */
-	public static final String DEFAULT_SOURCE_LANGUAGE_CODE = "deu";
-
 	/** The default OCR engine to use. */
 	public static final String DEFAULT_OCR_ENGINE_MODE = "Tesseract";
-
-	/** The default page segmentation mode to use. */
-	public static final String DEFAULT_PAGE_SEGMENTATION_MODE = "Single line";
-
-	/** Whether to beep by default when the shutter button is pressed. */
-	public static final boolean DEFAULT_TOGGLE_BEEP = true;
-
-	/** Whether to initially show a looping, real-time OCR display. */
-	public static final boolean DEFAULT_TOGGLE_CONTINUOUS = true;
-
-	/** Whether to initially reverse the image returned by the camera. */
-	public static final boolean DEFAULT_TOGGLE_REVERSED_IMAGE = false;
-
-	/** Whether the light should be initially activated by default. */
-	public static final boolean DEFAULT_TOGGLE_LIGHT = false;
-
-
-	/** Flag to display the real-time recognition results at the top of the scanning screen. */
-	private static final boolean CONTINUOUS_DISPLAY_RECOGNIZED_TEXT = true;
 
 	/** Flag to enable display of the on-screen shutter button. */
 	private static final boolean DISPLAY_SHUTTER_BUTTON = false;
@@ -222,7 +198,7 @@ ShutterButton.OnShutterButtonListener {
 		viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_view);
 		cameraButtonView = findViewById(R.id.camera_button_view);
 		resultView = findViewById(R.id.result_view);
-		
+
 		statusViewTop = findViewById(R.id.status_view_top);
 
 		statusViewBottom = (TextView) findViewById(R.id.status_view_bottom);
@@ -242,8 +218,8 @@ ShutterButton.OnShutterButtonListener {
 			shutterButton.setOnShutterButtonListener(this);
 		}
 
-//		ocrResultView = (TextView) findViewById(R.id.ocr_result_text_view);
-//		registerForContextMenu(ocrResultView);
+		//		ocrResultView = (TextView) findViewById(R.id.ocr_result_text_view);
+		//		registerForContextMenu(ocrResultView);
 
 		cameraManager = new CameraManager(getApplication());
 		viewfinderView.setCameraManager(cameraManager);
@@ -340,7 +316,7 @@ ShutterButton.OnShutterButtonListener {
 				//      if (clipboardManager.hasPrimaryClip()) {
 			}
 		});
-		
+
 		Button resultShare = (Button)findViewById(R.id.button_share_code_row);
 		resultShare.setOnClickListener(new Button.OnClickListener() {
 			@Override
@@ -348,18 +324,18 @@ ShutterButton.OnShutterButtonListener {
 				Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
 				sharingIntent.setType("text/plain");
 				sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "ESR code");
-				
+
 				String text = lastResult.getAccount() 
 						+ "\r\n" + lastResult.getCurrency() 
 						+ " " + lastResult.getAmount()
 						+ "\r\n\r\n" + lastResult.getCompleteCode();
-				
+
 				sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, text);
 
 				startActivity(Intent.createChooser(sharingIntent, "Share via"));
 			}
 		});
-		
+
 		isEngineReady = false;
 	}
 
@@ -567,12 +543,12 @@ ShutterButton.OnShutterButtonListener {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		    MenuInflater inflater = getMenuInflater();
-		    inflater.inflate(R.menu.capture_menu, menu);
-//		super.onCreateOptionsMenu(menu);
-//		menu.add(0, SETTINGS_ID, 0, "Settings").setIcon(android.R.drawable.ic_menu_preferences);
-//		menu.add(0, HISTORY_ID, 0, "History").setIcon(android.R.drawable.ic_menu_recent_history);
-//		menu.add(0, ABOUT_ID, 0, "About").setIcon(android.R.drawable.ic_menu_info_details);
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.capture_menu, menu);
+		//		super.onCreateOptionsMenu(menu);
+		//		menu.add(0, SETTINGS_ID, 0, "Settings").setIcon(android.R.drawable.ic_menu_preferences);
+		//		menu.add(0, HISTORY_ID, 0, "History").setIcon(android.R.drawable.ic_menu_recent_history);
+		//		menu.add(0, ABOUT_ID, 0, "About").setIcon(android.R.drawable.ic_menu_info_details);
 		return true;
 	}
 
@@ -609,8 +585,8 @@ ShutterButton.OnShutterButtonListener {
 
 			HistoryItem item = historyManager.buildHistoryItem(position);
 
-	        Message message = Message.obtain(handler, R.id.esr_show_history_item, item.getResult());
-	        message.sendToTarget();
+			Message message = Message.obtain(handler, R.id.esr_show_history_item, item.getResult());
+			message.sendToTarget();
 		}
 	}
 
@@ -696,8 +672,6 @@ ShutterButton.OnShutterButtonListener {
 			for (String s : CUBE_REQUIRED_LANGUAGES) {
 				if (s.equals(languageCode)) {
 					ocrEngineMode = TessBaseAPI.OEM_CUBE_ONLY;
-					SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-					prefs.edit().putString(PreferencesActivity.KEY_OCR_ENGINE_MODE, getOcrEngineModeName()).commit();
 				}
 			}
 		}
@@ -712,8 +686,6 @@ ShutterButton.OnShutterButtonListener {
 			}
 			if (!cubeOk) {
 				ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-				prefs.edit().putString(PreferencesActivity.KEY_OCR_ENGINE_MODE, getOcrEngineModeName()).commit();
 			}
 		}
 
@@ -738,8 +710,6 @@ ShutterButton.OnShutterButtonListener {
 		if (ocrEngineMode == TessBaseAPI.OEM_CUBE_ONLY || ocrEngineMode == TessBaseAPI.OEM_TESSERACT_CUBE_COMBINED) {
 			Log.d(TAG, "Disabling continuous preview");
 			isContinuousModeActive = false;
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-			prefs.edit().putBoolean(PreferencesActivity.KEY_CONTINUOUS_PREVIEW, false);
 		}
 
 		// Start AsyncTask to install language data and init OCR
@@ -792,22 +762,22 @@ ShutterButton.OnShutterButtonListener {
 				R.drawable.ez_or));
 
 		// Display the recognized text
-//		TextView ocrResultTextView = (TextView) findViewById(R.id.ocr_result_text_view);
-//		ocrResultTextView.setText(esrResult.getCompleteCode());
+		//		TextView ocrResultTextView = (TextView) findViewById(R.id.ocr_result_text_view);
+		//		ocrResultTextView.setText(esrResult.getCompleteCode());
 
 		// Crudely scale betweeen 22 and 32 -- bigger font for shorter text
-//		int scaledSize = Math.max(14, 32 - esrResult.getCompleteCode().length() / 4);
-//		ocrResultTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledSize);
-		
+		//		int scaledSize = Math.max(14, 32 - esrResult.getCompleteCode().length() / 4);
+		//		ocrResultTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledSize);
+
 		TextView accountTextView = (TextView) findViewById(R.id.esr_result_account);
 		accountTextView.setText(esrResult.getAccount());
-		
+
 		TextView amountTextView = (TextView) findViewById(R.id.esr_result_amount);
 		amountTextView.setText(esrResult.getAmount());
-		
+
 		TextView currencyTextView = (TextView) findViewById(R.id.esr_result_currency);
 		currencyTextView.setText(esrResult.getCurrency());
-		
+
 		TextView referenceTextView = (TextView) findViewById(R.id.esr_result_reference_number);
 		referenceTextView.setText(esrResult.getReference());
 
@@ -835,9 +805,7 @@ ShutterButton.OnShutterButtonListener {
 
 		Integer meanConfidence = ocrResult.getMeanConfidence();
 
-		if (CONTINUOUS_DISPLAY_RECOGNIZED_TEXT) {
-			refreshStatusView();
-		}
+		refreshStatusView();
 	}
 
 	/**
@@ -879,15 +847,15 @@ ShutterButton.OnShutterButtonListener {
 		return text;
 	}
 
-//	@Override
-//	public void onCreateContextMenu(ContextMenu menu, View v,
-//			ContextMenuInfo menuInfo) {
-//		super.onCreateContextMenu(menu, v, menuInfo);
-//		if (v.equals(ocrResultView)) {
-//			menu.add(Menu.NONE, OPTIONS_COPY_RECOGNIZED_TEXT_ID, Menu.NONE, "Copy recognized text");
-//			menu.add(Menu.NONE, OPTIONS_SHARE_RECOGNIZED_TEXT_ID, Menu.NONE, "Share recognized text");
-//		} 
-//	}
+	//	@Override
+	//	public void onCreateContextMenu(ContextMenu menu, View v,
+	//			ContextMenuInfo menuInfo) {
+	//		super.onCreateContextMenu(menu, v, menuInfo);
+	//		if (v.equals(ocrResultView)) {
+	//			menu.add(Menu.NONE, OPTIONS_COPY_RECOGNIZED_TEXT_ID, Menu.NONE, "Copy recognized text");
+	//			menu.add(Menu.NONE, OPTIONS_SHARE_RECOGNIZED_TEXT_ID, Menu.NONE, "Share recognized text");
+	//		} 
+	//	}
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
@@ -899,7 +867,7 @@ ShutterButton.OnShutterButtonListener {
 
 			//        clipboardManager.setPrimaryClip(ClipData.newPlainText("ocrResult", ocrResultView.getText()));
 			//      if (clipboardManager.hasPrimaryClip()) {
-			
+
 			if(clipboardManager.hasText()){
 				Toast toast = Toast.makeText(this, "Text copied.", Toast.LENGTH_LONG);
 				toast.setGravity(Gravity.BOTTOM, 0, 0);
@@ -924,19 +892,17 @@ ShutterButton.OnShutterButtonListener {
 	 */
 	private void resetStatusView() {
 		resultView.setVisibility(View.GONE);
-		
-		if (CONTINUOUS_DISPLAY_RECOGNIZED_TEXT) {
-			refreshStatusView();
-			statusViewTop.setVisibility(View.VISIBLE);
-		}
-		
+
+		refreshStatusView();
+		statusViewTop.setVisibility(View.VISIBLE);
+
 		viewfinderView.setVisibility(View.VISIBLE);
 		cameraButtonView.setVisibility(View.VISIBLE);
-		
+
 		if (DISPLAY_SHUTTER_BUTTON) {
 			shutterButton.setVisibility(View.VISIBLE);
 		}
-		
+
 		lastResult = null;
 		viewfinderView.removeResultText();
 	}
@@ -945,7 +911,7 @@ ShutterButton.OnShutterButtonListener {
 		TextView statusView1 = (TextView) findViewById(R.id.status_view_1);
 		TextView statusView2 = (TextView) findViewById(R.id.status_view_2);
 		TextView statusView3 = (TextView) findViewById(R.id.status_view_3);
-		
+
 		statusView1.setBackgroundResource(0);
 		statusView2.setBackgroundResource(0);
 		statusView3.setBackgroundResource(0);
@@ -1084,16 +1050,7 @@ ShutterButton.OnShutterButtonListener {
 	 * @return OCR engine mode
 	 */
 	String getOcrEngineModeName() {
-		String ocrEngineModeName = "";
-		String[] ocrEngineModes = getResources().getStringArray(R.array.ocrenginemodes);
-		if (ocrEngineMode == TessBaseAPI.OEM_TESSERACT_ONLY) {
-			ocrEngineModeName = ocrEngineModes[0];
-		} else if (ocrEngineMode == TessBaseAPI.OEM_CUBE_ONLY) {
-			ocrEngineModeName = ocrEngineModes[1];
-		} else if (ocrEngineMode == TessBaseAPI.OEM_TESSERACT_CUBE_COMBINED) {
-			ocrEngineModeName = ocrEngineModes[2];
-		}
-		return ocrEngineModeName;
+		return DEFAULT_OCR_ENGINE_MODE;
 	}
 
 	/**
@@ -1104,49 +1061,16 @@ ShutterButton.OnShutterButtonListener {
 
 		// Retrieve from preferences, and set in this Activity, the language preferences
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-		setSourceLanguage(prefs.getString(PreferencesActivity.KEY_SOURCE_LANGUAGE_PREFERENCE, CaptureActivity.DEFAULT_SOURCE_LANGUAGE_CODE));
+		setSourceLanguage(prefs.getString(PreferencesActivity.KEY_SOURCE_LANGUAGE_PREFERENCE, "deu"));
 
 		// Retrieve from preferences, and set in this Activity, the capture mode preference
-		if (prefs.getBoolean(PreferencesActivity.KEY_CONTINUOUS_PREVIEW, CaptureActivity.DEFAULT_TOGGLE_CONTINUOUS)) {
-			isContinuousModeActive = true;
-		} else {
-			isContinuousModeActive = false;
-		}
+		isContinuousModeActive = true;
 
 		// Retrieve from preferences, and set in this Activity, the page segmentation mode preference
-		String[] pageSegmentationModes = getResources().getStringArray(R.array.pagesegmentationmodes);
-		String pageSegmentationModeName = prefs.getString(PreferencesActivity.KEY_PAGE_SEGMENTATION_MODE, pageSegmentationModes[0]);
-		if (pageSegmentationModeName.equals(pageSegmentationModes[0])) {
-			pageSegmentationMode = TessBaseAPI.PSM_AUTO_OSD;
-		} else if (pageSegmentationModeName.equals(pageSegmentationModes[1])) {
-			pageSegmentationMode = TessBaseAPI.PSM_AUTO;
-		} else if (pageSegmentationModeName.equals(pageSegmentationModes[2])) {
-			pageSegmentationMode = TessBaseAPI.PSM_SINGLE_BLOCK;
-		} else if (pageSegmentationModeName.equals(pageSegmentationModes[3])) {
-			pageSegmentationMode = TessBaseAPI.PSM_SINGLE_CHAR;
-		} else if (pageSegmentationModeName.equals(pageSegmentationModes[4])) {
-			pageSegmentationMode = TessBaseAPI.PSM_SINGLE_COLUMN;
-		} else if (pageSegmentationModeName.equals(pageSegmentationModes[5])) {
-			pageSegmentationMode = TessBaseAPI.PSM_SINGLE_LINE;
-		} else if (pageSegmentationModeName.equals(pageSegmentationModes[6])) {
-			pageSegmentationMode = TessBaseAPI.PSM_SINGLE_WORD;
-		} else if (pageSegmentationModeName.equals(pageSegmentationModes[7])) {
-			pageSegmentationMode = TessBaseAPI.PSM_SINGLE_BLOCK_VERT_TEXT;
-		}
+		pageSegmentationMode = TessBaseAPI.PSM_SINGLE_LINE;
 
-		// Retrieve from preferences, and set in this Activity, the OCR engine mode
-		String[] ocrEngineModes = getResources().getStringArray(R.array.ocrenginemodes);
-		String ocrEngineModeName = prefs.getString(PreferencesActivity.KEY_OCR_ENGINE_MODE, ocrEngineModes[0]);
-		if (ocrEngineModeName.equals(ocrEngineModes[0])) {
-			ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
-		} else if (ocrEngineModeName.equals(ocrEngineModes[1])) {
-			ocrEngineMode = TessBaseAPI.OEM_CUBE_ONLY;
-		} else if (ocrEngineModeName.equals(ocrEngineModes[2])) {
-			ocrEngineMode = TessBaseAPI.OEM_TESSERACT_CUBE_COMBINED;
-		}
+		ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
 
-		// Retrieve from preferences, and set in this Activity, the character blacklist and whitelist
-		characterBlacklist = OcrCharacterHelper.getBlacklist(prefs, sourceLanguageCodeOcr);
 		characterWhitelist = OcrCharacterHelper.getWhitelist(prefs, sourceLanguageCodeOcr);
 
 		prefs.registerOnSharedPreferenceChangeListener(listener);
@@ -1160,34 +1084,10 @@ ShutterButton.OnShutterButtonListener {
 	private void setDefaultPreferences() {
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-		// Continuous preview
-		prefs.edit().putBoolean(PreferencesActivity.KEY_CONTINUOUS_PREVIEW, CaptureActivity.DEFAULT_TOGGLE_CONTINUOUS).commit();
-
-		// Recognition language
-		prefs.edit().putString(PreferencesActivity.KEY_SOURCE_LANGUAGE_PREFERENCE, CaptureActivity.DEFAULT_SOURCE_LANGUAGE_CODE).commit();
-
-		// OCR Engine
-		prefs.edit().putString(PreferencesActivity.KEY_OCR_ENGINE_MODE, CaptureActivity.DEFAULT_OCR_ENGINE_MODE).commit();
-
-		// Beep
-		prefs.edit().putBoolean(PreferencesActivity.KEY_PLAY_BEEP, CaptureActivity.DEFAULT_TOGGLE_BEEP).commit();
-
-		// Character blacklist
-		prefs.edit().putString(PreferencesActivity.KEY_CHARACTER_BLACKLIST, 
-				OcrCharacterHelper.getDefaultBlacklist(CaptureActivity.DEFAULT_SOURCE_LANGUAGE_CODE)).commit();
-
 		// Character whitelist
 		prefs.edit().putString(PreferencesActivity.KEY_CHARACTER_WHITELIST, 
-				OcrCharacterHelper.getDefaultWhitelist(CaptureActivity.DEFAULT_SOURCE_LANGUAGE_CODE)).commit();
-
-		// Page segmentation mode
-		prefs.edit().putString(PreferencesActivity.KEY_PAGE_SEGMENTATION_MODE, CaptureActivity.DEFAULT_PAGE_SEGMENTATION_MODE).commit();
-
-		// Reversed camera image
-		prefs.edit().putBoolean(PreferencesActivity.KEY_REVERSE_IMAGE, CaptureActivity.DEFAULT_TOGGLE_REVERSED_IMAGE).commit();
-
-		// Light
-		prefs.edit().putBoolean(PreferencesActivity.KEY_TOGGLE_LIGHT, CaptureActivity.DEFAULT_TOGGLE_LIGHT).commit();
+				OcrCharacterHelper.getDefaultWhitelist(
+						prefs.getString(PreferencesActivity.KEY_SOURCE_LANGUAGE_PREFERENCE, "deu"))).commit();
 	}
 
 	/**

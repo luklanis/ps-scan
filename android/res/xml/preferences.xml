@@ -13,57 +13,59 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
- -->
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-
-	<!-- GENERAL SETTINGS -->
-	<PreferenceCategory android:title="General settings">
-
-		<!-- <CheckBoxPreference android:key="preference_capture_continuous"
-			android:title="Continuous preview"
-			android:entries="@array/capturemodes" /> -->
-
-		<ListPreference android:title="Recognize"
-			android:key="sourceLanguageCodeOcrPref"
-			android:entries="@array/languagenames"
-			android:entryValues="@array/iso6393" />
-			
-	</PreferenceCategory>
-
-	<!-- ADVANCED SETTINGS -->
-	<PreferenceCategory android:title="Advanced settings">
-
-	    <ListPreference android:key="preference_ocr_engine_mode"
-	        android:title="OCR engine"
-	        android:entries="@array/ocrenginemodes"
-	        android:entryValues="@array/ocrenginemodes"/>
-	    
-	    <CheckBoxPreference
-            android:key="preferences_play_beep"
-            android:title="Beep"/>
-	    	    
-        <EditTextPreference android:key="preference_character_blacklist"
-            android:title="Character blacklist"/>
-                
-        <EditTextPreference android:key="preference_character_whitelist"
-            android:title="Character whitelist"/>
-
-<!-- 
-		<CheckBoxPreference
-		    android:key="preference_toggle_light"
-		    android:title="Light"/>
 -->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
-	    <ListPreference android:key="preference_page_segmentation_mode"
-			android:title="Page segmentation"
-			android:entries="@array/pagesegmentationmodes"
-			android:entryValues="@array/pagesegmentationmodes" />
+    <!-- GENERAL SETTINGS -->
+    <PreferenceCategory android:title="@string/preferences_general_title" >
+        <CheckBoxPreference
+            android:key="preferences_only_macro_focus"
+            android:defaultValue="false"
+            android:title="@string/preferences_only_macro_focus_title" />
 
-	    <CheckBoxPreference
+        <ListPreference
+            android:key="preferences_source_language"
+            android:defaultValue="deu"
+            android:entries="@array/language_names"
+            android:entryValues="@array/iso6393_language_names"
+            android:title="Recognize" />
+    </PreferenceCategory>
+
+    <!-- ADTA FORMAT SETTINGS -->
+    <PreferenceCategory android:title="@string/preferences_dta_format_title" >
+        <EditTextPreference
+            android:defaultValue=""
+            android:key="preferences_address"
+            android:summary="@string/preferences_address_summary"
+            android:title="@string/preferences_address_title" />
+        <EditTextPreference
+            android:defaultValue=""
+            android:key="preferences_iban"
+            android:title="@string/preferences_iban_title" />
+    </PreferenceCategory>
+
+    <!-- ADVANCED SETTINGS -->
+    <PreferenceCategory android:title="@string/preferences_advanced_title" >
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="preferences_play_beep"
+            android:title="@string/preferences_play_beep_title" />
+        
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="preferences_vibrate"
+            android:title="@string/preferences_vibrate_title" />
+
+        <EditTextPreference
+            android:defaultValue=">+ 0123456789"
+            android:key="preferences_character_whitelist"
+            android:title="@string/preferences_character_whitelist_title" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
             android:key="preferences_reverse_image"
-            android:title="Reversed camera image"
-            android:summary="(For devices with only a front camera)"/>
-	    
-	</PreferenceCategory>
-	
+            android:summary="@string/preferences_reverse_image_summary"
+            android:title="@string/preferences_reverse_image_title" />
+    </PreferenceCategory>
+
 </PreferenceScreen>

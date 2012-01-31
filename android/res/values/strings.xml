@@ -38,4 +38,16 @@
   <string name="esr_result_reference_number">Reference Number</string>
   <string name="button_copy_code_row">Copy code row</string>
   <string name="button_share_code_row">Share code row</string>
+  <string name="preferences_general_title">General settings</string>
+  <string name="preferences_only_macro_focus_title">Use only macro focus mode</string>
+  <string name="preferences_dta_format_title">DTA format settings</string>
+  <string name="preferences_advanced_title">Advanced settings</string>
+  <string name="preferences_play_beep_title">Play beep</string>
+  <string name="preferences_character_whitelist_title">Character whitelist</string>
+  <string name="preferences_reverse_image_title">Reversed camera image</string>
+  <string name="preferences_reverse_image_summary">Enable on devices with a front camera only</string>
+  <string name="preferences_address_title">Your Address</string>
+  <string name="preferences_address_summary">At least your name on the first line and location on the second line</string>
+  <string name="preferences_iban_title">Your IBAN</string>
+  <string name="preferences_vibrate_title">Vibrate</string>
 </resources>

@@ -15,35 +15,8 @@
  limitations under the License.
  -->
 <resources>
-	<string-array name="capturemodes">
-		<item>Continuous</item>
-		<item>Single shot</item>
-	</string-array>
-
-    <string-array name="pagesegmentationmodes">
-        <item>Auto</item>
-        <item>Auto (no OSD)</item>
-        <item>Single block</item>
-        <item>Single character</item>
-        <item>Single column</item>
-        <item>Single line</item>
-        <item>Single word</item>
-        <item>Vertical block</item>
-    </string-array>
-    
-    <string-array name="ocrenginemodes">
-        <item>Tesseract</item>
-        <item>Cube</item>
-        <item>Both</item>
-    </string-array>
-
-	<string-array name="translators">
-		<item>Bing Translator</item>
-		<item>Google Translate</item>
-	</string-array>
-
 	<!-- The elements in this array must match to the iso6393 array. -->
-	<string-array name="languagenames">
+	<string-array name="language_names">
 		<item>Arabic</item>
 		<item>Bulgarian</item>
 		<item>Catalan</item>
@@ -83,7 +56,7 @@
 	</string-array>
 
 	<!-- The elements in this array must match to the languagenames array. -->
-	<string-array name="iso6393">
+	<string-array name="iso6393_language_names">
 		<item>ara</item> <!-- Arabic -->
 		<item>bul</item> <!-- Bulgarian -->
 		<item>cat</item> <!-- Catalan -->
@@ -121,53 +94,4 @@
 		<item>ukr</item> <!-- Ukrainian -->
 		<item>vie</item> <!-- Vietnamese -->
 	</string-array>
-
-	<!-- Unused --> 
-	<string-array name="iso6391">
-		<item>bg</item> <!-- Bulgarian -->
-		<item>ca</item> <!-- Catalan -->
-		<item>zh-CN</item> <!-- Chinese (Simplified) -->
-		<item>zh-TW</item> <!-- Chinese (Traditional) -->
-		<item>cs</item> <!-- Czech -->
-		<item>da</item> <!-- Danish -->
-		<item>nl</item> <!-- Dutch -->
-		<item>en</item> <!-- English -->
-		<item>fi</item> <!-- Finnish -->
-		<item>fr</item> <!-- French -->
-		<item>de</item> <!-- German -->
-		<item>el</item> <!-- Greek -->
-		<item>hu</item> <!-- Hungarian -->
-		<item>id</item> <!-- Indonesian -->
-		<item>it</item> <!-- Italian -->
-		<item>ja</item> <!-- Japanese -->
-		<item>ko</item> <!-- Korean -->
-		<item>lv</item> <!-- Latvian -->
-		<item>lt</item> <!-- Lithuanian -->
-		<item>no</item> <!-- Norwegian -->
-		<item>pl</item> <!-- Polish -->
-		<item>pt</item> <!-- Portuguese -->
-		<item>ro</item> <!-- Romanian -->
-		<item>ru</item> <!-- Russian -->
-		<item>sr</item> <!-- Serbian (Latin) -->
-		<item>sk</item> <!-- Slovak -->
-		<item>sl</item> <!-- Slovenian -->
-		<item>es</item> <!-- Spanish -->
-		<item>sv</item> <!-- Swedish -->
-		<item>tl</item> <!-- Tagalog -->
-		<item>tr</item> <!-- Turkish -->
-		<item>uk</item> <!-- Ukrainian -->
-		<item>vi</item> <!-- Vietnamese -->
-	</string-array>
-	
-	<!-- Translation target codes for Google Translate. -->
-	<!-- The elements in this array must match to the translationtargetlanguagenames_google array. -->
-	
-	<!-- Translation target names for Google Translate. -->
-	<!-- The elements in this array must match to the translationtargetiso6391_google array. -->
-	
-	<!-- Translation target language codes for the Microsoft Translate API. -->
-	<!-- The elements in this array must match to the translationtargetlanguagenames_microsoft array. -->
-	
-	<!-- Translation target names for the Microsoft Translate API. -->
-	<!-- The elements in this array must match to the translationtargetiso6391_microsoft array. -->
 </resources>

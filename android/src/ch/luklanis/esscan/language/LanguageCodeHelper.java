@@ -137,8 +137,8 @@ public class LanguageCodeHelper {
 	 */
 	public static String getOcrLanguageName(Context context, String languageCode) {
 		Resources res = context.getResources();
-		String[] language6393 = res.getStringArray(R.array.iso6393);
-		String[] languageNames = res.getStringArray(R.array.languagenames);
+		String[] language6393 = res.getStringArray(R.array.iso6393_language_names);
+		String[] languageNames = res.getStringArray(R.array.language_names);
 		int len;
 
 		// Finds the given language code in the iso6393 array, and takes the name with the same index

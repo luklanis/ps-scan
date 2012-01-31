@@ -83,11 +83,19 @@ final class CameraConfigurationManager {
     }
 
     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-
-    initializeTorch(parameters, prefs);
-    String focusMode = findSettableValue(parameters.getSupportedFocusModes(),
-                                         Camera.Parameters.FOCUS_MODE_AUTO,
+    
+    String focusMode;
+    
+    if(prefs.getBoolean(PreferencesActivity.KEY_ONLY_MACRO_FOCUS, false)){
+    	focusMode = findSettableValue(parameters.getSupportedFocusModes(),
                                          Camera.Parameters.FOCUS_MODE_MACRO);
+    }
+    else{
+    	focusMode = findSettableValue(parameters.getSupportedFocusModes(),
+                Camera.Parameters.FOCUS_MODE_AUTO,
+                Camera.Parameters.FOCUS_MODE_MACRO);
+    }
+    
     if (focusMode != null) {
       parameters.setFocusMode(focusMode);
     }
@@ -108,18 +116,6 @@ final class CameraConfigurationManager {
     Camera.Parameters parameters = camera.getParameters();
     doSetTorch(parameters, newSetting);
     camera.setParameters(parameters);
-    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-    boolean currentSetting = prefs.getBoolean(PreferencesActivity.KEY_TOGGLE_LIGHT, false);
-    if (currentSetting != newSetting) {
-      SharedPreferences.Editor editor = prefs.edit();
-      editor.putBoolean(PreferencesActivity.KEY_TOGGLE_LIGHT, newSetting);
-      editor.commit();
-    }
-  }
-
-  private static void initializeTorch(Camera.Parameters parameters, SharedPreferences prefs) {
-    boolean currentSetting = prefs.getBoolean(PreferencesActivity.KEY_TOGGLE_LIGHT, false);
-    doSetTorch(parameters, currentSetting);
   }
 
   private static void doSetTorch(Camera.Parameters parameters, boolean newSetting) {
