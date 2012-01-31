@@ -162,7 +162,10 @@ public final class CameraManager {
    * @param message The message to deliver.
    */
   public void requestAutoFocus(Handler handler, int message) {
-    if (camera != null && previewing) {
+	  SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+	  
+    if (camera != null && previewing 
+    		&& !prefs.getBoolean(PreferencesActivity.KEY_ONLY_MACRO_FOCUS, false)) {
       autoFocusCallback.setHandler(handler, message);
       camera.autoFocus(autoFocusCallback);
     }
