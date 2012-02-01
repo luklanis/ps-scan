@@ -22,6 +22,7 @@ import android.content.SharedPreferences;
 import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -37,10 +38,14 @@ public final class BeepManager {
   private static final String TAG = BeepManager.class.getSimpleName();
 
   private static final float BEEP_VOLUME = 0.10f;
+  private static final long VIBRATE_DURATION = 200L;
+
 
   private final Activity activity;
   private MediaPlayer mediaPlayer;
   private boolean playBeep;
+
+private boolean vibrate;
 
   public BeepManager(Activity activity) {
     this.activity = activity;
@@ -51,6 +56,7 @@ public final class BeepManager {
   public void updatePrefs() {
     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
     playBeep = shouldBeep(prefs, activity);
+    vibrate = prefs.getBoolean(PreferencesActivity.KEY_VIBRATE, false);
     if (playBeep && mediaPlayer == null) {
       // The volume on STREAM_SYSTEM is not adjustable, and users found it too loud,
       // so we now play on the music stream.
@@ -63,6 +69,10 @@ public final class BeepManager {
     if (playBeep && mediaPlayer != null) {
       mediaPlayer.start();
     }
+    if (vibrate) {
+        Vibrator vibrator = (Vibrator) activity.getSystemService(Context.VIBRATOR_SERVICE);
+        vibrator.vibrate(VIBRATE_DURATION);
+      }
   }
 
   private static boolean shouldBeep(SharedPreferences prefs, Context activity) {
