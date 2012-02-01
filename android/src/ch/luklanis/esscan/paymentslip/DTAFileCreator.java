@@ -50,29 +50,30 @@ public class DTAFileCreator {
 		StringBuilder historyText = new StringBuilder(1000);
 		
 		String today = getDateFormated(new Date(System.currentTimeMillis()));
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
+		
+		String iban = prefs.getString(PreferencesActivity.KEY_IBAN, "");
 
-		for (HistoryItem historyItem : historyItems) {
+		if(iban == ""){
+			return "";
+		}
 
-					        historyText.append("01").append(getExecutionDateFormated()).append(spacePaddedEnd("", 12));
-					        
-					        historyText.append(padded("", '0', 5, true)).append(nullToEmpty(today));
-//					        // Add timestamp, formatted
-//					        long timestamp = cursor.getLong(1);
-//					        historyText.append('"').append(messageHistoryField(
-//					            EXPORT_DATE_TIME_FORMAT.format(new Date(timestamp)))).append("\",");
-//					        
-//					        historyText.append('"').append(messageHistoryField(cursor.getString(2))).append("\",");
-//					        
-//					        // Add paid, formatted
-//					        long paid = cursor.getLong(3);
-//					        
-//					        if(paid != 0){
-//					        historyText.append('"').append(messageHistoryField(
-//					            EXPORT_DATE_TIME_FORMAT.format(new Date(paid)))).append("\"\r\n");
-//					        }
-//					        else{
-//					            historyText.append('"').append(messageHistoryField("")).append("\"\r\n");
-//					        }
+		for (int i = 0; i < historyItems.size(); i++) {
+			HistoryItem historyItem = historyItems.get(i);
+			
+			String clearing = String.valueOf((Integer.parseInt(iban.substring(4, 9))));
+
+			// HEADER
+			historyText
+			.append("01")
+			.append(getExecutionDateFormated())
+			.append(spacePaddedEnd("", 12))
+			.append(padded("", '0', 5, true))
+			.append(nullToEmpty(today))
+			.append(spacePaddedEnd(clearing, 7))
+			.append(padded("", 'X', 5, true))
+			.append(padded(String.valueOf(i + 1), '0', 5, false))
+			.append("82600"); 
 
 		}
 		return historyText;
