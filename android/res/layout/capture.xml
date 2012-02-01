@@ -208,20 +208,6 @@
                 android:textSize="14sp" />
         </LinearLayout>
 
-        <!--
-             <TextView
-            android:id="@+id/status_view_top"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:autoLink="web"
-            android:background="#0000"
-            android:clickable="true"
-            android:text=""
-            android:textColor="@color/status_text"
-            android:textSize="14sp" />
-        -->
-
         <ch.luklanis.esscan.camera.ShutterButton
             android:id="@+id/shutter_button"
             android:layout_width="wrap_content"

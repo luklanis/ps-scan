@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ch.luklanis.esscan.validation;
+package ch.luklanis.esscan.paymentslip;
 
 public abstract class PsValidation {
     private static final int STEP_COUNT = 1;  

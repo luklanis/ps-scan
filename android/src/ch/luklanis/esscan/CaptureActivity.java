@@ -30,8 +30,8 @@ import ch.luklanis.esscan.history.HistoryActivity;
 import ch.luklanis.esscan.history.HistoryItem;
 import ch.luklanis.esscan.history.HistoryManager;
 import ch.luklanis.esscan.language.LanguageCodeHelper;
-import ch.luklanis.esscan.validation.EsrValidation;
-import ch.luklanis.esscan.validation.PsValidation;
+import ch.luklanis.esscan.paymentslip.EsrValidation;
+import ch.luklanis.esscan.paymentslip.PsValidation;
 
 import android.app.Activity;
 import android.app.AlertDialog;

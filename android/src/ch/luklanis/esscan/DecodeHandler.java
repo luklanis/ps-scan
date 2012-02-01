@@ -24,7 +24,6 @@ import ch.luklanis.esscan.CaptureActivity;
 import ch.luklanis.esscan.OcrRecognizeAsyncTask;
 import ch.luklanis.esscan.R;
 
-import android.app.ProgressDialog;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
