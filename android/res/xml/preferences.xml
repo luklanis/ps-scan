@@ -31,17 +31,28 @@
             android:title="Recognize" />
     </PreferenceCategory>
 
-    <!-- ADTA FORMAT SETTINGS -->
+    <!-- DTA FORMAT SETTINGS -->
     <PreferenceCategory android:title="@string/preferences_dta_format_title" >
+        
         <EditTextPreference
             android:defaultValue=""
             android:key="preferences_address"
             android:summary="@string/preferences_address_summary"
             android:title="@string/preferences_address_title" />
+        
         <EditTextPreference
             android:defaultValue=""
             android:key="preferences_iban"
             android:title="@string/preferences_iban_title" />
+
+        <ListPreference
+            android:key="preferences_execution_day"
+            android:defaultValue="26"
+            android:entries="@array/execution_day"
+            android:entryValues="@array/execution_day"
+            android:title="@string/preferences_execution_day_title"
+            android:summary="@string/preferences_execution_day_summary" />
+        
     </PreferenceCategory>
 
     <!-- ADVANCED SETTINGS -->

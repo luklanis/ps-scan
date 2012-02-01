@@ -50,4 +50,6 @@
   <string name="preferences_address_summary">At least your name on the first line and location on the second line</string>
   <string name="preferences_iban_title">Your IBAN</string>
   <string name="preferences_vibrate_title">Vibrate</string>
+  <string name="preferences_execution_day_title">Execution day</string>
+  <string name="preferences_execution_day_summary">Day of pay execution every month</string>
 </resources>

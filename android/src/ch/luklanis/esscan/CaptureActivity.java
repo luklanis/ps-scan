@@ -36,6 +36,7 @@ import ch.luklanis.esscan.validation.PsValidation;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+//import android.content.ClipData;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -775,6 +776,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 	 * @param ocrResult Object representing successful OCR results
 	 */
 	void handleOcrContinuousDecode(OcrResult ocrResult) {
+		
+		beepManager.playBeepSoundAndVibrate();
 
 		// Send an OcrResultText object to the ViewfinderView for text rendering
 		viewfinderView.addResultText(new OcrResultText(ocrResult.getText(), 
@@ -811,6 +814,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 	 * "Hello world!"} with {@code world} in red.
 	 * 
 	 */
+	@SuppressWarnings("unused")
 	private CharSequence setSpanBetweenTokens(CharSequence text, String token,
 			CharacterStyle... cs) {
 		// Start and end refer to the points where the span will apply
@@ -846,8 +850,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 			ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
 			clipboardManager.setText(ocrResultView.getText());
 
-			//        clipboardManager.setPrimaryClip(ClipData.newPlainText("ocrResult", ocrResultView.getText()));
-			//      if (clipboardManager.hasPrimaryClip()) {
+//			        clipboardManager.setPrimaryClip(ClipData.newPlainText("ocrResult", ocrResultView.getText()));
+//			      if (clipboardManager.hasPrimaryClip()) {
 
 			if(clipboardManager.hasText()){
 				Toast toast = Toast.makeText(this, "Text copied.", Toast.LENGTH_LONG);
