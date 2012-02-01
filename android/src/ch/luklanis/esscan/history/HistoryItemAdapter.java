@@ -25,8 +25,8 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import ch.luklanis.esscan.EsrResult;
 import ch.luklanis.esscan.R;
+import ch.luklanis.esscan.paymentslip.EsrResult;
 
 import java.util.ArrayList;
 

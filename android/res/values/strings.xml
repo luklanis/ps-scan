@@ -47,7 +47,7 @@
   <string name="preferences_reverse_image_title">Reversed camera image</string>
   <string name="preferences_reverse_image_summary">Enable on devices with a front camera only</string>
   <string name="preferences_address_title">Your Address</string>
-  <string name="preferences_address_summary">At least your name on the first line and location on the second line</string>
+  <string name="preferences_address_summary">At least your name/surname on the first line and ZIP/city on the second line</string>
   <string name="preferences_iban_title">Your IBAN</string>
   <string name="preferences_vibrate_title">Vibrate</string>
   <string name="preferences_execution_day_title">Execution day</string>

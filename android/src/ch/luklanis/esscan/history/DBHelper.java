@@ -29,7 +29,7 @@ final class DBHelper extends SQLiteOpenHelper {
   private static final String DB_NAME = "barcode_scanner_history.db";
   static final String TABLE_NAME = "history";
   static final String ID_COL = "id";
-  static final String TEXT_COL = "text";
+  static final String CODE_ROW_COL = "code_row";
   static final String TIMESTAMP_COL = "timestamp";
   static final String ADDRESS_COL = "address";
   static final String PAID_COL = "buyed";
@@ -43,7 +43,7 @@ final class DBHelper extends SQLiteOpenHelper {
     sqLiteDatabase.execSQL(
             "CREATE TABLE " + TABLE_NAME + " (" +
             ID_COL + " INTEGER PRIMARY KEY, " +
-            TEXT_COL + " TEXT, " +
+            CODE_ROW_COL + " TEXT, " +
             TIMESTAMP_COL + " INTEGER, " +
             ADDRESS_COL + " TEXT, " +
             PAID_COL + " INTEGER);");

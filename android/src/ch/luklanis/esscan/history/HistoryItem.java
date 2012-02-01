@@ -16,7 +16,7 @@
 
 package ch.luklanis.esscan.history;
 
-import ch.luklanis.esscan.EsrResult;
+import ch.luklanis.esscan.paymentslip.EsrResult;
 
 public final class HistoryItem {
 

@@ -17,6 +17,7 @@ package ch.luklanis.esscan;
 
 import java.util.List;
 
+import ch.luklanis.esscan.paymentslip.EsrResult;
 import ch.luklanis.esscan.paymentslip.PsValidation;
 
 import com.googlecode.tesseract.android.TessBaseAPI;

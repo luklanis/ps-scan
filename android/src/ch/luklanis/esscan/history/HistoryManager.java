@@ -17,7 +17,7 @@
 
 package ch.luklanis.esscan.history;
 
-import ch.luklanis.esscan.EsrResult;
+import ch.luklanis.esscan.paymentslip.EsrResult;
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -50,7 +50,7 @@ public final class HistoryManager {
   private static final int MAX_ITEMS = 500;
 
   private static final String[] COLUMNS = {
-      DBHelper.TEXT_COL,
+      DBHelper.CODE_ROW_COL,
       DBHelper.TIMESTAMP_COL,
       DBHelper.ADDRESS_COL,
       DBHelper.PAID_COL
@@ -92,11 +92,11 @@ public final class HistoryManager {
       db = helper.getReadableDatabase();
       cursor = db.query(DBHelper.TABLE_NAME, COLUMNS, null, null, null, null, DBHelper.TIMESTAMP_COL + " DESC");
       while (cursor.moveToNext()) {
-    	  String text = cursor.getString(0);
+    	  String code_row = cursor.getString(0);
     	  long timestamp = cursor.getLong(1);
     	  String address = cursor.getString(2);
     	  long paid = cursor.getLong(3);
-    	  EsrResult result = new EsrResult(text, timestamp, address, paid);
+    	  EsrResult result = new EsrResult(code_row, timestamp, address, paid);
     	  items.add(new HistoryItem(result));
       }
     } finally {
@@ -154,7 +154,7 @@ public final class HistoryManager {
 //	  }
 
     ContentValues values = new ContentValues();
-    values.put(DBHelper.TEXT_COL, result.getCompleteCode());
+    values.put(DBHelper.CODE_ROW_COL, result.getCompleteCode());
     values.put(DBHelper.TIMESTAMP_COL, result.getTimestamp());
     values.put(DBHelper.ADDRESS_COL, result.getAddress());
     values.put(DBHelper.PAID_COL, result.getPaid());
@@ -180,7 +180,7 @@ public final class HistoryManager {
       db = helper.getWritableDatabase();
       cursor = db.query(DBHelper.TABLE_NAME,
                         ID_ADDRESS_COL_PROJECTION,
-                        DBHelper.TEXT_COL + "=?",
+                        DBHelper.CODE_ROW_COL + "=?",
                         new String[] { itemID },
                         null,
                         null,
@@ -213,7 +213,7 @@ public final class HistoryManager {
       db = helper.getWritableDatabase();
       cursor = db.query(DBHelper.TABLE_NAME,
                         ID_PAID_COL_PROJECTION,
-                        DBHelper.TEXT_COL + "=?",
+                        DBHelper.CODE_ROW_COL + "=?",
                         new String[] { itemID },
                         null,
                         null,
@@ -240,7 +240,7 @@ private void deletePrevious(String text) {
     SQLiteDatabase db = null;
     try {
       db = helper.getWritableDatabase();      
-      db.delete(DBHelper.TABLE_NAME, DBHelper.TEXT_COL + "=?", new String[] { text });
+      db.delete(DBHelper.TABLE_NAME, DBHelper.CODE_ROW_COL + "=?", new String[] { text });
     } finally {
       close(null, db);
     }
@@ -330,7 +330,7 @@ private void deletePrevious(String text) {
   }
 
   static Uri saveHistory(String history) {
-    File bsRoot = new File(Environment.getExternalStorageDirectory(), "BarcodeScanner");
+    File bsRoot = new File(Environment.getExternalStorageDirectory(), "ESRScan");
     File historyRoot = new File(bsRoot, "History");
     if (!historyRoot.exists() && !historyRoot.mkdirs()) {
       Log.w(TAG, "Couldn't make dir " + historyRoot);

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ch.luklanis.esscan;
+package ch.luklanis.esscan.paymentslip;
 
 /**
  * Encapsulates the result of OCR.

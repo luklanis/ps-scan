@@ -30,6 +30,7 @@ import ch.luklanis.esscan.history.HistoryActivity;
 import ch.luklanis.esscan.history.HistoryItem;
 import ch.luklanis.esscan.history.HistoryManager;
 import ch.luklanis.esscan.language.LanguageCodeHelper;
+import ch.luklanis.esscan.paymentslip.EsrResult;
 import ch.luklanis.esscan.paymentslip.EsrValidation;
 import ch.luklanis.esscan.paymentslip.PsValidation;
 
