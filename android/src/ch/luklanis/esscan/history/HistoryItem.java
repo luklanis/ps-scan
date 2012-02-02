@@ -20,13 +20,45 @@ import ch.luklanis.esscan.paymentslip.EsrResult;
 
 public final class HistoryItem {
 
-  private final EsrResult result;
-  
-  HistoryItem(EsrResult result) {
-    this.result = result;
-  }
+	private final EsrResult result;
+	private String address;
+	private String amount;
 
-  public EsrResult getResult() {
-    return result;
-  }  
+	HistoryItem(EsrResult result) {
+		this.result = result;
+		this.address = null;
+		this.amount = null;
+	}
+
+	HistoryItem(EsrResult result, String amount) {
+		this.result = result;
+		this.address = null;
+		this.amount = amount;
+	}
+
+	HistoryItem(EsrResult result, String amount, String address) {
+		this.result = result;
+		this.address = address;
+		this.amount = amount;
+	}
+
+	public EsrResult getResult() {
+		return result;
+	}
+
+	public String getAddress() {
+		return address;
+	}  
+
+//	public void setAddress(String address){
+//		this.address = address;
+//	}
+
+	public String getAmount() {
+		if(result.getAmount() != ""){
+			return result.getAmount();
+		}
+		
+		return amount;
+	}
 }

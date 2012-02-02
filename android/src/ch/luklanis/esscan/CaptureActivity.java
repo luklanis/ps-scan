@@ -1035,6 +1035,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 	}
 
 	public void saveInHistory(EsrResult result) {
-		historyManager.addHistoryItem(result);
+		historyManager.addHistoryItem(result, "", "");
 	}
 }

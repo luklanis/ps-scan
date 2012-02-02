@@ -53,14 +53,14 @@ public final class HistoryManager {
       DBHelper.CODE_ROW_COL,
       DBHelper.TIMESTAMP_COL,
       DBHelper.ADDRESS_COL,
-      DBHelper.PAID_COL
+      DBHelper.AMOUNT_COL
   };
 
   private static final String[] COUNT_COLUMN = { "COUNT(1)" };
 
   private static final String[] ID_COL_PROJECTION = { DBHelper.ID_COL };
   private static final String[] ID_ADDRESS_COL_PROJECTION = { DBHelper.ID_COL, DBHelper.ADDRESS_COL };
-  private static final String[] ID_PAID_COL_PROJECTION = { DBHelper.ID_COL, DBHelper.PAID_COL };
+  private static final String[] ID_AMOUNT_COL_PROJECTION = { DBHelper.ID_COL, DBHelper.AMOUNT_COL };
   private static final DateFormat EXPORT_DATE_TIME_FORMAT = DateFormat.getDateTimeInstance();
 
   private final Activity activity;
@@ -95,9 +95,9 @@ public final class HistoryManager {
     	  String code_row = cursor.getString(0);
     	  long timestamp = cursor.getLong(1);
     	  String address = cursor.getString(2);
-    	  long paid = cursor.getLong(3);
-    	  EsrResult result = new EsrResult(code_row, timestamp, address, paid);
-    	  items.add(new HistoryItem(result));
+    	  String amount = cursor.getString(3);
+    	  EsrResult result = new EsrResult(code_row, timestamp);
+    	  items.add(new HistoryItem(result, amount, address));
       }
     } finally {
       close(cursor, db);
@@ -116,9 +116,9 @@ public final class HistoryManager {
       String text = cursor.getString(0);
       long timestamp = cursor.getLong(1);
       String address = cursor.getString(2);
-      long paid = cursor.getLong(3);
-      EsrResult result = new EsrResult(text, timestamp, address, paid);
-      return new HistoryItem(result);
+	  String amount = cursor.getString(3);
+      EsrResult result = new EsrResult(text, timestamp);
+      return new HistoryItem(result, amount, address);
     } finally {
       close(cursor, db);
     }
@@ -141,7 +141,7 @@ public final class HistoryManager {
     }
   }
 
-  public void addHistoryItem(EsrResult result) {
+  public void addHistoryItem(EsrResult result, String amount, String address) {
     // Do not save this item to the history if the preference is turned off, or the contents are
     // considered secure.
 //    if (!activity.getIntent().getBooleanExtra(Intents.Scan.SAVE_HISTORY, true)) {
@@ -156,8 +156,8 @@ public final class HistoryManager {
     ContentValues values = new ContentValues();
     values.put(DBHelper.CODE_ROW_COL, result.getCompleteCode());
     values.put(DBHelper.TIMESTAMP_COL, result.getTimestamp());
-    values.put(DBHelper.ADDRESS_COL, result.getAddress());
-    values.put(DBHelper.PAID_COL, result.getPaid());
+    values.put(DBHelper.AMOUNT_COL, amount);
+    values.put(DBHelper.ADDRESS_COL, address);
 
     SQLiteOpenHelper helper = new DBHelper(activity);
     SQLiteDatabase db = null;
@@ -203,7 +203,7 @@ public final class HistoryManager {
     }
   }
 
-  public void updateHistoryItemPaid(String itemID, long itemPaid) {
+  public void updateHistoryItemAmount(String itemID, String itemAmount) {
     // As we're going to do an update only we don't need need to worry
     // about the preferences; if the item wasn't saved it won't be updated
     SQLiteOpenHelper helper = new DBHelper(activity);
@@ -212,7 +212,7 @@ public final class HistoryManager {
     try {
       db = helper.getWritableDatabase();
       cursor = db.query(DBHelper.TABLE_NAME,
-                        ID_PAID_COL_PROJECTION,
+                        ID_AMOUNT_COL_PROJECTION,
                         DBHelper.CODE_ROW_COL + "=?",
                         new String[] { itemID },
                         null,
@@ -225,7 +225,7 @@ public final class HistoryManager {
       }
 
       ContentValues values = new ContentValues();
-      values.put(DBHelper.PAID_COL, itemPaid);
+      values.put(DBHelper.AMOUNT_COL, itemAmount);
 
       db.update(DBHelper.TABLE_NAME, values, DBHelper.ID_COL + "=?", new String[] { oldID });
 

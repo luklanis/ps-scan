@@ -32,7 +32,7 @@ final class DBHelper extends SQLiteOpenHelper {
   static final String CODE_ROW_COL = "code_row";
   static final String TIMESTAMP_COL = "timestamp";
   static final String ADDRESS_COL = "address";
-  static final String PAID_COL = "buyed";
+  static final String AMOUNT_COL = "amount";
 
   DBHelper(Context context) {
     super(context, DB_NAME, null, DB_VERSION);
@@ -46,7 +46,7 @@ final class DBHelper extends SQLiteOpenHelper {
             CODE_ROW_COL + " TEXT, " +
             TIMESTAMP_COL + " INTEGER, " +
             ADDRESS_COL + " TEXT, " +
-            PAID_COL + " INTEGER);");
+            AMOUNT_COL + " TEXT);");
   }
 
   @Override

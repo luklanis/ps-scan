@@ -20,38 +20,17 @@ package ch.luklanis.esscan.paymentslip;
  */
 public final class EsrResult {
 	private final String completeCode;
-	private final String address;
 
 	private final long timestamp;
-
-	private long paid;
 
 	public EsrResult(String completeCode) {
 		this.completeCode = completeCode;
 		this.timestamp = System.currentTimeMillis();
-		this.address = null;
-		this.paid = 0;
 	}
 
 	public EsrResult(String completeCode, long timestamp) {
 		this.completeCode = completeCode;
 		this.timestamp = timestamp;
-		this.address = null;
-		this.paid = 0;
-	}
-
-	public EsrResult(String completeCode, long timestamp, String address) {
-		this.completeCode = completeCode;
-		this.timestamp = timestamp;
-		this.address = address;
-		this.paid = 0;
-	}
-
-	public EsrResult(String completeCode, long timestamp, String address, long paid) {
-		this.completeCode = completeCode;
-		this.timestamp = timestamp;
-		this.address = address;
-		this.paid = paid;
 	}
 
 	public String getCompleteCode() {
@@ -60,18 +39,6 @@ public final class EsrResult {
 
 	public long getTimestamp() {
 		return timestamp;
-	}
-
-	public String getAddress() {
-		return address;
-	}
-
-	public long getPaid() {
-		return paid;
-	}
-
-	public void setPaidNow() {
-		paid = System.currentTimeMillis();
 	}
 
 	public String getAmount(){
@@ -118,6 +85,17 @@ public final class EsrResult {
 
 		return code.substring((indexOfSpace + 1), (indexOfSpace + 3)) + "-" + String.valueOf(indentureNumber) + "-"
 		+ code.substring((indexOfSpace + 9), (indexOfSpace + 10));
+	}
+
+	public String getAccountUnformated(){
+		String code = completeCode;
+		int indexOfSpace = code.indexOf(' ');
+
+		if(indexOfSpace < 0){
+			return "";
+		}
+
+		return code.substring((indexOfSpace + 3), (indexOfSpace + 9));
 	}
 
 	public String getReference(){
