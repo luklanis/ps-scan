@@ -161,7 +161,7 @@ public final class HistoryActivity extends ListActivity {
         } else {
           Intent intent = new Intent(Intent.ACTION_SEND, Uri.parse("mailto:"));
           intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-          String subject = getResources().getString(R.string.history_email_title);
+          String subject = getResources().getString(R.string.history_email_as_dta_title);
           intent.putExtra(Intent.EXTRA_SUBJECT, subject);
           intent.putExtra(Intent.EXTRA_TEXT, subject);
           intent.putExtra(Intent.EXTRA_STREAM, dtaFile);

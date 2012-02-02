@@ -25,6 +25,8 @@ import android.util.Log;
 public class DTAFileCreator {
 
 	private static final String TAG = DTAFileCreator.class.getName();
+	private static final String NEWLINE_PATTERN = "[\\r\\n]+";
+	private static final String SPACE_PATTERN = "\\s";
 	private Activity activity;
 
 	public DTAFileCreator(Activity activity){
@@ -50,9 +52,9 @@ public class DTAFileCreator {
 		String today = getDateFormated(new Date(System.currentTimeMillis()));
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 
-		String iban = prefs.getString(PreferencesActivity.KEY_IBAN, "").replaceAll("\\s", "");
+		String iban = prefs.getString(PreferencesActivity.KEY_IBAN, "").replaceAll(SPACE_PATTERN, "");
 
-		String[] ownAddress = prefs.getString(PreferencesActivity.KEY_ADDRESS, "").split("\\r\\n");
+		String[] ownAddress = prefs.getString(PreferencesActivity.KEY_ADDRESS, "").split(NEWLINE_PATTERN);
 
 		float totalAmount = 0;
 
@@ -77,93 +79,103 @@ public class DTAFileCreator {
 
 			String account = esrResult.getAccount().replaceAll("-", "");
 
-			String[] address = esrResult.getAddress() != null ? esrResult.getAddress().split("\\r\\n"):new String[0];
+			String[] address = esrResult.getAddress() != null 
+					? esrResult.getAddress().split(NEWLINE_PATTERN)
+							: new String[0];
 
-			CharSequence paddedSequenz = padded(String.valueOf(i + 1), '0', 5, false);
+					CharSequence paddedSequenz = padded(String.valueOf(i + 1), '0', 5, false);
 
-			String amount = esrResult.getAmount().replace('.', ',');
+					String amount = esrResult.getAmount().replace('.', ',');
 
-			totalAmount += Float.parseFloat(esrResult.getAmount());
+					totalAmount += Float.parseFloat(esrResult.getAmount());
 
-			// HEADER for ESR
-			dtaText
-			.append("01")	// Segment number
-			.append(getExecutionDateFormated())	// desired execution date
-			.append(spacePaddedEnd("", 12))	// Clearing number of the target bank (not needed for ESR payments)
-			.append(padded("", '0', 5, true))	// Sequenz number (has to be 5 x 0)
-			.append(nullToEmpty(today))	// creation date
-			.append(spacePaddedEnd(clearing, 7))	// own clearing number
-			.append(padded("", 'X', 5, true))	// identification number
-			.append(paddedSequenz)	// sequenz number
-			.append("82600");	// transaction type (ESR = 826), payment type (ESR = 0) and a flag (always 0)
+					// HEADER for ESR
+					dtaText
+					.append("01")	// Segment number
+					.append(getExecutionDateFormated())	// desired execution date
+					.append(spacePaddedEnd("", 12))	// Clearing number of the target bank (not needed for ESR payments)
+					.append(padded("", '0', 5, true))	// Sequenz number (has to be 5 x 0)
+					.append(nullToEmpty(today))	// creation date
+					.append(spacePaddedEnd(clearing, 7))	// own clearing number
+					.append(padded("", 'X', 5, true))	// identification number
+					.append(paddedSequenz)	// sequenz number
+					.append("82600");	// transaction type (ESR = 826), payment type (ESR = 0) and a flag (always 0)
 
-			// ESR
-			dtaText
-			.append(padded("", 'X', 5, true))	// identification number (again)
-			.append("WZ0000")	// transaction number part 1
-			.append(paddedSequenz)	// transaction number part 2
-			.append(spacePaddedEnd(iban, 24))	// own IBAN
-			.append(spacePaddedEnd("", 6))	// Valuta (Blanks in ESR)
-			.append(currency)
-			.append(spacePaddedEnd(amount, 12))
-			.append(spacePaddedEnd("", 14))	// Reserve
-			.append("02")	// Begin Segment 02
-			.append(spacePaddedEnd(ownAddress[0], 20))
-			.append(spacePaddedEnd(ownAddress[1], 20));
+					// ESR
+					dtaText
+					.append(padded("", 'X', 5, true))	// identification number (again)
+					.append("WZ0000")	// transaction number part 1
+					.append(paddedSequenz)	// transaction number part 2
+					.append(spacePaddedEnd(iban, 24))	// own IBAN
+					.append(spacePaddedEnd("", 6))	// Valuta (Blanks in ESR)
+					.append(currency)
+					.append(spacePaddedEnd(amount, 12))
+					.append(spacePaddedEnd("", 14))	// Reserve
+					.append("02")	// Begin Segment 02
+					.append(spacePaddedEnd(ownAddress[0], 20))
+					.append(spacePaddedEnd(ownAddress[1], 20));
 
-			if(ownAddress.length > 2){
-				dtaText.append(spacePaddedEnd(ownAddress[2], 20));
-			}
-			if(ownAddress.length > 3){
-				dtaText.append(spacePaddedEnd(ownAddress[3], 20));
-			}
-			dtaText.append(spacePaddedEnd("", 46));	// Reserve
+					String ownAddressTemp = "";
+					if(ownAddress.length > 2){
+						ownAddressTemp += spacePaddedEnd(ownAddress[2], 20);
+					}
+					if(ownAddress.length > 3){
+						ownAddressTemp += spacePaddedEnd(ownAddress[3], 20);
+					}
+					
+					dtaText
+					.append(spacePaddedEnd(ownAddressTemp, 40))
+					.append(spacePaddedEnd("", 46));	// Reserve
 
-			dtaText
-			.append("03")	// Begin Segment 03
-			.append("/C/")	// Account begin
-			.append(padded(account, '0', 9, false));	// Account
+					dtaText
+					.append("03")	// Begin Segment 03
+					.append("/C/")	// Account begin
+					.append(padded(account, '0', 9, false));	// Account
 
-			if(address.length > 0){
-				dtaText.append(spacePaddedEnd(address[0], 20));
-			}
-			if(address.length > 1){
-				dtaText.append(spacePaddedEnd(address[1], 20));
-			}
-			if(address.length > 2){
-				dtaText.append(spacePaddedEnd(address[2], 20));
-			}
-			if(address.length > 3){
-				dtaText.append(spacePaddedEnd(address[3], 20));
-			}
+					String addressTemp = "";
+					if(address.length > 0){
+						addressTemp += spacePaddedEnd(address[0], 20);
+					}
+					if(address.length > 1){
+						addressTemp += spacePaddedEnd(address[1], 20);
+					}
+					if(address.length > 2){
+						addressTemp += spacePaddedEnd(address[2], 20);
+					}
+					if(address.length > 3){
+						addressTemp += spacePaddedEnd(address[3], 20);
+					}
+					
+					dtaText.append(spacePaddedEnd(addressTemp, 80));
 
-			if(account.length() > 5){
-				dtaText.append(padded(esrResult.getReference(), '0', 27, false));	// Referenz number
-			}
-			else{
-				dtaText.append(spacePaddedEnd(esrResult.getReference(), 27));	// Refernz number (with 5 digits account)
-				Log.w(TAG, "account only 5 digits long -> this will not work!");
-			}
+					String referenzNumber = esrResult.getReference().replaceAll(SPACE_PATTERN, "");
+					if(account.length() > 5){
+						dtaText.append(padded(referenzNumber, '0', 27, false));	// Referenz number
+					}
+					else{
+						dtaText.append(spacePaddedEnd(referenzNumber, 27));	// Refernz number (with 5 digits account)
+						Log.w(TAG, "account only 5 digits long -> this will not work!");
+					}
 
-			dtaText.append("  ")	// ESR Checksum (only with 5 digits, which is not supported)
-			.append(spacePaddedEnd("", 5));	// Reserve
+					dtaText.append("  ")	// ESR Checksum (only with 5 digits, which is not supported)
+					.append(spacePaddedEnd("", 5));	// Reserve
 		}
 
 		// HEADER for Total Record
 		dtaText
 		.append("01")	// Segment number
-		.append(getExecutionDateFormated())	// desired execution date
+		.append(padded("", '0', 6, true))	// desired execution date (not set in Total Record)
 		.append(spacePaddedEnd("", 12))	// Clearing number of the target bank (not needed for ESR payments)
 		.append(padded("", '0', 5, true))	// Sequenz number (has to be 5 x 0)
 		.append(nullToEmpty(today))	// creation date
-		.append(spacePaddedEnd(clearing, 7))	// own clearing number
+		.append(spacePaddedEnd("", 7))	// own clearing number (not set in Total Record)
 		.append(padded("", 'X', 5, true))	// identification number
 		.append(padded(String.valueOf(esrResults.size() + 1), '0', 5, false))	// sequenz number
 		.append("89000");	// transaction type (Total Record = 890), payment type (ESR = 0) and a flag (always 0)
 
-		String totalAmountTemp = String.valueOf(totalAmount).replace('.', ',');
-		int indexOfDecimal = totalAmountTemp.indexOf(',');
-		totalAmountTemp = totalAmountTemp.substring(indexOfDecimal + 1, indexOfDecimal + 3);
+		String[] totalAmountSplit = String.valueOf(totalAmount).split("\\.");
+		
+		String totalAmountTemp = totalAmountSplit[0] + "," + padded(totalAmountSplit[1], '0', 3, true);
 
 		// Total Record
 		dtaText
@@ -204,17 +216,17 @@ public class DTAFileCreator {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 
 		String iban = prefs.getString(PreferencesActivity.KEY_IBAN, "").replaceAll("\\s", "");
-		
+
 		if(iban == ""){
 			return activity.getResources().getString(R.string.msg_own_iban_is_not_set);
 		}
 
-		String[] ownAddress = prefs.getString(PreferencesActivity.KEY_ADDRESS, "").split("\\r\\n");
-		
+		String[] ownAddress = prefs.getString(PreferencesActivity.KEY_ADDRESS, "").split(NEWLINE_PATTERN);
+
 		if(ownAddress.length < 2){
 			return activity.getResources().getString(R.string.msg_own_address_is_not_set);
 		}
-		
+
 		List<EsrResult> esrResults = new ArrayList<EsrResult>();
 
 		for (HistoryItem historyItem : historyItems) {
