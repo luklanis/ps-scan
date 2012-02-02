@@ -34,6 +34,9 @@
   <string name="menu_share">Share</string>
   <string name="msg_sure">Are you sure?</string>
   <string name="msg_unmount_usb">Sorry, the SD card is not accessible.</string>
+  <string name="msg_amount_is_empty">Sorry, please set the amount for the transfer to %s first.</string>
+  <string name="msg_own_iban_is_not_set">Sorry, need your own IBAN to create DTA files. You can set it under menu -> settings.</string>
+  <string name="msg_own_address_is_not_set">Sorry, need your own address to create DTA files. You can set it under menu -> settings.</string>
   <string name="esr_result_account">Account</string>
   <string name="esr_result_reference_number">Reference Number</string>
   <string name="button_copy_code_row">Copy code row</string>

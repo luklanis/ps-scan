@@ -33,13 +33,14 @@ import android.widget.ListView;
 import ch.luklanis.esscan.CaptureActivity;
 import ch.luklanis.esscan.Intents;
 import ch.luklanis.esscan.R;
+import ch.luklanis.esscan.paymentslip.DTAFileCreator;
 
 import java.util.List;
 
 public final class HistoryActivity extends ListActivity {
 
-  private static final int SEND_ID = Menu.FIRST;
-  private static final int CLEAR_ID = Menu.FIRST + 1;
+//  private static final int SEND_ID = Menu.FIRST;
+//  private static final int CLEAR_ID = Menu.FIRST + 1;
 
   private HistoryManager historyManager;
   private HistoryItemAdapter adapter;
@@ -109,14 +110,12 @@ public final class HistoryActivity extends ListActivity {
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
-      case SEND_ID:
+//      case SEND_ID:
+    case R.id.history_menu_send:
         CharSequence history = historyManager.buildHistory();
         Uri historyFile = HistoryManager.saveHistory(history.toString());
         if (historyFile == null) {
-          AlertDialog.Builder builder = new AlertDialog.Builder(this);
-          builder.setMessage(R.string.msg_unmount_usb);
-          builder.setPositiveButton(R.string.button_ok, null);
-          builder.show();
+            setOKAlert(R.string.msg_unmount_usb);
         } else {
           Intent intent = new Intent(Intent.ACTION_SEND, Uri.parse("mailto:"));
           intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
@@ -128,7 +127,8 @@ public final class HistoryActivity extends ListActivity {
           startActivity(intent);
         }
         break;
-      case CLEAR_ID:
+//      case CLEAR_ID:
+    case R.id.history_menu_clear:
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.msg_sure);
         builder.setCancelable(true);
@@ -143,9 +143,49 @@ public final class HistoryActivity extends ListActivity {
         builder.setNegativeButton(R.string.button_cancel, null);
         builder.show();
         break;
+    case R.id.history_menu_send_dta:
+        List<HistoryItem> historyItems = historyManager.buildHistoryItems();
+        DTAFileCreator dtaFileCreator = new DTAFileCreator(this);
+        String error = dtaFileCreator.getFirstError(historyItems);
+        
+        if(error != ""){
+        	setOKAlert(error);
+        	break;
+        }
+        
+        CharSequence dta = dtaFileCreator.buildDTA(historyItems);
+        
+        Uri dtaFile = DTAFileCreator.saveDTAFile(dta.toString());
+        if (dtaFile == null) {
+          setOKAlert(R.string.msg_unmount_usb);
+        } else {
+          Intent intent = new Intent(Intent.ACTION_SEND, Uri.parse("mailto:"));
+          intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+          String subject = getResources().getString(R.string.history_email_title);
+          intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+          intent.putExtra(Intent.EXTRA_TEXT, subject);
+          intent.putExtra(Intent.EXTRA_STREAM, dtaFile);
+          intent.setType("text/plain");
+          startActivity(intent);
+        }
+        break;
       default:
         return super.onOptionsItemSelected(item);
     }
     return true;
+  }
+  
+  private void setOKAlert(String message){
+      AlertDialog.Builder builder = new AlertDialog.Builder(this);
+      builder.setMessage(message);
+      builder.setPositiveButton(R.string.button_ok, null);
+      builder.show();
+  }
+  
+  private void setOKAlert(int id){
+      AlertDialog.Builder builder = new AlertDialog.Builder(this);
+      builder.setMessage(id);
+      builder.setPositiveButton(R.string.button_ok, null);
+      builder.show();
   }
 }
