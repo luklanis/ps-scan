@@ -64,30 +64,31 @@ public class DTAFileCreator {
 
 		String clearing = String.valueOf((Integer.parseInt(iban.substring(4, 9))));
 
-		List<EsrResult> esrResults = new ArrayList<EsrResult>();
+		List<HistoryItem> filteredHistoryItem = new ArrayList<HistoryItem>();
 
 		for (HistoryItem historyItem : historyItems) {
 			if(historyItem.getResult().getCurrency() == "CHF"){
-				esrResults.add(historyItem.getResult());
+				filteredHistoryItem.add(historyItem);
 			}
 		}
 
-		for (int i = 0; i < esrResults.size(); i++) {
-			EsrResult esrResult = esrResults.get(i);
+		for (int i = 0; i < filteredHistoryItem.size(); i++) {
+			EsrResult esrResult = filteredHistoryItem.get(i).getResult();
 
 			String currency = esrResult.getCurrency();
 
-			String account = esrResult.getAccount().replaceAll("-", "");
+			String account = esrResult.getAccountUnformated();
 
-			String[] address = esrResult.getAddress() != null 
-					? esrResult.getAddress().split(NEWLINE_PATTERN)
+			String addressLine = filteredHistoryItem.get(i).getAddress();
+			String[] address = addressLine != null 
+					? addressLine.split(NEWLINE_PATTERN)
 							: new String[0];
 
 					CharSequence paddedSequenz = padded(String.valueOf(i + 1), '0', 5, false);
 
-					String amount = esrResult.getAmount().replace('.', ',');
+					String amount = filteredHistoryItem.get(i).getAmount().replace('.', ',');
 
-					totalAmount += Float.parseFloat(esrResult.getAmount());
+					totalAmount += Float.parseFloat(amount);
 
 					// HEADER for ESR
 					dtaText
@@ -170,7 +171,7 @@ public class DTAFileCreator {
 		.append(nullToEmpty(today))	// creation date
 		.append(spacePaddedEnd("", 7))	// own clearing number (not set in Total Record)
 		.append(padded("", 'X', 5, true))	// identification number
-		.append(padded(String.valueOf(esrResults.size() + 1), '0', 5, false))	// sequenz number
+		.append(padded(String.valueOf(filteredHistoryItem.size() + 1), '0', 5, false))	// sequenz number
 		.append("89000");	// transaction type (Total Record = 890), payment type (ESR = 0) and a flag (always 0)
 
 		String[] totalAmountSplit = String.valueOf(totalAmount).split("\\.");
