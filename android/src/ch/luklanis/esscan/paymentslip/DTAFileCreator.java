@@ -17,10 +17,6 @@ import ch.luklanis.esscan.history.HistoryItem;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-import android.net.ParseException;
 import android.net.Uri;
 import android.os.Environment;
 import android.preference.PreferenceManager;
