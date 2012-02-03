@@ -21,6 +21,7 @@ import com.googlecode.tesseract.android.TessBaseAPI;
 import ch.luklanis.esscan.CaptureActivity;
 import ch.luklanis.esscan.R;
 import ch.luklanis.esscan.camera.CameraManager;
+import ch.luklanis.esscan.history.HistoryItem;
 import ch.luklanis.esscan.paymentslip.EsrResult;
 import ch.luklanis.esscan.OcrResult;
 
@@ -156,20 +157,21 @@ final class CaptureActivityHandler extends Handler {
         }
         break;
       case R.id.esr_decode_succeeded:
-      case R.id.esr_show_history_item:
-        state = State.SUCCESS;
-        
-        EsrResult result = (EsrResult) message.obj;
-        
-        boolean fromHistory = true;
-        if(message.what == R.id.esr_decode_succeeded){
-        	activity.saveInHistory(result);
-        	fromHistory = false;
-        }
+    	  state = State.SUCCESS;
 
-        activity.showResult(result, fromHistory);
-        DecodeHandler.resetDecodeState();
-        break;
+    	  EsrResult result = (EsrResult) message.obj;
+
+    	  activity.saveInHistory(result);
+
+    	  activity.showResult(result);
+    	  DecodeHandler.resetDecodeState();
+    	  break;
+      case R.id.esr_show_history_item:
+    	  state = State.SUCCESS;
+
+    	  activity.showResult((HistoryItem) message.obj);
+    	  DecodeHandler.resetDecodeState();
+    	  break;
     }
   }
   

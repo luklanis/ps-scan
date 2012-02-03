@@ -152,25 +152,44 @@ public final class HistoryManager {
 		//	  if (!prefs.getBoolean(PreferencesActivity.KEY_REMEMBER_DUPLICATES, false)) {
 		//		  deletePrevious(result.getText());
 		//	  }
-
-		ContentValues values = new ContentValues();
-		values.put(DBHelper.CODE_ROW_COL, result.getCompleteCode());
-		values.put(DBHelper.TIMESTAMP_COL, result.getTimestamp());
-		values.put(DBHelper.AMOUNT_COL, amount);
-		values.put(DBHelper.ADDRESS_COL, address);
-
 		SQLiteOpenHelper helper = new DBHelper(activity);
-		SQLiteDatabase db = null;
+		SQLiteDatabase db = null;    
+		Cursor cursor = null;
 		try {
-			db = helper.getWritableDatabase();      
-			// Insert the new entry into the DB.
-			db.insert(DBHelper.TABLE_NAME, DBHelper.TIMESTAMP_COL, values);
-		} finally {
+			db = helper.getWritableDatabase();
+			cursor = db.query(DBHelper.TABLE_NAME,
+					COLUMNS,
+					DBHelper.CODE_ROW_COL + "=?",
+					new String[] { result.getCompleteCode() },
+					null,
+					null,
+					DBHelper.TIMESTAMP_COL + " DESC",
+					"1");
+			String oldID = null;
+			if (cursor.moveToNext()) {
+				oldID = cursor.getString(0);
+				ContentValues values = new ContentValues();
+				values.put(DBHelper.AMOUNT_COL, amount);
+				values.put(DBHelper.ADDRESS_COL, address);
+				db.update(DBHelper.TABLE_NAME, values, DBHelper.ID_COL + "=?", new String[] { oldID });
+			}
+			else{
+				ContentValues values = new ContentValues();
+				values.put(DBHelper.CODE_ROW_COL, result.getCompleteCode());
+				values.put(DBHelper.TIMESTAMP_COL, result.getTimestamp());
+				values.put(DBHelper.AMOUNT_COL, amount);
+				values.put(DBHelper.ADDRESS_COL, address);
+
+				// Insert the new entry into the DB.
+				db.insert(DBHelper.TABLE_NAME, DBHelper.TIMESTAMP_COL, values);
+			}
+		}
+		finally {
 			close(null, db);
 		}
 	}
 
-	public void addHistoryItemAddress(String itemID, String itemAddress) {
+	public void updateHistoryItemAddress(String code_row, String itemAddress) {
 		// As we're going to do an update only we don't need need to worry
 		// about the preferences; if the item wasn't saved it won't be udpated
 		SQLiteOpenHelper helper = new DBHelper(activity);
@@ -181,29 +200,29 @@ public final class HistoryManager {
 			cursor = db.query(DBHelper.TABLE_NAME,
 					ID_ADDRESS_COL_PROJECTION,
 					DBHelper.CODE_ROW_COL + "=?",
-							new String[] { itemID },
-							null,
-							null,
-							DBHelper.TIMESTAMP_COL + " DESC",
-							"1");
+					new String[] { code_row },
+					null,
+					null,
+					DBHelper.TIMESTAMP_COL + " DESC",
+					"1");
 			String oldID = null;
 			if (cursor.moveToNext()) {
 				oldID = cursor.getString(0);
+
+				//      String newAddress = oldAddress == null ? itemAddress : oldAddress + " : " + itemAddress;
+				ContentValues values = new ContentValues();
+				//      values.put(DBHelper.ADDRESS_COL, newAddress);
+				values.put(DBHelper.ADDRESS_COL, itemAddress);
+
+				db.update(DBHelper.TABLE_NAME, values, DBHelper.ID_COL + "=?", new String[] { oldID });
 			}
-
-			//      String newAddress = oldAddress == null ? itemAddress : oldAddress + " : " + itemAddress;
-			ContentValues values = new ContentValues();
-			//      values.put(DBHelper.ADDRESS_COL, newAddress);
-			values.put(DBHelper.ADDRESS_COL, itemAddress);
-
-			db.update(DBHelper.TABLE_NAME, values, DBHelper.ID_COL + "=?", new String[] { oldID });
 
 		} finally {
 			close(cursor, db);
 		}
 	}
 
-	public void updateHistoryItemAmount(String itemID, String itemAmount) {
+	public void updateHistoryItemAmount(String code_row, String itemAmount) {
 		// As we're going to do an update only we don't need need to worry
 		// about the preferences; if the item wasn't saved it won't be updated
 		SQLiteOpenHelper helper = new DBHelper(activity);
@@ -214,20 +233,20 @@ public final class HistoryManager {
 			cursor = db.query(DBHelper.TABLE_NAME,
 					ID_AMOUNT_COL_PROJECTION,
 					DBHelper.CODE_ROW_COL + "=?",
-							new String[] { itemID },
-							null,
-							null,
-							DBHelper.TIMESTAMP_COL + " DESC",
-							"1");
+					new String[] { code_row },
+					null,
+					null,
+					DBHelper.TIMESTAMP_COL + " DESC",
+					"1");
 			String oldID = null;
 			if (cursor.moveToNext()) {
 				oldID = cursor.getString(0);
+
+				ContentValues values = new ContentValues();
+				values.put(DBHelper.AMOUNT_COL, itemAmount);
+
+				db.update(DBHelper.TABLE_NAME, values, DBHelper.ID_COL + "=?", new String[] { oldID });
 			}
-
-			ContentValues values = new ContentValues();
-			values.put(DBHelper.AMOUNT_COL, itemAmount);
-
-			db.update(DBHelper.TABLE_NAME, values, DBHelper.ID_COL + "=?", new String[] { oldID });
 
 		} finally {
 			close(cursor, db);

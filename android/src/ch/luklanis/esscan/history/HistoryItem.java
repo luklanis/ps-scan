@@ -24,7 +24,7 @@ public final class HistoryItem {
 	private String address;
 	private String amount;
 
-	HistoryItem(EsrResult result) {
+	public HistoryItem(EsrResult result) {
 		this.result = result;
 		this.address = null;
 		this.amount = null;

@@ -19,6 +19,7 @@
   <string name="app_name">ESR scan</string>
   <string name="button_cancel">Cancel</string>
   <string name="button_ok">OK</string>
+  <string name="button_save">Save</string>
   <string name="history_clear_text">Clear history</string>
   <string name="history_send_dta">Send history as DTA file</string>
   <string name="history_send">Send history</string>
@@ -35,12 +36,14 @@
   <string name="menu_share">Share</string>
   <string name="msg_sure">Are you sure?</string>
   <string name="msg_unmount_usb">Sorry, the SD card is not accessible.</string>
+  <string name="msg_amount_not_valid">Sorry, this is not a valid amount.</string>
   <string name="msg_amount_is_empty">Sorry, please set the amount for the transfer to %s first.</string>
   <string name="msg_own_iban_is_not_set">Sorry, to create DTA files your own IBAN is needed. You can set it under menu -> settings.</string>
   <string name="msg_own_iban_is_not_valid">Sorry, this is not a valid swiss IBAN. Please try again or, if you don\'t know it at the momant, let it blank.</string>
   <string name="msg_own_address_is_not_set">Sorry, to create DTA files your own address is needed. You can set it under menu -> settings.</string>
   <string name="esr_result_account">Account</string>
   <string name="esr_result_reference_number">Reference Number</string>
+  <string name="esr_result_amount_not_set">Not set</string>
   <string name="button_copy_code_row">Copy code row</string>
   <string name="button_share_code_row">Share code row</string>
   <string name="preferences_general_title">General settings</string>

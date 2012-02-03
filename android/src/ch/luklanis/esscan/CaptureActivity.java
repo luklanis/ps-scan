@@ -52,7 +52,9 @@ import android.os.Message;
 import android.preference.PreferenceManager;
 //import android.content.ClipboardManager;
 import android.text.ClipboardManager;
+import android.text.Editable;
 import android.text.SpannableStringBuilder;
+import android.text.TextWatcher;
 import android.text.style.CharacterStyle;
 import android.util.Log;
 import android.view.Gravity;
@@ -64,9 +66,11 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -136,7 +140,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 	private TextView ocrResultView;
 	private View cameraButtonView;
 	private View resultView;
-	private EsrResult lastResult;
+	private HistoryItem lastItem;
 	private boolean hasSurface;
 	private BeepManager beepManager;
 	private TessBaseAPI baseApi; // Java interface for the Tesseract OCR engine
@@ -185,9 +189,9 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		Window window = getWindow();
 		window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-		
+
 		setContentView(R.layout.capture);
-		
+
 		viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_view);
 		cameraButtonView = findViewById(R.id.camera_button_view);
 		resultView = findViewById(R.id.result_view);
@@ -198,10 +202,10 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		registerForContextMenu(statusViewBottom);
 
 		handler = null;
-		lastResult = null;
+		lastItem = null;
 		hasSurface = false;
 		beepManager = new BeepManager(this);
-		
+
 		psValidation = new EsrValidation();
 		this.lastValidationStep = psValidation.getCurrentStep();
 
@@ -299,7 +303,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 			@Override
 			public void onClick(View v) {
 				ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-				clipboardManager.setText(lastResult.getCompleteCode());
+				clipboardManager.setText(lastItem.getResult().getCompleteCode());
 
 				//        clipboardManager.setPrimaryClip(ClipData.newPlainText("ocrResult", ocrResultView.getText()));
 				//      if (clipboardManager.hasPrimaryClip()) {
@@ -314,14 +318,46 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 				sharingIntent.setType("text/plain");
 				sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "ESR code");
 
-				String text = lastResult.getAccount() 
-						+ "\r\n" + lastResult.getCurrency() 
-						+ " " + lastResult.getAmount()
-						+ "\r\n\r\n" + lastResult.getCompleteCode();
+				EsrResult result = lastItem.getResult();
+				String text = result.getAccount() 
+						+ "\r\n" + result.getCurrency() 
+						+ " " + lastItem.getAmount()
+						+ "\r\n\r\n" + result.getCompleteCode();
 
 				sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, text);
 
 				startActivity(Intent.createChooser(sharingIntent, "Share via"));
+			}
+		});
+
+		Button amountSaveButton = (Button) findViewById(R.id.esr_result_amount_save);
+		amountSaveButton.setOnClickListener(new Button.OnClickListener() {
+			public void onClick(View v) {
+				EditText amountEditText = (EditText) findViewById(R.id.esr_result_amount);
+				String newAmount = amountEditText.getText().toString().replace(',', '.');
+				try {
+					float newAmountTemp = Float.parseFloat(newAmount);
+					newAmountTemp *= 100;
+					newAmountTemp -= (newAmountTemp % 5);
+					newAmountTemp /= 100;
+					
+					newAmount = String.valueOf(newAmountTemp);
+					
+					if(newAmount.indexOf('.') == newAmount.length() - 2){
+						newAmount += "0";
+					}
+					
+					if(historyManager == null){
+						Log.e(TAG, "onClick: historyManager is null!");
+						return;
+					}
+					
+					historyManager.updateHistoryItemAmount(lastItem.getResult().getCompleteCode(), 
+							newAmount);
+					amountEditText.setText(newAmount);
+				} catch (NumberFormatException e) {
+					setOKAlert(R.string.msg_amount_not_valid);
+				}
 			}
 		});
 
@@ -400,8 +436,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		isPaused = true;
 		handler.stop();  
 		beepManager.playBeepSoundAndVibrate();
-		if (lastResult != null) {
-			showResult(lastResult);
+		if (lastItem != null) {
+			showResult(lastItem);
 		} else {
 			Toast toast = Toast.makeText(this, "OCR failed. Please try again.", Toast.LENGTH_SHORT);
 			toast.setGravity(Gravity.TOP, 0, 0);
@@ -499,7 +535,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 			}
 
 			// Exit the app if we're not viewing a result.
-			if (lastResult == null) {
+			if (lastItem == null) {
 				setResult(RESULT_CANCELED);
 				finish();
 				return true;
@@ -565,7 +601,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
 			HistoryItem item = historyManager.buildHistoryItem(position);
 
-			Message message = Message.obtain(handler, R.id.esr_show_history_item, item.getResult());
+			Message message = Message.obtain(handler, R.id.esr_show_history_item, item);
 			message.sendToTarget();
 		}
 	}
@@ -704,7 +740,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 	 * @return True if a non-null result was received for OCR
 	 */
 	boolean showResult(EsrResult esrResult) {
-		return showResult(esrResult, false);
+		beepManager.playBeepSoundAndVibrate();
+		return showResult(new HistoryItem(esrResult));
 	}
 
 	/**
@@ -714,16 +751,12 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 	 * @param ocrResult Object representing successful OCR results
 	 * @return True if a non-null result was received for OCR
 	 */
-	boolean showResult(EsrResult esrResult, boolean fromHistory) {
-		lastResult = esrResult;
-		
-		if(!fromHistory){
-			beepManager.playBeepSoundAndVibrate();
-		}
+	boolean showResult(HistoryItem historyItem) {
+		lastItem = historyItem;
 
 		try {
 			// Test whether the result is null
-			esrResult.getCompleteCode();
+			lastItem.getResult().getCompleteCode();
 		} catch (NullPointerException e) {
 			Toast toast = Toast.makeText(this, "OCR failed. Please try again.", Toast.LENGTH_SHORT);
 			toast.setGravity(Gravity.TOP, 0, 0);
@@ -740,6 +773,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 				isPaused = true;
 			}
 		}
+
+		EsrResult result = historyItem.getResult();
 
 		// Turn off capture-related UI elements
 		statusViewBottom.setVisibility(View.GONE);
@@ -761,16 +796,31 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		//		ocrResultTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledSize);
 
 		TextView accountTextView = (TextView) findViewById(R.id.esr_result_account);
-		accountTextView.setText(esrResult.getAccount());
+		accountTextView.setText(result.getAccount());
 
-		TextView amountTextView = (TextView) findViewById(R.id.esr_result_amount);
-		amountTextView.setText(esrResult.getAmount());
+		EditText amountEditText = (EditText) findViewById(R.id.esr_result_amount);
+		Button amountSaveButton = (Button) findViewById(R.id.esr_result_amount_save);
+
+		if(result.getAmount() != ""){
+			amountEditText.setEnabled(false);
+			amountEditText.setText(historyItem.getAmount());
+			amountSaveButton.setVisibility(View.GONE);
+		}
+		else{
+			if(lastItem.getAmount() == null || lastItem.getAmount() == ""){
+				amountEditText.setText(R.string.esr_result_amount_not_set);
+			}
+			else{
+				amountEditText.setText(lastItem.getAmount());
+			}
+			amountSaveButton.setVisibility(View.VISIBLE);
+		}
 
 		TextView currencyTextView = (TextView) findViewById(R.id.esr_result_currency);
-		currencyTextView.setText(esrResult.getCurrency());
+		currencyTextView.setText(result.getCurrency());
 
 		TextView referenceTextView = (TextView) findViewById(R.id.esr_result_reference_number);
-		referenceTextView.setText(esrResult.getReference());
+		referenceTextView.setText(result.getReference());
 
 		setProgressBarVisibility(false);
 
@@ -807,7 +857,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 	 * @param obj Metadata for the failed OCR request.
 	 */
 	void handleOcrContinuousDecode(OcrResultFailure obj) {
-		lastResult = null;
+		lastItem = null;
+		Log.i(TAG, "handleOcrContinuousDecode: set lastItem to null");
 	}
 
 	/**
@@ -859,8 +910,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 			ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
 			clipboardManager.setText(ocrResultView.getText());
 
-//			        clipboardManager.setPrimaryClip(ClipData.newPlainText("ocrResult", ocrResultView.getText()));
-//			      if (clipboardManager.hasPrimaryClip()) {
+			//			        clipboardManager.setPrimaryClip(ClipData.newPlainText("ocrResult", ocrResultView.getText()));
+			//			      if (clipboardManager.hasPrimaryClip()) {
 
 			if(clipboardManager.hasText()){
 				Toast toast = Toast.makeText(this, "Text copied.", Toast.LENGTH_LONG);
@@ -893,7 +944,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		viewfinderView.setVisibility(View.VISIBLE);
 		cameraButtonView.setVisibility(View.VISIBLE);
 
-		lastResult = null;
+		lastItem = null;
+		Log.i(TAG, "resetStatusView: set lastItem to null");
 		viewfinderView.removeResultText();
 	}
 
@@ -1044,5 +1096,12 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
 	public void saveInHistory(EsrResult result) {
 		historyManager.addHistoryItem(result, "", "");
+	}
+
+	private void setOKAlert(int id){
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(id);
+		builder.setPositiveButton(R.string.button_ok, null);
+		builder.show();
 	}
 }

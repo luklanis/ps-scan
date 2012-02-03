@@ -127,6 +127,6 @@ public final class EsrResult {
 
 	@Override
 	public String toString() {
-		return getAccount() + ", " + getCurrency() + " " + getAmount();
+		return getAccount() + ", " + getCurrency();
 	}
 }
