@@ -45,328 +45,321 @@ import java.util.List;
  */
 public final class HistoryManager {
 
-  private static final String TAG = HistoryManager.class.getSimpleName();
+	private static final String TAG = HistoryManager.class.getSimpleName();
 
-  private static final int MAX_ITEMS = 500;
+	private static final int MAX_ITEMS = 500;
 
-  private static final String[] COLUMNS = {
-      DBHelper.CODE_ROW_COL,
-      DBHelper.TIMESTAMP_COL,
-      DBHelper.ADDRESS_COL,
-      DBHelper.AMOUNT_COL
-  };
+	private static final String[] COLUMNS = {
+		DBHelper.CODE_ROW_COL,
+		DBHelper.TIMESTAMP_COL,
+		DBHelper.ADDRESS_COL,
+		DBHelper.AMOUNT_COL
+	};
 
-  private static final String[] COUNT_COLUMN = { "COUNT(1)" };
+	private static final String[] COUNT_COLUMN = { "COUNT(1)" };
 
-  private static final String[] ID_COL_PROJECTION = { DBHelper.ID_COL };
-  private static final String[] ID_ADDRESS_COL_PROJECTION = { DBHelper.ID_COL, DBHelper.ADDRESS_COL };
-  private static final String[] ID_AMOUNT_COL_PROJECTION = { DBHelper.ID_COL, DBHelper.AMOUNT_COL };
-  private static final DateFormat EXPORT_DATE_TIME_FORMAT = DateFormat.getDateTimeInstance();
+	private static final String[] ID_COL_PROJECTION = { DBHelper.ID_COL };
+	private static final String[] ID_ADDRESS_COL_PROJECTION = { DBHelper.ID_COL, DBHelper.ADDRESS_COL };
+	private static final String[] ID_AMOUNT_COL_PROJECTION = { DBHelper.ID_COL, DBHelper.AMOUNT_COL };
+	private static final DateFormat EXPORT_DATE_TIME_FORMAT = DateFormat.getDateTimeInstance();
 
-  private final Activity activity;
+	private final Activity activity;
 
-  public HistoryManager(Activity activity) {
-    this.activity = activity;
-  }
+	public HistoryManager(Activity activity) {
+		this.activity = activity;
+	}
 
-  public boolean hasHistoryItems() {
-    SQLiteOpenHelper helper = new DBHelper(activity);
-    SQLiteDatabase db = null;
-    Cursor cursor = null;
-    try {
-      db = helper.getReadableDatabase();
-      cursor = db.query(DBHelper.TABLE_NAME, COUNT_COLUMN, null, null, null, null, null);
-      cursor.moveToFirst();
-      return cursor.getInt(0) > 0;
-    } finally {
-      close(cursor, db);
-    }
-  }
+	public boolean hasHistoryItems() {
+		SQLiteOpenHelper helper = new DBHelper(activity);
+		SQLiteDatabase db = null;
+		Cursor cursor = null;
+		try {
+			db = helper.getReadableDatabase();
+			cursor = db.query(DBHelper.TABLE_NAME, COUNT_COLUMN, null, null, null, null, null);
+			cursor.moveToFirst();
+			return cursor.getInt(0) > 0;
+		} finally {
+			close(cursor, db);
+		}
+	}
 
-  public List<HistoryItem> buildHistoryItems() {
-    SQLiteOpenHelper helper = new DBHelper(activity);
-    List<HistoryItem> items = new ArrayList<HistoryItem>();
-    SQLiteDatabase db = null;
-    Cursor cursor = null;
-    try {
-      db = helper.getReadableDatabase();
-      cursor = db.query(DBHelper.TABLE_NAME, COLUMNS, null, null, null, null, DBHelper.TIMESTAMP_COL + " DESC");
-      while (cursor.moveToNext()) {
-    	  String code_row = cursor.getString(0);
-    	  long timestamp = cursor.getLong(1);
-    	  String address = cursor.getString(2);
-    	  String amount = cursor.getString(3);
-    	  EsrResult result = new EsrResult(code_row, timestamp);
-    	  items.add(new HistoryItem(result, amount, address));
-      }
-    } finally {
-      close(cursor, db);
-    }
-    return items;
-  }
+	public List<HistoryItem> buildHistoryItems() {
+		SQLiteOpenHelper helper = new DBHelper(activity);
+		List<HistoryItem> items = new ArrayList<HistoryItem>();
+		SQLiteDatabase db = null;
+		Cursor cursor = null;
+		try {
+			db = helper.getReadableDatabase();
+			cursor = db.query(DBHelper.TABLE_NAME, COLUMNS, null, null, null, null, DBHelper.TIMESTAMP_COL + " DESC");
+			while (cursor.moveToNext()) {
+				String code_row = cursor.getString(0);
+				long timestamp = cursor.getLong(1);
+				String address = cursor.getString(2);
+				String amount = cursor.getString(3);
+				EsrResult result = new EsrResult(code_row, timestamp);
+				items.add(new HistoryItem(result, amount, address));
+			}
+		} finally {
+			close(cursor, db);
+		}
+		return items;
+	}
 
-  public HistoryItem buildHistoryItem(int number) {
-    SQLiteOpenHelper helper = new DBHelper(activity);
-    SQLiteDatabase db = null;
-    Cursor cursor = null;
-    try {
-      db = helper.getReadableDatabase();
-      cursor = db.query(DBHelper.TABLE_NAME, COLUMNS, null, null, null, null, DBHelper.TIMESTAMP_COL + " DESC");
-      cursor.move(number + 1);
-      String text = cursor.getString(0);
-      long timestamp = cursor.getLong(1);
-      String address = cursor.getString(2);
-	  String amount = cursor.getString(3);
-      EsrResult result = new EsrResult(text, timestamp);
-      return new HistoryItem(result, amount, address);
-    } finally {
-      close(cursor, db);
-    }
-  }
-  
-  public void deleteHistoryItem(int number) {
-    SQLiteOpenHelper helper = new DBHelper(activity);
-    SQLiteDatabase db = null;
-    Cursor cursor = null;
-    try {
-      db = helper.getWritableDatabase();      
-      cursor = db.query(DBHelper.TABLE_NAME,
-                        ID_COL_PROJECTION,
-                        null, null, null, null,
-                        DBHelper.TIMESTAMP_COL + " DESC");
-      cursor.move(number + 1);
-      db.delete(DBHelper.TABLE_NAME, DBHelper.ID_COL + '=' + cursor.getString(0), null);
-    } finally {
-      close(cursor, db);
-    }
-  }
+	public HistoryItem buildHistoryItem(int number) {
+		SQLiteOpenHelper helper = new DBHelper(activity);
+		SQLiteDatabase db = null;
+		Cursor cursor = null;
+		try {
+			db = helper.getReadableDatabase();
+			cursor = db.query(DBHelper.TABLE_NAME, COLUMNS, null, null, null, null, DBHelper.TIMESTAMP_COL + " DESC");
+			cursor.move(number + 1);
+			String text = cursor.getString(0);
+			long timestamp = cursor.getLong(1);
+			String address = cursor.getString(2);
+			String amount = cursor.getString(3);
+			EsrResult result = new EsrResult(text, timestamp);
+			return new HistoryItem(result, amount, address);
+		} finally {
+			close(cursor, db);
+		}
+	}
 
-  public void addHistoryItem(EsrResult result, String amount, String address) {
-    // Do not save this item to the history if the preference is turned off, or the contents are
-    // considered secure.
-//    if (!activity.getIntent().getBooleanExtra(Intents.Scan.SAVE_HISTORY, true)) {
-//      return;
-//    }
+	public void deleteHistoryItem(int number) {
+		SQLiteOpenHelper helper = new DBHelper(activity);
+		SQLiteDatabase db = null;
+		Cursor cursor = null;
+		try {
+			db = helper.getWritableDatabase();      
+			cursor = db.query(DBHelper.TABLE_NAME,
+					ID_COL_PROJECTION,
+					null, null, null, null,
+					DBHelper.TIMESTAMP_COL + " DESC");
+			cursor.move(number + 1);
+			db.delete(DBHelper.TABLE_NAME, DBHelper.ID_COL + '=' + cursor.getString(0), null);
+		} finally {
+			close(cursor, db);
+		}
+	}
 
-//	  SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
-//	  if (!prefs.getBoolean(PreferencesActivity.KEY_REMEMBER_DUPLICATES, false)) {
-//		  deletePrevious(result.getText());
-//	  }
+	public void addHistoryItem(EsrResult result, String amount, String address) {
+		// Do not save this item to the history if the preference is turned off, or the contents are
+		// considered secure.
+		//    if (!activity.getIntent().getBooleanExtra(Intents.Scan.SAVE_HISTORY, true)) {
+		//      return;
+		//    }
 
-    ContentValues values = new ContentValues();
-    values.put(DBHelper.CODE_ROW_COL, result.getCompleteCode());
-    values.put(DBHelper.TIMESTAMP_COL, result.getTimestamp());
-    values.put(DBHelper.AMOUNT_COL, amount);
-    values.put(DBHelper.ADDRESS_COL, address);
+		//	  SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
+		//	  if (!prefs.getBoolean(PreferencesActivity.KEY_REMEMBER_DUPLICATES, false)) {
+		//		  deletePrevious(result.getText());
+		//	  }
 
-    SQLiteOpenHelper helper = new DBHelper(activity);
-    SQLiteDatabase db = null;
-    try {
-      db = helper.getWritableDatabase();      
-      // Insert the new entry into the DB.
-      db.insert(DBHelper.TABLE_NAME, DBHelper.TIMESTAMP_COL, values);
-    } finally {
-      close(null, db);
-    }
-  }
+		ContentValues values = new ContentValues();
+		values.put(DBHelper.CODE_ROW_COL, result.getCompleteCode());
+		values.put(DBHelper.TIMESTAMP_COL, result.getTimestamp());
+		values.put(DBHelper.AMOUNT_COL, amount);
+		values.put(DBHelper.ADDRESS_COL, address);
 
-  public void addHistoryItemAddress(String itemID, String itemAddress) {
-    // As we're going to do an update only we don't need need to worry
-    // about the preferences; if the item wasn't saved it won't be udpated
-    SQLiteOpenHelper helper = new DBHelper(activity);
-    SQLiteDatabase db = null;    
-    Cursor cursor = null;
-    try {
-      db = helper.getWritableDatabase();
-      cursor = db.query(DBHelper.TABLE_NAME,
-                        ID_ADDRESS_COL_PROJECTION,
-                        DBHelper.CODE_ROW_COL + "=?",
-                        new String[] { itemID },
-                        null,
-                        null,
-                        DBHelper.TIMESTAMP_COL + " DESC",
-                        "1");
-      String oldID = null;
-      if (cursor.moveToNext()) {
-        oldID = cursor.getString(0);
-      }
+		SQLiteOpenHelper helper = new DBHelper(activity);
+		SQLiteDatabase db = null;
+		try {
+			db = helper.getWritableDatabase();      
+			// Insert the new entry into the DB.
+			db.insert(DBHelper.TABLE_NAME, DBHelper.TIMESTAMP_COL, values);
+		} finally {
+			close(null, db);
+		}
+	}
 
-//      String newAddress = oldAddress == null ? itemAddress : oldAddress + " : " + itemAddress;
-      ContentValues values = new ContentValues();
-//      values.put(DBHelper.ADDRESS_COL, newAddress);
-      values.put(DBHelper.ADDRESS_COL, itemAddress);
+	public void addHistoryItemAddress(String itemID, String itemAddress) {
+		// As we're going to do an update only we don't need need to worry
+		// about the preferences; if the item wasn't saved it won't be udpated
+		SQLiteOpenHelper helper = new DBHelper(activity);
+		SQLiteDatabase db = null;    
+		Cursor cursor = null;
+		try {
+			db = helper.getWritableDatabase();
+			cursor = db.query(DBHelper.TABLE_NAME,
+					ID_ADDRESS_COL_PROJECTION,
+					DBHelper.CODE_ROW_COL + "=?",
+							new String[] { itemID },
+							null,
+							null,
+							DBHelper.TIMESTAMP_COL + " DESC",
+							"1");
+			String oldID = null;
+			if (cursor.moveToNext()) {
+				oldID = cursor.getString(0);
+			}
 
-      db.update(DBHelper.TABLE_NAME, values, DBHelper.ID_COL + "=?", new String[] { oldID });
+			//      String newAddress = oldAddress == null ? itemAddress : oldAddress + " : " + itemAddress;
+			ContentValues values = new ContentValues();
+			//      values.put(DBHelper.ADDRESS_COL, newAddress);
+			values.put(DBHelper.ADDRESS_COL, itemAddress);
 
-    } finally {
-      close(cursor, db);
-    }
-  }
+			db.update(DBHelper.TABLE_NAME, values, DBHelper.ID_COL + "=?", new String[] { oldID });
 
-  public void updateHistoryItemAmount(String itemID, String itemAmount) {
-    // As we're going to do an update only we don't need need to worry
-    // about the preferences; if the item wasn't saved it won't be updated
-    SQLiteOpenHelper helper = new DBHelper(activity);
-    SQLiteDatabase db = null;    
-    Cursor cursor = null;
-    try {
-      db = helper.getWritableDatabase();
-      cursor = db.query(DBHelper.TABLE_NAME,
-                        ID_AMOUNT_COL_PROJECTION,
-                        DBHelper.CODE_ROW_COL + "=?",
-                        new String[] { itemID },
-                        null,
-                        null,
-                        DBHelper.TIMESTAMP_COL + " DESC",
-                        "1");
-      String oldID = null;
-      if (cursor.moveToNext()) {
-        oldID = cursor.getString(0);
-      }
+		} finally {
+			close(cursor, db);
+		}
+	}
 
-      ContentValues values = new ContentValues();
-      values.put(DBHelper.AMOUNT_COL, itemAmount);
+	public void updateHistoryItemAmount(String itemID, String itemAmount) {
+		// As we're going to do an update only we don't need need to worry
+		// about the preferences; if the item wasn't saved it won't be updated
+		SQLiteOpenHelper helper = new DBHelper(activity);
+		SQLiteDatabase db = null;    
+		Cursor cursor = null;
+		try {
+			db = helper.getWritableDatabase();
+			cursor = db.query(DBHelper.TABLE_NAME,
+					ID_AMOUNT_COL_PROJECTION,
+					DBHelper.CODE_ROW_COL + "=?",
+							new String[] { itemID },
+							null,
+							null,
+							DBHelper.TIMESTAMP_COL + " DESC",
+							"1");
+			String oldID = null;
+			if (cursor.moveToNext()) {
+				oldID = cursor.getString(0);
+			}
 
-      db.update(DBHelper.TABLE_NAME, values, DBHelper.ID_COL + "=?", new String[] { oldID });
+			ContentValues values = new ContentValues();
+			values.put(DBHelper.AMOUNT_COL, itemAmount);
 
-    } finally {
-      close(cursor, db);
-    }
-  }
+			db.update(DBHelper.TABLE_NAME, values, DBHelper.ID_COL + "=?", new String[] { oldID });
 
-  @SuppressWarnings("unused")
-private void deletePrevious(String text) {
-    SQLiteOpenHelper helper = new DBHelper(activity);
-    SQLiteDatabase db = null;
-    try {
-      db = helper.getWritableDatabase();      
-      db.delete(DBHelper.TABLE_NAME, DBHelper.CODE_ROW_COL + "=?", new String[] { text });
-    } finally {
-      close(null, db);
-    }
-  }
+		} finally {
+			close(cursor, db);
+		}
+	}
 
-  public void trimHistory() {
-    SQLiteOpenHelper helper = new DBHelper(activity);
-    SQLiteDatabase db = null;
-    Cursor cursor = null;
-    try {
-      db = helper.getWritableDatabase();      
-      cursor = db.query(DBHelper.TABLE_NAME,
-                        ID_COL_PROJECTION,
-                        null, null, null, null,
-                        DBHelper.TIMESTAMP_COL + " DESC");
-      cursor.move(MAX_ITEMS);
-      while (cursor.moveToNext()) {
-        db.delete(DBHelper.TABLE_NAME, DBHelper.ID_COL + '=' + cursor.getString(0), null);
-      }
-    } finally {
-      close(cursor, db);
-    }
-  }
+	@SuppressWarnings("unused")
+	private void deletePrevious(String text) {
+		SQLiteOpenHelper helper = new DBHelper(activity);
+		SQLiteDatabase db = null;
+		try {
+			db = helper.getWritableDatabase();      
+			db.delete(DBHelper.TABLE_NAME, DBHelper.CODE_ROW_COL + "=?", new String[] { text });
+		} finally {
+			close(null, db);
+		}
+	}
 
-  /**
-   * <p>Builds a text representation of the scanning history. Each scan is encoded on one
-   * line, terminated by a line break (\r\n). The values in each line are comma-separated,
-   * and double-quoted. Double-quotes within values are escaped with a sequence of two
-   * double-quotes. The fields output are:</p>
-   *
-   * <ul>
-   *  <li>Code row</li>
-   *  <li>Formatted version of timestamp</li>
-   *  <li>Address text</li>
-   *  <li>Paid timespamp</li>
-   * </ul>
-   */
-  CharSequence buildHistory() {
-    StringBuilder historyText = new StringBuilder(1000);
-    SQLiteOpenHelper helper = new DBHelper(activity);
-    SQLiteDatabase db = null;
-    Cursor cursor = null;
-    try {
-      db = helper.getWritableDatabase();
-      cursor = db.query(DBHelper.TABLE_NAME,
-                        COLUMNS,
-                        null, null, null, null,
-                        DBHelper.TIMESTAMP_COL + " DESC");
+	public void trimHistory() {
+		SQLiteOpenHelper helper = new DBHelper(activity);
+		SQLiteDatabase db = null;
+		Cursor cursor = null;
+		try {
+			db = helper.getWritableDatabase();      
+			cursor = db.query(DBHelper.TABLE_NAME,
+					ID_COL_PROJECTION,
+					null, null, null, null,
+					DBHelper.TIMESTAMP_COL + " DESC");
+			cursor.move(MAX_ITEMS);
+			while (cursor.moveToNext()) {
+				db.delete(DBHelper.TABLE_NAME, DBHelper.ID_COL + '=' + cursor.getString(0), null);
+			}
+		} finally {
+			close(cursor, db);
+		}
+	}
 
-      while (cursor.moveToNext()) {
+	/**
+	 * <p>Builds a text representation of the scanning history. Each scan is encoded on one
+	 * line, terminated by a line break (\r\n). The values in each line are comma-separated,
+	 * and double-quoted. Double-quotes within values are escaped with a sequence of two
+	 * double-quotes. The fields output are:</p>
+	 *
+	 * <ul>
+	 *  <li>Code row</li>
+	 *  <li>Formatted version of timestamp</li>
+	 *  <li>Address text</li>
+	 *  <li>Paid timespamp</li>
+	 * </ul>
+	 */
+	CharSequence buildHistory() {
+		StringBuilder historyText = new StringBuilder(1000);
+		SQLiteOpenHelper helper = new DBHelper(activity);
+		SQLiteDatabase db = null;
+		Cursor cursor = null;
+		try {
+			db = helper.getWritableDatabase();
+			cursor = db.query(DBHelper.TABLE_NAME,
+					COLUMNS,
+					null, null, null, null,
+					DBHelper.TIMESTAMP_COL + " DESC");
 
-        historyText.append('"').append(messageHistoryField(cursor.getString(0))).append("\",");
-        
-        // Add timestamp, formatted
-        long timestamp = cursor.getLong(1);
-        historyText.append('"').append(messageHistoryField(
-            EXPORT_DATE_TIME_FORMAT.format(new Date(timestamp)))).append("\",");
-        
-        historyText.append('"').append(messageHistoryField(cursor.getString(2))).append("\",");
-        
-        // Add paid, formatted
-        long paid = cursor.getLong(3);
-        
-        if(paid != 0){
-        historyText.append('"').append(messageHistoryField(
-            EXPORT_DATE_TIME_FORMAT.format(new Date(paid)))).append("\"\r\n");
-        }
-        else{
-            historyText.append('"').append(messageHistoryField("")).append("\"\r\n");
-        }
-      }
-      return historyText;
-    } finally {
-      close(cursor, db);
-    }
-  }
-  
-  void clearHistory() {
-    SQLiteOpenHelper helper = new DBHelper(activity);
-    SQLiteDatabase db = null;
-    try {
-      db = helper.getWritableDatabase();      
-      db.delete(DBHelper.TABLE_NAME, null, null);
-    } finally {
-      close(null, db);
-    }
-  }
+			while (cursor.moveToNext()) {
 
-  static Uri saveHistory(String history) {
-    File bsRoot = new File(Environment.getExternalStorageDirectory(), "ESRScan");
-    File historyRoot = new File(bsRoot, "History");
-    if (!historyRoot.exists() && !historyRoot.mkdirs()) {
-      Log.w(TAG, "Couldn't make dir " + historyRoot);
-      return null;
-    }
-    File historyFile = new File(historyRoot, "history-" + System.currentTimeMillis() + ".csv");
-    OutputStreamWriter out = null;
-    try {
-      out = new OutputStreamWriter(new FileOutputStream(historyFile), Charset.forName("UTF-8"));
-      out.write(history);
-      return Uri.parse("file://" + historyFile.getAbsolutePath());
-    } catch (IOException ioe) {
-      Log.w(TAG, "Couldn't access file " + historyFile + " due to " + ioe);
-      return null;
-    } finally {
-      if (out != null) {
-        try {
-          out.close();
-        } catch (IOException ioe) {
-          // do nothing
-        }
-      }
-    }
-  }
+				EsrResult result = new EsrResult(cursor.getString(0));
 
-  private static String messageHistoryField(String value) {
-    return value == null ? "" : value.replace("\"","\"\"");
-  }
-  
-  private static void close(Cursor cursor, SQLiteDatabase database) {
-    if (cursor != null) {
-      cursor.close();
-    }
-    if (database != null) {
-      database.close();
-    }
-  }
+				// Add timestamp, formatted
+				long timestamp = cursor.getLong(1);
+				historyText.append('"').append(messageHistoryField(
+						EXPORT_DATE_TIME_FORMAT.format(new Date(timestamp)))).append("\",");
+
+				historyText.append('"').append(messageHistoryField(result.toString())).append("\",");
+
+				historyText.append('"').append(messageHistoryField(cursor.getString(2)).split("[\\r\\n]+")[0]).append("\",");
+
+				historyText.append('"').append(messageHistoryField(result.getCompleteCode())).append("\"\r\n");
+			}
+			return historyText;
+		} finally {
+			close(cursor, db);
+		}
+	}
+
+	void clearHistory() {
+		SQLiteOpenHelper helper = new DBHelper(activity);
+		SQLiteDatabase db = null;
+		try {
+			db = helper.getWritableDatabase();      
+			db.delete(DBHelper.TABLE_NAME, null, null);
+		} finally {
+			close(null, db);
+		}
+	}
+
+	static Uri saveHistory(String history) {
+		File bsRoot = new File(Environment.getExternalStorageDirectory(), "ESRScan");
+		File historyRoot = new File(bsRoot, "History");
+		if (!historyRoot.exists() && !historyRoot.mkdirs()) {
+			Log.w(TAG, "Couldn't make dir " + historyRoot);
+			return null;
+		}
+		File historyFile = new File(historyRoot, "history-" + System.currentTimeMillis() + ".csv");
+		OutputStreamWriter out = null;
+		try {
+			out = new OutputStreamWriter(new FileOutputStream(historyFile), Charset.forName("UTF-8"));
+			out.write(history);
+			return Uri.parse("file://" + historyFile.getAbsolutePath());
+		} catch (IOException ioe) {
+			Log.w(TAG, "Couldn't access file " + historyFile + " due to " + ioe);
+			return null;
+		} finally {
+			if (out != null) {
+				try {
+					out.close();
+				} catch (IOException ioe) {
+					// do nothing
+				}
+			}
+		}
+	}
+
+	private static String messageHistoryField(String value) {
+		return value == null ? "" : value.replace("\"","\"\"");
+	}
+
+	private static void close(Cursor cursor, SQLiteDatabase database) {
+		if (cursor != null) {
+			cursor.close();
+		}
+		if (database != null) {
+			database.close();
+		}
+	}
 
 }
