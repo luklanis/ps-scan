@@ -18,6 +18,9 @@ package ch.luklanis.esscan;
 
 import ch.luklanis.esscan.language.LanguageCodeHelper;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
@@ -114,6 +117,59 @@ public class PreferencesActivity extends PreferenceActivity implements
       // Set the summary text
       editTextPreferenceCharacterWhitelist.setSummary(sharedPreferences.getString(key, OcrCharacterHelper.getDefaultWhitelist(listPreferenceSourceLanguage.getValue())));
       
+    } else if (key.equals(KEY_IBAN)){
+    	String iban = sharedPreferences.getString(key, "").replaceAll("[\\s\\r\\n]+", "");
+    	
+    	if(iban == ""){
+    		return;
+    	}
+    	
+    	if(iban.length() != 21){
+    		setOKAlert(R.string.msg_own_iban_is_not_valid);
+    		return;
+    	}
+    	
+    	iban = iban.substring(4, 21) + iban.substring(0, 4);
+
+		StringBuilder ibanNumber = new StringBuilder(1000);
+		
+		for(int i=0; i<iban.length();i++){
+			char ibanChar = iban.charAt(i);
+			
+			if(ibanChar < '0' || ibanChar > '9'){
+				int ibanLetter = 10 + (ibanChar - 'A');
+				ibanNumber.append(ibanLetter);
+			}
+			else{
+				ibanNumber.append(ibanChar);
+			}
+		}
+		
+		int lastEnd = 0;
+		int subIbanLength = 9;
+		int modulo97 = 97;
+		
+		int subIban = Integer.parseInt(ibanNumber.substring(lastEnd, subIbanLength));
+		int lastModulo = subIban % modulo97;
+		lastEnd = subIbanLength;
+		
+		while(lastEnd < ibanNumber.length()){
+			if((lastEnd + subIbanLength) < ibanNumber.length()){
+				int newEnd = lastEnd + subIbanLength - 2;
+				subIban = Integer.parseInt(String.format("%2d%s", lastModulo, ibanNumber.substring(lastEnd, newEnd)));
+				lastEnd = newEnd;
+			}
+			else{
+				subIban = Integer.parseInt(String.format("%2d%s", lastModulo, ibanNumber.substring(lastEnd, ibanNumber.length())));
+				lastEnd = ibanNumber.length();
+			}
+			
+			lastModulo = subIban % modulo97;
+		}
+		
+		if(lastModulo != 1){
+    		setOKAlert(R.string.msg_own_iban_is_not_valid);
+		}
     }
   }
   
@@ -141,4 +197,20 @@ public class PreferencesActivity extends PreferenceActivity implements
     super.onPause();
     getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
   }
+  
+  private void setOKAlert(int id){
+	  AlertDialog.Builder builder = new AlertDialog.Builder(this);
+	  builder.setMessage(id);
+	  builder.setPositiveButton(R.string.button_ok, new OnClickListener() {
+		  public void onClick(DialogInterface dialog, int which) {
+			  reload();
+		  }
+	  });
+	  builder.show();
+  }
+  
+  private void reload(){
+      startActivity(getIntent()); 
+      finish();
+ }
 }

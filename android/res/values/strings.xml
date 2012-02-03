@@ -37,6 +37,7 @@
   <string name="msg_unmount_usb">Sorry, the SD card is not accessible.</string>
   <string name="msg_amount_is_empty">Sorry, please set the amount for the transfer to %s first.</string>
   <string name="msg_own_iban_is_not_set">Sorry, to create DTA files your own IBAN is needed. You can set it under menu -> settings.</string>
+  <string name="msg_own_iban_is_not_valid">Sorry, this is not a valid swiss IBAN. Please try again or, if you don\'t know it at the momant, let it blank.</string>
   <string name="msg_own_address_is_not_set">Sorry, to create DTA files your own address is needed. You can set it under menu -> settings.</string>
   <string name="esr_result_account">Account</string>
   <string name="esr_result_reference_number">Reference Number</string>
