@@ -86,7 +86,7 @@ public class DTAFileCreator {
 
 					CharSequence paddedSequenz = padded(String.valueOf(i + 1), '0', 5, false);
 
-					String amount = filteredHistoryItem.get(i).getAmount().replace('.', ',');
+					String amount = filteredHistoryItem.get(i).getAmount();
 
 					totalAmount += Float.parseFloat(amount);
 
@@ -110,7 +110,7 @@ public class DTAFileCreator {
 					.append(spacePaddedEnd(iban, 24))	// own IBAN
 					.append(spacePaddedEnd("", 6))	// Valuta (Blanks in ESR)
 					.append(currency)
-					.append(spacePaddedEnd(amount, 12))
+					.append(spacePaddedEnd(amount.replace('.', ','), 12))
 					.append(spacePaddedEnd("", 14))	// Reserve
 					.append("02")	// Begin Segment 02
 					.append(spacePaddedEnd(ownAddress[0], 20))

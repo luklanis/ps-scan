@@ -158,6 +158,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
 	private PsValidation psValidation;
 
+	private int lastValidationStep;
+
 	Handler getHandler() {
 		return handler;
 	}
@@ -199,7 +201,9 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		lastResult = null;
 		hasSurface = false;
 		beepManager = new BeepManager(this);
+		
 		psValidation = new EsrValidation();
+		this.lastValidationStep = psValidation.getCurrentStep();
 
 		historyManager = new HistoryManager(this);
 
@@ -329,6 +333,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		super.onResume();   
 		resetStatusView();
 		psValidation.gotoBeginning();
+		this.lastValidationStep = psValidation.getCurrentStep();
 
 		String previousSourceLanguageCodeOcr = sourceLanguageCodeOcr;
 		int previousOcrEngineMode = ocrEngineMode;
@@ -488,6 +493,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 			if (isPaused) {
 				Log.d(TAG, "only resuming continuous recognition, not quitting...");
 				psValidation.gotoBeginning();
+				this.lastValidationStep = psValidation.getCurrentStep();
 				resumeContinuousDecoding();
 				return true;
 			}
@@ -777,8 +783,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 	 * @param ocrResult Object representing successful OCR results
 	 */
 	void handleOcrContinuousDecode(OcrResult ocrResult) {
-		
-		beepManager.playBeepSoundAndVibrate();
 
 		// Send an OcrResultText object to the ViewfinderView for text rendering
 		viewfinderView.addResultText(new OcrResultText(ocrResult.getText(), 
@@ -790,7 +794,11 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 				ocrResult.getTextlineBoundingBoxes(),
 				ocrResult.getRegionBoundingBoxes()));
 
-		refreshStatusView();
+		if(this.psValidation.getCurrentStep() != this.lastValidationStep){
+			this.lastValidationStep = this.psValidation.getCurrentStep();
+			beepManager.playBeepSoundAndVibrate();
+			refreshStatusView();
+		}
 	}
 
 	/**
