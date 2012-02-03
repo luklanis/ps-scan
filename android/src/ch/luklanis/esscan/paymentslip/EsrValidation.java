@@ -108,18 +108,6 @@ public class EsrValidation extends PsValidation {
 	}
 
 	@Override
-	public String[] getStepHint() {
-		switch(getCurrentStep())
-		{
-		case 1: return new String[]{ "<" };
-		case 2: return  new String[]{ "+", "<" };
-		case 3: return new String[]{ "<" };
-
-		default: return null;
-		}
-	}
-
-	@Override
 	public String getRelatedText() {
 		return relatedText;
 	}

@@ -95,7 +95,7 @@ public final class EsrResult {
 			return "";
 		}
 
-		return code.substring((indexOfSpace + 3), (indexOfSpace + 9));
+		return code.substring((indexOfSpace + 1), (indexOfSpace + 10));
 	}
 
 	public String getReference(){

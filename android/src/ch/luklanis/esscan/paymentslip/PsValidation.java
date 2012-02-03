@@ -72,8 +72,6 @@ public abstract class PsValidation {
 
 	public abstract boolean validate(String text);
 	
-	public abstract String[] getStepHint();
-	
 	public abstract String getRelatedText();	
 	
 	public abstract String getRelatedText(String text);
