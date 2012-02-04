@@ -18,7 +18,7 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="ch.luklanis.esscan"
-          android:installLocation="auto" 
+          android:installLocation="preferExternal" 
           android:versionName="0.5.01" 
           android:versionCode="3"
           >

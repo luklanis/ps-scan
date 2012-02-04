@@ -124,6 +124,9 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginRight="4dip"
+                                android:background="@drawable/edit_text_background"
+                                android:textColor="@color/result_text"
+                                android:padding="4dip"
                                 android:inputType="numberDecimal"
                                 android:numeric="decimal"
                                 android:textSize="14sp" />

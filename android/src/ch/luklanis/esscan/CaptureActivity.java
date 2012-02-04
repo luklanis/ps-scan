@@ -809,6 +809,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		else{
 			if(lastItem.getAmount() == null || lastItem.getAmount() == ""){
 				amountEditText.setText(R.string.esr_result_amount_not_set);
+				amountEditText.selectAll();
 			}
 			else{
 				amountEditText.setText(lastItem.getAmount());
