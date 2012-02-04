@@ -330,33 +330,41 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 			}
 		});
 
-		Button amountSaveButton = (Button) findViewById(R.id.esr_result_amount_save);
+		Button amountSaveButton = (Button) findViewById(R.id.button_result_save);
 		amountSaveButton.setOnClickListener(new Button.OnClickListener() {
 			public void onClick(View v) {
-				EditText amountEditText = (EditText) findViewById(R.id.esr_result_amount);
-				String newAmount = amountEditText.getText().toString().replace(',', '.');
-				try {
-					float newAmountTemp = Float.parseFloat(newAmount);
-					newAmountTemp *= 100;
-					newAmountTemp -= (newAmountTemp % 5);
-					newAmountTemp /= 100;
-					
-					newAmount = String.valueOf(newAmountTemp);
-					
-					if(newAmount.indexOf('.') == newAmount.length() - 2){
-						newAmount += "0";
+				if(lastItem.getResult().getAmount() == ""){
+					EditText amountEditText = (EditText) findViewById(R.id.esr_result_amount);
+					String newAmount = amountEditText.getText().toString().replace(',', '.');
+					try {
+						float newAmountTemp = Float.parseFloat(newAmount);
+						newAmountTemp *= 100;
+						newAmountTemp -= (newAmountTemp % 5);
+						newAmountTemp /= 100;
+
+						newAmount = String.valueOf(newAmountTemp);
+
+						if(newAmount.indexOf('.') == newAmount.length() - 2){
+							newAmount += "0";
+						}
+
+						if(historyManager == null){
+							Log.e(TAG, "onClick: historyManager is null!");
+							return;
+						}
+
+						historyManager.updateHistoryItemAmount(lastItem.getResult().getCompleteCode(), 
+								newAmount);
+						amountEditText.setText(newAmount);
+					} catch (NumberFormatException e) {
+						setOKAlert(R.string.msg_amount_not_valid);
 					}
-					
-					if(historyManager == null){
-						Log.e(TAG, "onClick: historyManager is null!");
-						return;
-					}
-					
-					historyManager.updateHistoryItemAmount(lastItem.getResult().getCompleteCode(), 
-							newAmount);
-					amountEditText.setText(newAmount);
-				} catch (NumberFormatException e) {
-					setOKAlert(R.string.msg_amount_not_valid);
+				}
+
+				EditText addressEditText = (EditText) findViewById(R.id.esr_result_address);
+				String address = addressEditText.getText().toString();
+				if(address.length() > 0){
+					historyManager.updateHistoryItemAddress(lastItem.getResult().getCompleteCode(), address);
 				}
 			}
 		});
@@ -799,12 +807,11 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		accountTextView.setText(result.getAccount());
 
 		EditText amountEditText = (EditText) findViewById(R.id.esr_result_amount);
-		Button amountSaveButton = (Button) findViewById(R.id.esr_result_amount_save);
+		Button amountSaveButton = (Button) findViewById(R.id.button_result_save);
 
 		if(result.getAmount() != ""){
 			amountEditText.setEnabled(false);
 			amountEditText.setText(historyItem.getAmount());
-			amountSaveButton.setVisibility(View.GONE);
 		}
 		else{
 			if(lastItem.getAmount() == null || lastItem.getAmount() == ""){
@@ -822,6 +829,9 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
 		TextView referenceTextView = (TextView) findViewById(R.id.esr_result_reference_number);
 		referenceTextView.setText(result.getReference());
+
+		EditText addressEditText = (EditText) findViewById(R.id.esr_result_address);
+		addressEditText.setText(lastItem.getAddress());
 
 		setProgressBarVisibility(false);
 
@@ -858,7 +868,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 	 * @param obj Metadata for the failed OCR request.
 	 */
 	void handleOcrContinuousDecode(OcrResultFailure obj) {
-		lastItem = null;
+//		lastItem = null;
 		Log.i(TAG, "handleOcrContinuousDecode: set lastItem to null");
 	}
 
@@ -888,7 +898,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 			SpannableStringBuilder ssb = new SpannableStringBuilder(text);
 			for (CharacterStyle c : cs)
 				ssb.setSpan(c, start, end, 0);
-			text = ssb;
+					text = ssb;
 		}
 		return text;
 	}
