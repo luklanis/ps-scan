@@ -16,15 +16,15 @@
  limitations under the License.
  -->
 <resources>
-  <string name="app_name">ESR scan</string>
+  <string name="app_name">ESR Scanner</string>
   <string name="button_cancel">Cancel</string>
   <string name="button_ok">OK</string>
   <string name="button_save">Save</string>
   <string name="history_clear_text">Clear history</string>
   <string name="history_send_dta">Send history as DTA file</string>
   <string name="history_send">Send history</string>
-  <string name="history_email_title">ESR scan history</string>
-  <string name="history_email_as_dta_title">ESR scan DTA file</string>
+  <string name="history_email_title">ESR Scanner history</string>
+  <string name="history_email_as_dta_title">DTA file from ESR Scanner</string>
   <string name="history_title">History</string>
   <string name="history_clear_one_history_text">Clear</string>
   <string name="history_empty">Empty</string>
