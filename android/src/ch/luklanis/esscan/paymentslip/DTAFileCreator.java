@@ -303,19 +303,19 @@ public class DTAFileCreator {
 			return activity.getResources().getString(R.string.msg_own_address_is_not_set);
 		}
 
-		List<EsrResult> esrResults = new ArrayList<EsrResult>();
+		List<HistoryItem> items = new ArrayList<HistoryItem>();
 
 		for (HistoryItem historyItem : historyItems) {
 			if(historyItem.getResult().getCurrency() == "CHF"){
-				esrResults.add(historyItem.getResult());
+				items.add(historyItem);
 			}
 		}
 
-		for (int i = 0; i < esrResults.size(); i++) {
-			EsrResult result = esrResults.get(i);
+		for (int i = 0; i < items.size(); i++) {
+			HistoryItem item = items.get(i);
 
-			if(nullToEmpty(result.getAmount()) == ""){
-				return String.format(activity.getResources().getString(R.string.msg_amount_is_empty), result.getAccount());
+			if(nullToEmpty(item.getAmount()) == ""){
+				return String.format(activity.getResources().getString(R.string.msg_amount_is_empty), item.getResult().getAccount());
 			}
 		}
 
