@@ -30,6 +30,7 @@ import ch.luklanis.esscan.history.HistoryActivity;
 import ch.luklanis.esscan.history.HistoryItem;
 import ch.luklanis.esscan.history.HistoryManager;
 import ch.luklanis.esscan.language.LanguageCodeHelper;
+import ch.luklanis.esscan.paymentslip.DTAFileCreator;
 import ch.luklanis.esscan.paymentslip.EsrResult;
 import ch.luklanis.esscan.paymentslip.EsrValidation;
 import ch.luklanis.esscan.paymentslip.PsValidation;
@@ -38,6 +39,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 //import android.content.ClipData;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -333,6 +335,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		Button amountSaveButton = (Button) findViewById(R.id.button_result_save);
 		amountSaveButton.setOnClickListener(new Button.OnClickListener() {
 			public void onClick(View v) {
+				boolean somethingSaved = false;
+
 				if(lastItem.getResult().getAmount() == ""){
 					EditText amountEditText = (EditText) findViewById(R.id.esr_result_amount);
 					String newAmount = amountEditText.getText().toString().replace(',', '.');
@@ -356,15 +360,31 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 						historyManager.updateHistoryItemAmount(lastItem.getResult().getCompleteCode(), 
 								newAmount);
 						amountEditText.setText(newAmount);
+
+						somethingSaved = true;
 					} catch (NumberFormatException e) {
-						setOKAlert(R.string.msg_amount_not_valid);
+						setOKAlert(CaptureActivity.this, R.string.msg_amount_not_valid);
 					}
 				}
 
 				EditText addressEditText = (EditText) findViewById(R.id.esr_result_address);
 				String address = addressEditText.getText().toString();
 				if(address.length() > 0){
+
+					int error = DTAFileCreator.validateAddress(address);
+					if(error != 0){
+						setOKAlert(CaptureActivity.this, error);
+					}
+
 					historyManager.updateHistoryItemAddress(lastItem.getResult().getCompleteCode(), address);
+
+					somethingSaved = true;
+				}
+
+				if(somethingSaved){
+					Toast toast = Toast.makeText(CaptureActivity.this, R.string.msg_saved, Toast.LENGTH_SHORT);
+					toast.setGravity(Gravity.BOTTOM, 0, 0);
+					toast.show();
 				}
 			}
 		});
@@ -868,7 +888,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 	 * @param obj Metadata for the failed OCR request.
 	 */
 	void handleOcrContinuousDecode(OcrResultFailure obj) {
-//		lastItem = null;
+		//		lastItem = null;
 		Log.i(TAG, "handleOcrContinuousDecode: set lastItem to null");
 	}
 
@@ -1109,8 +1129,13 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		historyManager.addHistoryItem(result, "", "");
 	}
 
+	@SuppressWarnings("unused")
 	private void setOKAlert(int id){
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		setOKAlert(this, id);
+	}
+
+	private void setOKAlert(Context context, int id){
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setMessage(id);
 		builder.setPositiveButton(R.string.button_ok, null);
 		builder.show();

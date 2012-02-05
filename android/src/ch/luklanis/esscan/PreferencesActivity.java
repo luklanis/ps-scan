@@ -17,6 +17,7 @@
 package ch.luklanis.esscan;
 
 import ch.luklanis.esscan.language.LanguageCodeHelper;
+import ch.luklanis.esscan.paymentslip.DTAFileCreator;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -118,58 +119,19 @@ public class PreferencesActivity extends PreferenceActivity implements
       editTextPreferenceCharacterWhitelist.setSummary(sharedPreferences.getString(key, OcrCharacterHelper.getDefaultWhitelist(listPreferenceSourceLanguage.getValue())));
       
     } else if (key.equals(KEY_IBAN)){
-    	String iban = sharedPreferences.getString(key, "").replaceAll("[\\s\\r\\n]+", "");
+    	String iban = sharedPreferences.getString(key, "");
     	
-    	if(iban == ""){
-    		return;
+    	int warning = DTAFileCreator.validateIBAN(iban);
+    	if (warning != 0){
+    		setOKAlert(warning);
     	}
+    }else if (key.equals(KEY_ADDRESS)){
+    	String address = sharedPreferences.getString(key, "");
     	
-    	if(iban.length() != 21){
-    		setOKAlert(R.string.msg_own_iban_is_not_valid);
-    		return;
+    	int warning = DTAFileCreator.validateAddress(address);
+    	if (warning != 0){
+    		setOKAlert(warning);
     	}
-    	
-    	iban = iban.substring(4, 21) + iban.substring(0, 4);
-
-		StringBuilder ibanNumber = new StringBuilder(1000);
-		
-		for(int i=0; i<iban.length();i++){
-			char ibanChar = iban.charAt(i);
-			
-			if(ibanChar < '0' || ibanChar > '9'){
-				int ibanLetter = 10 + (ibanChar - 'A');
-				ibanNumber.append(ibanLetter);
-			}
-			else{
-				ibanNumber.append(ibanChar);
-			}
-		}
-		
-		int lastEnd = 0;
-		int subIbanLength = 9;
-		int modulo97 = 97;
-		
-		int subIban = Integer.parseInt(ibanNumber.substring(lastEnd, subIbanLength));
-		int lastModulo = subIban % modulo97;
-		lastEnd = subIbanLength;
-		
-		while(lastEnd < ibanNumber.length()){
-			if((lastEnd + subIbanLength) < ibanNumber.length()){
-				int newEnd = lastEnd + subIbanLength - 2;
-				subIban = Integer.parseInt(String.format("%2d%s", lastModulo, ibanNumber.substring(lastEnd, newEnd)));
-				lastEnd = newEnd;
-			}
-			else{
-				subIban = Integer.parseInt(String.format("%2d%s", lastModulo, ibanNumber.substring(lastEnd, ibanNumber.length())));
-				lastEnd = ibanNumber.length();
-			}
-			
-			lastModulo = subIban % modulo97;
-		}
-		
-		if(lastModulo != 1){
-    		setOKAlert(R.string.msg_own_iban_is_not_valid);
-		}
     }
   }
   

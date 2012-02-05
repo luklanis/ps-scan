@@ -71,6 +71,7 @@
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginRight="4dip"
                         android:orientation="vertical" >
 
                         <ImageView
@@ -163,13 +164,12 @@
 
                     <LinearLayout
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:orientation="vertical" >
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dip"
                             android:text="@string/esr_result_address"
                             android:textColor="@color/result_text"
                             android:textColorLink="@color/result_text"
@@ -179,13 +179,13 @@
                         <EditText
                             android:id="@+id/esr_result_address"
                             android:layout_width="170dip"
-                            android:layout_height="wrap_content"
-                            android:layout_marginRight="4dip"
+                            android:layout_height="match_parent"
+                            android:layout_marginTop="4dip"
                             android:background="@drawable/edit_text_background"
-                            android:lines="4"
                             android:padding="4dip"
                             android:textColor="@color/result_text"
-                            android:textSize="14sp" />
+                            android:textSize="14sp"
+                            android:gravity="top" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
