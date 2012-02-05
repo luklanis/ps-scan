@@ -829,17 +829,19 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		EditText amountEditText = (EditText) findViewById(R.id.esr_result_amount);
 		Button amountSaveButton = (Button) findViewById(R.id.button_result_save);
 
-		if(result.getAmount() != ""){
+		String amountFromCode = result.getAmount(); 
+		if(amountFromCode != ""){
 			amountEditText.setEnabled(false);
-			amountEditText.setText(historyItem.getAmount());
+			amountEditText.setText(amountFromCode);
 		}
 		else{
-			if(lastItem.getAmount() == null || lastItem.getAmount() == ""){
+			String amountManuel = lastItem.getAmount();
+			if(amountManuel == null || amountManuel == "" || amountManuel.length() == 0){
 				amountEditText.setText(R.string.esr_result_amount_not_set);
 				amountEditText.selectAll();
 			}
 			else{
-				amountEditText.setText(lastItem.getAmount());
+				amountEditText.setText(amountManuel);
 			}
 			amountSaveButton.setVisibility(View.VISIBLE);
 		}

@@ -297,6 +297,10 @@ public class DTAFileCreator {
 			return activity.getResources().getString(R.string.msg_own_iban_is_not_set);
 		}
 
+		if(validateIBAN(iban) != 0){
+			return activity.getResources().getString(R.string.msg_own_iban_is_not_valid);
+		}
+
 		String[] ownAddress = prefs.getString(PreferencesActivity.KEY_ADDRESS, "").split(NEWLINE_PATTERN);
 
 		if(ownAddress.length < 2){

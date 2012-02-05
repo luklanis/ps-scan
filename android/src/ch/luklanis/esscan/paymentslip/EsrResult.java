@@ -111,7 +111,7 @@ public final class EsrResult {
 		String referenz = code.substring((indexOfSpecialChar + 1), indexOfPlus);
 		
 		while(referenz.indexOf('0') == 0){
-			referenz = referenz.substring(0, 1);
+			referenz = referenz.substring(1, referenz.length());
 		}
 
 		int firstChars = referenz.length() % blockSize;
