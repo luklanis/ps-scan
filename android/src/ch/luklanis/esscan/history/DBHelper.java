@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2009 ZXing authors
+ * Copyright (C) 2012 Lukas Landis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +27,19 @@ import android.content.Context;
 final class DBHelper extends SQLiteOpenHelper {
 
   private static final int DB_VERSION = 5;
-  private static final String DB_NAME = "esrscan_history.db";
-  static final String TABLE_NAME = "history";
+  private static final String DB_NAME = "esrscan.db";
   static final String ID_COL = "id";
-  static final String CODE_ROW_COL = "code_row";
-  static final String TIMESTAMP_COL = "timestamp";
-  static final String ADDRESS_COL = "address";
-  static final String AMOUNT_COL = "amount";
+  
+  static final String HISTORY_TABLE_NAME = "history";
+  static final String HISTORY_CODE_ROW_COL = "code_row";
+  static final String HISTORY_TIMESTAMP_COL = "timestamp";
+  static final String HISTORY_ADDRESS_COL = "address";
+  static final String HISTORY_AMOUNT_COL = "amount";
+  static final String HISTORY_FILE_NAME_COL = "file";
+  
+  static final String ADDRESS_TABLE_NAME = "address";
+  static final String ADDRESS_ACCOUNT_COL = "account";
+  static final String ADDRESS_ADDRESS_COL = "address";
 
   DBHelper(Context context) {
     super(context, DB_NAME, null, DB_VERSION);
@@ -41,17 +48,25 @@ final class DBHelper extends SQLiteOpenHelper {
   @Override
   public void onCreate(SQLiteDatabase sqLiteDatabase) {
     sqLiteDatabase.execSQL(
-            "CREATE TABLE " + TABLE_NAME + " (" +
+            "CREATE TABLE " + HISTORY_TABLE_NAME + " (" +
             ID_COL + " INTEGER PRIMARY KEY, " +
-            CODE_ROW_COL + " TEXT, " +
-            TIMESTAMP_COL + " INTEGER, " +
-            ADDRESS_COL + " TEXT, " +
-            AMOUNT_COL + " TEXT);");
+            HISTORY_CODE_ROW_COL + " TEXT, " +
+            HISTORY_TIMESTAMP_COL + " INTEGER, " +
+            HISTORY_ADDRESS_COL + " TEXT, " +
+            HISTORY_AMOUNT_COL + " TEXT, " +
+            HISTORY_FILE_NAME_COL + " TEXT);");
+    
+    sqLiteDatabase.execSQL(
+            "CREATE TABLE " + ADDRESS_TABLE_NAME + " (" +
+            ID_COL + " INTEGER PRIMARY KEY, " +
+            ADDRESS_ACCOUNT_COL + " TEXT, " +
+            ADDRESS_ADDRESS_COL + " TEXT);");
   }
 
   @Override
   public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-    sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+    sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + HISTORY_TABLE_NAME);
+    sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + ADDRESS_TABLE_NAME);
     onCreate(sqLiteDatabase);
   }
 

@@ -49,18 +49,25 @@ public final class HistoryManager {
 
 	private static final int MAX_ITEMS = 500;
 
-	private static final String[] COLUMNS = {
-		DBHelper.CODE_ROW_COL,
-		DBHelper.TIMESTAMP_COL,
-		DBHelper.ADDRESS_COL,
-		DBHelper.AMOUNT_COL
+	private static final String[] HISTORY_COLUMNS = {
+		DBHelper.HISTORY_CODE_ROW_COL,
+		DBHelper.HISTORY_TIMESTAMP_COL,
+		DBHelper.HISTORY_ADDRESS_COL,
+		DBHelper.HISTORY_AMOUNT_COL,
+		DBHelper.HISTORY_FILE_NAME_COL
+	};
+
+	private static final String[] ADDRESS_COLUMNS = {
+		DBHelper.ADDRESS_ACCOUNT_COL,
+		DBHelper.ADDRESS_ADDRESS_COL
 	};
 
 	private static final String[] COUNT_COLUMN = { "COUNT(1)" };
 
 	private static final String[] ID_COL_PROJECTION = { DBHelper.ID_COL };
-	private static final String[] ID_ADDRESS_COL_PROJECTION = { DBHelper.ID_COL, DBHelper.ADDRESS_COL };
-	private static final String[] ID_AMOUNT_COL_PROJECTION = { DBHelper.ID_COL, DBHelper.AMOUNT_COL };
+	private static final String[] ID_ADDRESS_COL_PROJECTION = { DBHelper.ID_COL, DBHelper.HISTORY_ADDRESS_COL };
+	private static final String[] ID_AMOUNT_COL_PROJECTION = { DBHelper.ID_COL, DBHelper.HISTORY_AMOUNT_COL };
+	private static final String[] ID_FILE_NAME_COL_PROJECTION = { DBHelper.ID_COL, DBHelper.HISTORY_FILE_NAME_COL };
 	private static final DateFormat EXPORT_DATE_TIME_FORMAT = DateFormat.getDateTimeInstance();
 
 	private final Activity activity;
@@ -75,7 +82,7 @@ public final class HistoryManager {
 		Cursor cursor = null;
 		try {
 			db = helper.getReadableDatabase();
-			cursor = db.query(DBHelper.TABLE_NAME, COUNT_COLUMN, null, null, null, null, null);
+			cursor = db.query(DBHelper.HISTORY_TABLE_NAME, COUNT_COLUMN, null, null, null, null, null);
 			cursor.moveToFirst();
 			return cursor.getInt(0) > 0;
 		} finally {
@@ -90,7 +97,7 @@ public final class HistoryManager {
 		Cursor cursor = null;
 		try {
 			db = helper.getReadableDatabase();
-			cursor = db.query(DBHelper.TABLE_NAME, COLUMNS, null, null, null, null, DBHelper.TIMESTAMP_COL + " DESC");
+			cursor = db.query(DBHelper.HISTORY_TABLE_NAME, HISTORY_COLUMNS, null, null, null, null, DBHelper.HISTORY_TIMESTAMP_COL + " DESC");
 			while (cursor.moveToNext()) {
 				String code_row = cursor.getString(0);
 				long timestamp = cursor.getLong(1);
@@ -111,7 +118,7 @@ public final class HistoryManager {
 		Cursor cursor = null;
 		try {
 			db = helper.getReadableDatabase();
-			cursor = db.query(DBHelper.TABLE_NAME, COLUMNS, null, null, null, null, DBHelper.TIMESTAMP_COL + " DESC");
+			cursor = db.query(DBHelper.HISTORY_TABLE_NAME, HISTORY_COLUMNS, null, null, null, null, DBHelper.HISTORY_TIMESTAMP_COL + " DESC");
 			cursor.move(number + 1);
 			String text = cursor.getString(0);
 			long timestamp = cursor.getLong(1);
@@ -130,12 +137,12 @@ public final class HistoryManager {
 		Cursor cursor = null;
 		try {
 			db = helper.getWritableDatabase();      
-			cursor = db.query(DBHelper.TABLE_NAME,
+			cursor = db.query(DBHelper.HISTORY_TABLE_NAME,
 					ID_COL_PROJECTION,
 					null, null, null, null,
-					DBHelper.TIMESTAMP_COL + " DESC");
+					DBHelper.HISTORY_TIMESTAMP_COL + " DESC");
 			cursor.move(number + 1);
-			db.delete(DBHelper.TABLE_NAME, DBHelper.ID_COL + '=' + cursor.getString(0), null);
+			db.delete(DBHelper.HISTORY_TABLE_NAME, DBHelper.ID_COL + '=' + cursor.getString(0), null);
 		} finally {
 			close(cursor, db);
 		}
@@ -157,31 +164,31 @@ public final class HistoryManager {
 		Cursor cursor = null;
 		try {
 			db = helper.getWritableDatabase();
-			cursor = db.query(DBHelper.TABLE_NAME,
-					COLUMNS,
-					DBHelper.CODE_ROW_COL + "=?",
+			cursor = db.query(DBHelper.HISTORY_TABLE_NAME,
+					HISTORY_COLUMNS,
+					DBHelper.HISTORY_CODE_ROW_COL + "=?",
 					new String[] { result.getCompleteCode() },
 					null,
 					null,
-					DBHelper.TIMESTAMP_COL + " DESC",
+					DBHelper.HISTORY_TIMESTAMP_COL + " DESC",
 					"1");
 			String oldID = null;
 			if (cursor.moveToNext()) {
 				oldID = cursor.getString(0);
 				ContentValues values = new ContentValues();
-				values.put(DBHelper.AMOUNT_COL, amount);
-				values.put(DBHelper.ADDRESS_COL, address);
-				db.update(DBHelper.TABLE_NAME, values, DBHelper.ID_COL + "=?", new String[] { oldID });
+				values.put(DBHelper.HISTORY_AMOUNT_COL, amount);
+				values.put(DBHelper.HISTORY_ADDRESS_COL, address);
+				db.update(DBHelper.HISTORY_TABLE_NAME, values, DBHelper.ID_COL + "=?", new String[] { oldID });
 			}
 			else{
 				ContentValues values = new ContentValues();
-				values.put(DBHelper.CODE_ROW_COL, result.getCompleteCode());
-				values.put(DBHelper.TIMESTAMP_COL, result.getTimestamp());
-				values.put(DBHelper.AMOUNT_COL, amount);
-				values.put(DBHelper.ADDRESS_COL, address);
+				values.put(DBHelper.HISTORY_CODE_ROW_COL, result.getCompleteCode());
+				values.put(DBHelper.HISTORY_TIMESTAMP_COL, result.getTimestamp());
+				values.put(DBHelper.HISTORY_AMOUNT_COL, amount);
+				values.put(DBHelper.HISTORY_ADDRESS_COL, address);
 
 				// Insert the new entry into the DB.
-				db.insert(DBHelper.TABLE_NAME, DBHelper.TIMESTAMP_COL, values);
+				db.insert(DBHelper.HISTORY_TABLE_NAME, DBHelper.HISTORY_TIMESTAMP_COL, values);
 			}
 		}
 		finally {
@@ -190,39 +197,18 @@ public final class HistoryManager {
 	}
 
 	public void updateHistoryItemAddress(String code_row, String itemAddress) {
-		// As we're going to do an update only we don't need need to worry
-		// about the preferences; if the item wasn't saved it won't be udpated
-		SQLiteOpenHelper helper = new DBHelper(activity);
-		SQLiteDatabase db = null;    
-		Cursor cursor = null;
-		try {
-			db = helper.getWritableDatabase();
-			cursor = db.query(DBHelper.TABLE_NAME,
-					ID_ADDRESS_COL_PROJECTION,
-					DBHelper.CODE_ROW_COL + "=?",
-					new String[] { code_row },
-					null,
-					null,
-					DBHelper.TIMESTAMP_COL + " DESC",
-					"1");
-			String oldID = null;
-			if (cursor.moveToNext()) {
-				oldID = cursor.getString(0);
-
-				//      String newAddress = oldAddress == null ? itemAddress : oldAddress + " : " + itemAddress;
-				ContentValues values = new ContentValues();
-				//      values.put(DBHelper.ADDRESS_COL, newAddress);
-				values.put(DBHelper.ADDRESS_COL, itemAddress);
-
-				db.update(DBHelper.TABLE_NAME, values, DBHelper.ID_COL + "=?", new String[] { oldID });
-			}
-
-		} finally {
-			close(cursor, db);
-		}
+		updateHistoryItem(ID_ADDRESS_COL_PROJECTION, DBHelper.HISTORY_ADDRESS_COL, code_row, itemAddress);
 	}
 
 	public void updateHistoryItemAmount(String code_row, String itemAmount) {
+		updateHistoryItem(ID_AMOUNT_COL_PROJECTION, DBHelper.HISTORY_AMOUNT_COL, code_row, itemAmount);
+	}
+
+	public void updateHistoryItemFileName(String code_row, String itemFileName) {
+		updateHistoryItem(ID_FILE_NAME_COL_PROJECTION, DBHelper.HISTORY_FILE_NAME_COL, code_row, itemFileName);
+	}
+
+	private void updateHistoryItem(String[] projection, String col_name, String code_row, String item) {
 		// As we're going to do an update only we don't need need to worry
 		// about the preferences; if the item wasn't saved it won't be updated
 		SQLiteOpenHelper helper = new DBHelper(activity);
@@ -230,22 +216,22 @@ public final class HistoryManager {
 		Cursor cursor = null;
 		try {
 			db = helper.getWritableDatabase();
-			cursor = db.query(DBHelper.TABLE_NAME,
-					ID_AMOUNT_COL_PROJECTION,
-					DBHelper.CODE_ROW_COL + "=?",
+			cursor = db.query(DBHelper.HISTORY_TABLE_NAME,
+					projection,
+					DBHelper.HISTORY_CODE_ROW_COL + "=?",
 					new String[] { code_row },
 					null,
 					null,
-					DBHelper.TIMESTAMP_COL + " DESC",
+					DBHelper.HISTORY_TIMESTAMP_COL + " DESC",
 					"1");
 			String oldID = null;
 			if (cursor.moveToNext()) {
 				oldID = cursor.getString(0);
 
 				ContentValues values = new ContentValues();
-				values.put(DBHelper.AMOUNT_COL, itemAmount);
+				values.put(col_name, item);
 
-				db.update(DBHelper.TABLE_NAME, values, DBHelper.ID_COL + "=?", new String[] { oldID });
+				db.update(DBHelper.HISTORY_TABLE_NAME, values, DBHelper.ID_COL + "=?", new String[] { oldID });
 			}
 
 		} finally {
@@ -259,7 +245,7 @@ public final class HistoryManager {
 		SQLiteDatabase db = null;
 		try {
 			db = helper.getWritableDatabase();      
-			db.delete(DBHelper.TABLE_NAME, DBHelper.CODE_ROW_COL + "=?", new String[] { text });
+			db.delete(DBHelper.HISTORY_TABLE_NAME, DBHelper.HISTORY_CODE_ROW_COL + "=?", new String[] { text });
 		} finally {
 			close(null, db);
 		}
@@ -271,13 +257,13 @@ public final class HistoryManager {
 		Cursor cursor = null;
 		try {
 			db = helper.getWritableDatabase();      
-			cursor = db.query(DBHelper.TABLE_NAME,
+			cursor = db.query(DBHelper.HISTORY_TABLE_NAME,
 					ID_COL_PROJECTION,
 					null, null, null, null,
-					DBHelper.TIMESTAMP_COL + " DESC");
+					DBHelper.HISTORY_TIMESTAMP_COL + " DESC");
 			cursor.move(MAX_ITEMS);
 			while (cursor.moveToNext()) {
-				db.delete(DBHelper.TABLE_NAME, DBHelper.ID_COL + '=' + cursor.getString(0), null);
+				db.delete(DBHelper.HISTORY_TABLE_NAME, DBHelper.ID_COL + '=' + cursor.getString(0), null);
 			}
 		} finally {
 			close(cursor, db);
@@ -304,10 +290,10 @@ public final class HistoryManager {
 		Cursor cursor = null;
 		try {
 			db = helper.getWritableDatabase();
-			cursor = db.query(DBHelper.TABLE_NAME,
-					COLUMNS,
+			cursor = db.query(DBHelper.HISTORY_TABLE_NAME,
+					HISTORY_COLUMNS,
 					null, null, null, null,
-					DBHelper.TIMESTAMP_COL + " DESC");
+					DBHelper.HISTORY_TIMESTAMP_COL + " DESC");
 
 			while (cursor.moveToNext()) {
 
@@ -335,7 +321,7 @@ public final class HistoryManager {
 		SQLiteDatabase db = null;
 		try {
 			db = helper.getWritableDatabase();      
-			db.delete(DBHelper.TABLE_NAME, null, null);
+			db.delete(DBHelper.HISTORY_TABLE_NAME, null, null);
 		} finally {
 			close(null, db);
 		}
@@ -365,6 +351,67 @@ public final class HistoryManager {
 					// do nothing
 				}
 			}
+		}
+	}
+
+	public void addAddress(String account, String address) {
+		SQLiteOpenHelper helper = new DBHelper(activity);
+		SQLiteDatabase db = null;    
+		Cursor cursor = null;
+		try {
+			db = helper.getWritableDatabase();
+			cursor = db.query(DBHelper.ADDRESS_TABLE_NAME,
+					ADDRESS_COLUMNS,
+					DBHelper.ADDRESS_ACCOUNT_COL + "=?",
+					new String[] { account },
+					null,
+					null,
+					null,
+					"1");
+			String oldID = null;
+			if (cursor.moveToNext()) {
+				oldID = cursor.getString(0);
+				ContentValues values = new ContentValues();
+				values.put(DBHelper.ADDRESS_ADDRESS_COL, address);
+				db.update(DBHelper.HISTORY_TABLE_NAME, values, DBHelper.ID_COL + "=?", new String[] { oldID });
+			}
+			else{
+				ContentValues values = new ContentValues();
+				values.put(DBHelper.ADDRESS_ACCOUNT_COL, account);
+				values.put(DBHelper.ADDRESS_ADDRESS_COL, address);
+
+				// Insert the new entry into the DB.
+				db.insert(DBHelper.ADDRESS_TABLE_NAME, null, values);
+			}
+		}
+		finally {
+			close(null, db);
+		}
+	}
+
+	public String getAddress(String account) {
+		SQLiteOpenHelper helper = new DBHelper(activity);
+		SQLiteDatabase db = null;    
+		Cursor cursor = null;
+		try {
+			db = helper.getWritableDatabase();
+			cursor = db.query(DBHelper.ADDRESS_TABLE_NAME,
+					ADDRESS_COLUMNS,
+					DBHelper.ADDRESS_ACCOUNT_COL + "=?",
+					new String[] { account },
+					null,
+					null,
+					null,
+					"1");
+			if (cursor.moveToNext()) {
+				return cursor.getString(1);
+			}
+			else{
+				return "";
+			}
+		}
+		finally {
+			close(null, db);
 		}
 	}
 

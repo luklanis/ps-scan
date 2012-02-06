@@ -38,154 +38,158 @@ import ch.luklanis.esscan.paymentslip.DTAFileCreator;
 import java.util.List;
 
 public final class HistoryActivity extends ListActivity {
+	//  private static final int SEND_ID = Menu.FIRST;
+	//  private static final int CLEAR_ID = Menu.FIRST + 1;
 
-//  private static final int SEND_ID = Menu.FIRST;
-//  private static final int CLEAR_ID = Menu.FIRST + 1;
+	private HistoryManager historyManager;
+	private HistoryItemAdapter adapter;
 
-  private HistoryManager historyManager;
-  private HistoryItemAdapter adapter;
-  
-  @Override
-  protected void onCreate(Bundle icicle) {
-    super.onCreate(icicle);
-    this.historyManager = new HistoryManager(this);  
-    adapter = new HistoryItemAdapter(this);
-    setListAdapter(adapter);
-    ListView listview = getListView();
-    registerForContextMenu(listview);
-  }
+	@Override
+	protected void onCreate(Bundle icicle) {
+		super.onCreate(icicle);
+		this.historyManager = new HistoryManager(this);  
+		adapter = new HistoryItemAdapter(this);
+		setListAdapter(adapter);
+		ListView listview = getListView();
+		registerForContextMenu(listview);
+	}
 
-  @Override
-  protected void onResume() {
-    super.onResume();
-    List<HistoryItem> items = historyManager.buildHistoryItems();
-    adapter.clear();
-    for (HistoryItem item : items) {
-      adapter.add(item);
-    }
-    if (adapter.isEmpty()) {
-      adapter.add(new HistoryItem(null));
-    }
-  }
+	@Override
+	protected void onResume() {
+		super.onResume();
+		List<HistoryItem> items = historyManager.buildHistoryItems();
+		adapter.clear();
+		for (HistoryItem item : items) {
+			adapter.add(item);
+		}
+		if (adapter.isEmpty()) {
+			adapter.add(new HistoryItem(null));
+		}
+	}
 
-  @Override
-  protected void onListItemClick(ListView l, View v, int position, long id) {
-    if (adapter.getItem(position).getResult() != null) {
-      Intent intent = new Intent(this, CaptureActivity.class);
-      intent.putExtra(Intents.History.ITEM_NUMBER, position);
-      setResult(Activity.RESULT_OK, intent);
-      finish();
-    }
-  }
+	@Override
+	protected void onListItemClick(ListView l, View v, int position, long id) {
+		if (adapter.getItem(position).getResult() != null) {
+			Intent intent = new Intent(this, CaptureActivity.class);
+			intent.putExtra(Intents.History.ITEM_NUMBER, position);
+			setResult(Activity.RESULT_OK, intent);
+			finish();
+		}
+	}
 
-  @Override
-  public void onCreateContextMenu(ContextMenu menu,
-                                  View v,
-                                  ContextMenu.ContextMenuInfo menuInfo) {
-    int position = ((AdapterView.AdapterContextMenuInfo) menuInfo).position;
-    menu.add(Menu.NONE, position, position, R.string.history_clear_one_history_text);
-  }
+	@Override
+	public void onCreateContextMenu(ContextMenu menu,
+			View v,
+			ContextMenu.ContextMenuInfo menuInfo) {
+		int position = ((AdapterView.AdapterContextMenuInfo) menuInfo).position;
+		menu.add(Menu.NONE, position, position, R.string.history_clear_one_history_text);
+	}
 
-  @Override
-  public boolean onContextItemSelected(MenuItem item) {
-    int position = item.getItemId();
-    historyManager.deleteHistoryItem(position);
-    finish();
-    return true;
-  }
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		int position = item.getItemId();
+		historyManager.deleteHistoryItem(position);
+		finish();
+		return true;
+	}
 
-  @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
-//    super.onCreateOptionsMenu(menu);
-    if (historyManager.hasHistoryItems()) {
-	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.history_menu, menu);
-//      menu.add(0, SEND_ID, 0, R.string.history_send).setIcon(android.R.drawable.ic_menu_share);
-//      menu.add(0, CLEAR_ID, 0, R.string.history_clear_text).setIcon(android.R.drawable.ic_menu_delete);
-      return true;
-    }
-    return false;
-  }
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		//    super.onCreateOptionsMenu(menu);
+		if (historyManager.hasHistoryItems()) {
+			MenuInflater inflater = getMenuInflater();
+			inflater.inflate(R.menu.history_menu, menu);
+			//      menu.add(0, SEND_ID, 0, R.string.history_send).setIcon(android.R.drawable.ic_menu_share);
+			//      menu.add(0, CLEAR_ID, 0, R.string.history_clear_text).setIcon(android.R.drawable.ic_menu_delete);
+			return true;
+		}
+		return false;
+	}
 
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-//      case SEND_ID:
-    case R.id.history_menu_send:
-        CharSequence history = historyManager.buildHistory();
-        Uri historyFile = HistoryManager.saveHistory(history.toString());
-        if (historyFile == null) {
-            setOKAlert(R.string.msg_unmount_usb);
-        } else {
-          Intent intent = new Intent(Intent.ACTION_SEND, Uri.parse("mailto:"));
-          intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-          String subject = getResources().getString(R.string.history_email_title);
-          intent.putExtra(Intent.EXTRA_SUBJECT, subject);
-          intent.putExtra(Intent.EXTRA_TEXT, subject);
-          intent.putExtra(Intent.EXTRA_STREAM, historyFile);
-          intent.setType("text/csv");
-          startActivity(intent);
-        }
-        break;
-//      case CLEAR_ID:
-    case R.id.history_menu_clear:
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.msg_sure);
-        builder.setCancelable(true);
-        builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
-          @Override
-          public void onClick(DialogInterface dialog, int i2) {
-            historyManager.clearHistory();
-            dialog.dismiss();
-            finish();
-          }
-        });
-        builder.setNegativeButton(R.string.button_cancel, null);
-        builder.show();
-        break;
-    case R.id.history_menu_send_dta:
-        List<HistoryItem> historyItems = historyManager.buildHistoryItems();
-        DTAFileCreator dtaFileCreator = new DTAFileCreator(this);
-        String error = dtaFileCreator.getFirstError(historyItems);
-        
-        if(error != ""){
-        	setOKAlert(error);
-        	break;
-        }
-        
-        CharSequence dta = dtaFileCreator.buildDTA(historyItems);
-        
-        Uri dtaFile = DTAFileCreator.saveDTAFile(dta.toString());
-        if (dtaFile == null) {
-          setOKAlert(R.string.msg_unmount_usb);
-        } else {
-          Intent intent = new Intent(Intent.ACTION_SEND, Uri.parse("mailto:"));
-          intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-          String subject = getResources().getString(R.string.history_email_as_dta_title);
-          intent.putExtra(Intent.EXTRA_SUBJECT, subject);
-          intent.putExtra(Intent.EXTRA_TEXT, subject);
-          intent.putExtra(Intent.EXTRA_STREAM, dtaFile);
-          intent.setType("text/plain");
-          startActivity(intent);
-        }
-        break;
-      default:
-        return super.onOptionsItemSelected(item);
-    }
-    return true;
-  }
-  
-  private void setOKAlert(String message){
-      AlertDialog.Builder builder = new AlertDialog.Builder(this);
-      builder.setMessage(message);
-      builder.setPositiveButton(R.string.button_ok, null);
-      builder.show();
-  }
-  
-  private void setOKAlert(int id){
-      AlertDialog.Builder builder = new AlertDialog.Builder(this);
-      builder.setMessage(id);
-      builder.setPositiveButton(R.string.button_ok, null);
-      builder.show();
-  }
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		//      case SEND_ID:
+		case R.id.history_menu_send:
+			CharSequence history = historyManager.buildHistory();
+			Uri historyFile = HistoryManager.saveHistory(history.toString());
+			if (historyFile == null) {
+				setOKAlert(R.string.msg_unmount_usb);
+			} else {
+				Intent intent = new Intent(Intent.ACTION_SEND, Uri.parse("mailto:"));
+				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+				String subject = getResources().getString(R.string.history_email_title);
+				intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+				intent.putExtra(Intent.EXTRA_TEXT, subject);
+				intent.putExtra(Intent.EXTRA_STREAM, historyFile);
+				intent.setType("text/csv");
+				startActivity(intent);
+			}
+			break;
+			//      case CLEAR_ID:
+		case R.id.history_menu_clear:
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setMessage(R.string.msg_sure);
+			builder.setCancelable(true);
+			builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int i2) {
+					historyManager.clearHistory();
+					dialog.dismiss();
+					finish();
+				}
+			});
+			builder.setNegativeButton(R.string.button_cancel, null);
+			builder.show();
+			break;
+		case R.id.history_menu_send_dta:
+			List<HistoryItem> historyItems = historyManager.buildHistoryItems();
+			DTAFileCreator dtaFileCreator = new DTAFileCreator(this);
+			String error = dtaFileCreator.getFirstError(historyItems);
+
+			if(error != ""){
+				setOKAlert(error);
+				break;
+			}
+
+			CharSequence dta = dtaFileCreator.buildDTA(historyItems);
+
+			Uri dtaFile = DTAFileCreator.saveDTAFile(dta.toString());
+			if (dtaFile == null) {
+				setOKAlert(R.string.msg_unmount_usb);
+			} else {
+				String dtaFileName = dtaFile.getLastPathSegment();
+				
+				new HistoryExportUpdateAsyncTask(this.historyManager, dtaFileName)
+				.execute(historyItems.toArray(new HistoryItem[historyItems.size()]));
+				
+				Intent intent = new Intent(Intent.ACTION_SEND, Uri.parse("mailto:"));
+				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+				String subject = getResources().getString(R.string.history_email_as_dta_title);
+				intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+				intent.putExtra(Intent.EXTRA_TEXT, subject);
+				intent.putExtra(Intent.EXTRA_STREAM, dtaFile);
+				intent.setType("text/plain");
+				startActivity(intent);
+			}
+			break;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+		return true;
+	}
+
+	private void setOKAlert(String message){
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(message);
+		builder.setPositiveButton(R.string.button_ok, null);
+		builder.show();
+	}
+
+	private void setOKAlert(int id){
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(id);
+		builder.setPositiveButton(R.string.button_ok, null);
+		builder.show();
+	}
 }

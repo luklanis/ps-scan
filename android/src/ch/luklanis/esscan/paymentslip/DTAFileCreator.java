@@ -67,7 +67,7 @@ public class DTAFileCreator {
 		List<HistoryItem> filteredHistoryItem = new ArrayList<HistoryItem>();
 
 		for (HistoryItem historyItem : historyItems) {
-			if(historyItem.getResult().getCurrency() == "CHF"){
+			if(!historyItem.getExported() && historyItem.getResult().getCurrency() == "CHF"){
 				filteredHistoryItem.add(historyItem);
 			}
 		}
@@ -160,6 +160,8 @@ public class DTAFileCreator {
 
 					dtaText.append("  ")	// ESR Checksum (only with 5 digits, which is not supported)
 					.append(spacePaddedEnd("", 5));	// Reserve
+					
+					filteredHistoryItem.get(i).setExported(true);
 		}
 
 		// HEADER for Total Record
@@ -193,7 +195,8 @@ public class DTAFileCreator {
 			Log.w(TAG, "Couldn't make dir " + historyRoot);
 			return null;
 		}
-		File historyFile = new File(historyRoot, "DTA-" + System.currentTimeMillis() + ".001");
+		String fileName = "DTA-" + System.currentTimeMillis() + ".001";
+		File historyFile = new File(historyRoot, fileName);
 		OutputStreamWriter out = null;
 		try {
 			out = new OutputStreamWriter(new FileOutputStream(historyFile), Charset.forName("ISO-8859-1"));
