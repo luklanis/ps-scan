@@ -85,4 +85,8 @@ public final class HistoryItem {
 	public void setExported(boolean exported) {
 		this.exported = exported;
 	}
+
+	public String getDTAFilename() {
+		return this.dtaFile;
+	}
 }

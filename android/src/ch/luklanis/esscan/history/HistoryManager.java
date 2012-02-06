@@ -103,8 +103,9 @@ public final class HistoryManager {
 				long timestamp = cursor.getLong(1);
 				String address = cursor.getString(2);
 				String amount = cursor.getString(3);
+				String dtaFile = cursor.getString(4);
 				EsrResult result = new EsrResult(code_row, timestamp);
-				items.add(new HistoryItem(result, amount, address));
+				items.add(new HistoryItem(result, amount, address, dtaFile));
 			}
 		} finally {
 			close(cursor, db);
@@ -124,8 +125,9 @@ public final class HistoryManager {
 			long timestamp = cursor.getLong(1);
 			String address = cursor.getString(2);
 			String amount = cursor.getString(3);
+			String dtaFile = cursor.getString(4);
 			EsrResult result = new EsrResult(text, timestamp);
-			return new HistoryItem(result, amount, address);
+			return new HistoryItem(result, amount, address, dtaFile);
 		} finally {
 			close(cursor, db);
 		}
@@ -148,7 +150,7 @@ public final class HistoryManager {
 		}
 	}
 
-	public void addHistoryItem(EsrResult result, String amount, String address) {
+	public HistoryItem addHistoryItem(EsrResult result, String amount, String address) {
 		// Do not save this item to the history if the preference is turned off, or the contents are
 		// considered secure.
 		//    if (!activity.getIntent().getBooleanExtra(Intents.Scan.SAVE_HISTORY, true)) {
@@ -189,11 +191,15 @@ public final class HistoryManager {
 
 				// Insert the new entry into the DB.
 				db.insert(DBHelper.HISTORY_TABLE_NAME, DBHelper.HISTORY_TIMESTAMP_COL, values);
+				
+				return new HistoryItem(result, amount, address);
 			}
 		}
 		finally {
 			close(null, db);
 		}
+		
+		return null;
 	}
 
 	public void updateHistoryItemAddress(String code_row, String itemAddress) {

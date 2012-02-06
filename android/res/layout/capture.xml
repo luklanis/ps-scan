@@ -182,19 +182,47 @@
                             android:layout_height="match_parent"
                             android:layout_marginTop="4dip"
                             android:background="@drawable/edit_text_background"
+                            android:gravity="top"
                             android:padding="4dip"
                             android:textColor="@color/result_text"
-                            android:textSize="14sp"
-                            android:gravity="top" />
+                            android:textSize="14sp" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:gravity="right"
+                android:layout_alignParentLeft="true"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/esr_result_dta_file"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="4dip"
+                    android:textColor="@color/result_text"
+                    android:textColorLink="@color/result_text"
+                    android:textSize="14sp" />
+
+                <Button
+                    android:id="@+id/button_export_again"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/edit_text_background"
+                    android:padding="4dip"
+                    android:text="@string/button_export_again"
+                    android:textColor="@color/result_text"
+                    android:textSize="14sp"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
                 android:orientation="horizontal" >
 
                 <Button
@@ -218,7 +246,8 @@
                     android:text="@string/button_copy_code_row"
                     android:textColor="@color/result_text" />
 
-                <Button
+                <!--
+                     <Button
                     android:id="@+id/button_share_code_row"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -226,6 +255,7 @@
                     android:padding="4dip"
                     android:text="@string/button_share_code_row"
                     android:textColor="@color/result_text" />
+                -->
             </LinearLayout>
         </RelativeLayout>
     </LinearLayout>

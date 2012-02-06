@@ -20,6 +20,7 @@
   <string name="button_cancel">Cancel</string>
   <string name="button_ok">OK</string>
   <string name="button_save">Save</string>
+  <string name="button_export_again">Again</string>
   <string name="history_clear_text">Clear history</string>
   <string name="history_send_dta">Send history as DTA file</string>
   <string name="history_send">Send history</string>

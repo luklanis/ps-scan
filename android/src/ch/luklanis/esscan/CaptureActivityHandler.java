@@ -161,8 +161,6 @@ final class CaptureActivityHandler extends Handler {
 
     	  EsrResult result = (EsrResult) message.obj;
 
-    	  activity.saveInHistory(result);
-
     	  activity.showResult(result);
     	  DecodeHandler.resetDecodeState();
     	  break;

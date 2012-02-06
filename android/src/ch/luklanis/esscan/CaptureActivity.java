@@ -40,6 +40,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 //import android.content.ClipData;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -184,9 +185,9 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
 		checkFirstLaunch();
 
-//		if (isFirstLaunch) {
-//			setDefaultPreferences();
-//		}
+		//		if (isFirstLaunch) {
+		//			setDefaultPreferences();
+		//		}
 
 		Window window = getWindow();
 		window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -312,23 +313,45 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 			}
 		});
 
-		Button resultShare = (Button)findViewById(R.id.button_share_code_row);
-		resultShare.setOnClickListener(new Button.OnClickListener() {
+		//		Button resultShare = (Button)findViewById(R.id.button_share_code_row);
+		//		resultShare.setOnClickListener(new Button.OnClickListener() {
+		//			@Override
+		//			public void onClick(View v) {
+		//				Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+		//				sharingIntent.setType("text/plain");
+		//				sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "ESR code");
+		//
+		//				EsrResult result = lastItem.getResult();
+		//				String text = result.getAccount() 
+		//						+ "\r\n" + result.getCurrency() 
+		//						+ " " + lastItem.getAmount()
+		//						+ "\r\n\r\n" + result.getCompleteCode();
+		//
+		//				sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, text);
+		//
+		//				startActivity(Intent.createChooser(sharingIntent, "Share via"));
+		//			}
+		//		});
+
+		Button exportAgain = (Button)findViewById(R.id.button_export_again);
+		exportAgain.setOnClickListener(new Button.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-				sharingIntent.setType("text/plain");
-				sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "ESR code");
+				AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+				builder.setMessage(R.string.msg_sure);
+				builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						historyManager.updateHistoryItemFileName(lastItem.getResult().getCompleteCode(), null);
 
-				EsrResult result = lastItem.getResult();
-				String text = result.getAccount() 
-						+ "\r\n" + result.getCurrency() 
-						+ " " + lastItem.getAmount()
-						+ "\r\n\r\n" + result.getCompleteCode();
+						Button reexportButton = (Button) findViewById(R.id.button_export_again);
 
-				sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, text);
-
-				startActivity(Intent.createChooser(sharingIntent, "Share via"));
+						TextView dtaFilenameTextView = (TextView) findViewById(R.id.esr_result_dta_file);
+						dtaFilenameTextView.setText("");
+						reexportButton.setVisibility(View.GONE);
+					}
+				});
+				builder.show();
 			}
 		});
 
@@ -363,7 +386,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
 						somethingSaved = true;
 					} catch (NumberFormatException e) {
-						setOKAlert(CaptureActivity.this, R.string.msg_amount_not_valid);
+						setOKAlert(v.getContext(), R.string.msg_amount_not_valid);
 					}
 				}
 
@@ -373,10 +396,11 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
 					int error = DTAFileCreator.validateAddress(address);
 					if(error != 0){
-						setOKAlert(CaptureActivity.this, error);
+						setOKAlert(v.getContext(), error);
 					}
 
 					historyManager.updateHistoryItemAddress(lastItem.getResult().getCompleteCode(), address);
+					historyManager.addAddress(lastItem.getResult().getAccount(), address);
 
 					somethingSaved = true;
 				}
@@ -769,7 +793,10 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 	 */
 	boolean showResult(EsrResult esrResult) {
 		beepManager.playBeepSoundAndVibrate();
-		return showResult(new HistoryItem(esrResult));
+		String address = historyManager.getAddress(esrResult.getAccount());
+
+		HistoryItem historyItem = historyManager.addHistoryItem(esrResult, null, address);
+		return showResult(historyItem);
 	}
 
 	/**
@@ -854,6 +881,18 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
 		EditText addressEditText = (EditText) findViewById(R.id.esr_result_address);
 		addressEditText.setText(lastItem.getAddress());
+
+		String dtaFilename = lastItem.getDTAFilename();
+		Button reexportButton = (Button) findViewById(R.id.button_export_again);
+
+		if(dtaFilename != null && dtaFilename != ""){
+			TextView dtaFilenameTextView = (TextView) findViewById(R.id.esr_result_dta_file);
+			dtaFilenameTextView.setText(lastItem.getDTAFilename());
+			reexportButton.setVisibility(View.VISIBLE);
+		}
+		else{
+			reexportButton.setVisibility(View.GONE);
+		}
 
 		setProgressBarVisibility(false);
 
@@ -1125,10 +1164,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		.setOnCancelListener(new FinishListener(this))
 		.setPositiveButton( "Done", new FinishListener(this))
 		.show();
-	}
-
-	public void saveInHistory(EsrResult result) {
-		historyManager.addHistoryItem(result, "", "");
 	}
 
 	@SuppressWarnings("unused")
