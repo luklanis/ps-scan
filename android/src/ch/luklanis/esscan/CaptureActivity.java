@@ -339,6 +339,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 			public void onClick(View v) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
 				builder.setMessage(R.string.msg_sure);
+				builder.setNeutralButton(R.string.button_cancel, null);
 				builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
