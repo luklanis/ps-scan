@@ -167,14 +167,31 @@
                         android:layout_height="match_parent"
                         android:orientation="vertical" >
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/esr_result_address"
-                            android:textColor="@color/result_text"
-                            android:textColorLink="@color/result_text"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" >
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentLeft="true"
+                                android:text="@string/esr_result_address"
+                                android:textColor="@color/result_text"
+                                android:textColorLink="@color/result_text"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <Button
+                                android:id="@+id/button_address_change"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentRight="true"
+                                android:background="@drawable/edit_text_background"
+                                android:padding="4dip"
+                                android:text="@string/button_change"
+                                android:textColor="@color/result_text"
+                                android:textSize="14sp" />
+                        </RelativeLayout>
 
                         <EditText
                             android:id="@+id/esr_result_address"

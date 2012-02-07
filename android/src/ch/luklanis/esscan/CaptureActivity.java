@@ -80,6 +80,8 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This activity opens the camera and does the actual scanning on a background thread. It draws a
@@ -333,8 +335,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		//			}
 		//		});
 
-		Button exportAgain = (Button)findViewById(R.id.button_export_again);
-		exportAgain.setOnClickListener(new Button.OnClickListener() {
+		Button exportAgainButton = (Button)findViewById(R.id.button_export_again);
+		exportAgainButton.setOnClickListener(new Button.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
@@ -353,6 +355,14 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 					}
 				});
 				builder.show();
+			}
+		});
+
+		Button addressChangeButton = (Button)findViewById(R.id.button_address_change);
+		addressChangeButton.setOnClickListener(new Button.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				showAddressDialog(v.getContext());
 			}
 		});
 
@@ -400,8 +410,14 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 						setOKAlert(v.getContext(), error);
 					}
 
-					historyManager.updateHistoryItemAddress(lastItem.getResult().getCompleteCode(), address);
-					historyManager.addAddress(lastItem.getResult().getAccount(), address);
+					if (lastItem.getAddressNumber() == -1) {
+						historyManager.updateHistoryItemAddress(lastItem.getResult().getCompleteCode(), 
+								historyManager.addAddress(lastItem.getResult().getAccount(), address));
+					}
+					else{
+						historyManager.updateAddress(lastItem.getResult().getAccount(), 
+								lastItem.getAddressNumber(), address);
+					}
 
 					somethingSaved = true;
 				}
@@ -794,9 +810,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 	 */
 	boolean showResult(EsrResult esrResult) {
 		beepManager.playBeepSoundAndVibrate();
-		String address = historyManager.getAddress(esrResult.getAccount());
 
-		HistoryItem historyItem = historyManager.addHistoryItem(esrResult, null, address);
+		HistoryItem historyItem = historyManager.addHistoryItem(esrResult);
 		return showResult(historyItem);
 	}
 
@@ -880,9 +895,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		TextView referenceTextView = (TextView) findViewById(R.id.esr_result_reference_number);
 		referenceTextView.setText(result.getReference());
 
-		EditText addressEditText = (EditText) findViewById(R.id.esr_result_address);
-		addressEditText.setText(lastItem.getAddress());
-
 		String dtaFilename = lastItem.getDTAFilename();
 		Button reexportButton = (Button) findViewById(R.id.button_export_again);
 
@@ -895,9 +907,50 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 			reexportButton.setVisibility(View.GONE);
 		}
 
-		setProgressBarVisibility(false);
+		if(lastItem.getAddressNumber() != -1){
+			EditText addressEditText = (EditText) findViewById(R.id.esr_result_address);
+			addressEditText.setText(lastItem.getAddress());
+		}
+		else{
+			showAddressDialog(this);
+		}
 
 		return true;
+	}
+
+	private void showAddressDialog(Context context) {
+		EsrResult result = lastItem.getResult();
+		List<String> addresses = new ArrayList<String>();
+		addresses.add(getResources().getString(R.string.address_new));
+		addresses.addAll(historyManager.getAddresses(result.getAccount()));
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		builder.setTitle(R.string.address_dialog_title);
+		builder.setItems(addresses.toArray(new String[addresses.size()]), new DialogInterface.OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				int addressNumber = which - 1;
+
+				EditText addressEditText = (EditText) findViewById(R.id.esr_result_address);
+
+				if(addressNumber != -1){
+					historyManager.updateHistoryItemAddress(lastItem.getResult().getCompleteCode(), addressNumber);
+					String address = historyManager.getAddress(lastItem.getResult().getAccount(), addressNumber);
+
+					lastItem.setAddress(address);
+					lastItem.setAddressNumber(addressNumber);
+					addressEditText.setText(lastItem.getAddress());
+				}
+				else{
+					lastItem.setAddress("");
+					lastItem.setAddressNumber(addressNumber);
+					addressEditText.setText(lastItem.getAddress());
+				}
+			}
+		});
+		builder.setNeutralButton(R.string.button_cancel, null);
+		builder.show();
 	}
 
 	/**
@@ -960,7 +1013,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 			SpannableStringBuilder ssb = new SpannableStringBuilder(text);
 			for (CharacterStyle c : cs)
 				ssb.setSpan(c, start, end, 0);
-					text = ssb;
+			text = ssb;
 		}
 		return text;
 	}

@@ -56,6 +56,7 @@ final class HistoryItemAdapter extends ArrayAdapter<HistoryItem> {
     String address;
     if (result != null) {
       title = result.toString() + " " + item.getAmount();
+      // TODO get address
       address = item.getAddress().replaceAll("[\\r\\n]+", ", ");      
     } else {
       Resources resources = getContext().getResources();

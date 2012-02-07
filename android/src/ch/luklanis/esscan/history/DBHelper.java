@@ -26,7 +26,7 @@ import android.content.Context;
  */
 final class DBHelper extends SQLiteOpenHelper {
 
-  private static final int DB_VERSION = 5;
+  private static final int DB_VERSION = 6;
   private static final String DB_NAME = "esrscan.db";
   static final String ID_COL = "id";
   
@@ -40,6 +40,7 @@ final class DBHelper extends SQLiteOpenHelper {
   static final String ADDRESS_TABLE_NAME = "address";
   static final String ADDRESS_ACCOUNT_COL = "account";
   static final String ADDRESS_ADDRESS_COL = "address";
+  static final String ADDRESS_TIMESTAMP_COL = "timestamp";
 
   DBHelper(Context context) {
     super(context, DB_NAME, null, DB_VERSION);
@@ -52,7 +53,7 @@ final class DBHelper extends SQLiteOpenHelper {
             ID_COL + " INTEGER PRIMARY KEY, " +
             HISTORY_CODE_ROW_COL + " TEXT, " +
             HISTORY_TIMESTAMP_COL + " INTEGER, " +
-            HISTORY_ADDRESS_COL + " TEXT, " +
+            HISTORY_ADDRESS_COL + " INTEGER, " +
             HISTORY_AMOUNT_COL + " TEXT, " +
             HISTORY_FILE_NAME_COL + " TEXT);");
     
@@ -60,6 +61,7 @@ final class DBHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + ADDRESS_TABLE_NAME + " (" +
             ID_COL + " INTEGER PRIMARY KEY, " +
             ADDRESS_ACCOUNT_COL + " TEXT, " +
+            ADDRESS_TIMESTAMP_COL + " INTEGER, " +
             ADDRESS_ADDRESS_COL + " TEXT);");
   }
 

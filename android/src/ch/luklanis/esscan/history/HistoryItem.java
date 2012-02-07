@@ -21,50 +21,49 @@ import ch.luklanis.esscan.paymentslip.EsrResult;
 public final class HistoryItem {
 
 	private final EsrResult result;
-	private String address;
+	private int addressNumber;
 	private String amount;
 	private final String dtaFile;
 	private boolean exported;
+	private String address;
 
 	public HistoryItem(EsrResult result) {
 		this.result = result;
-		this.address = null;
+		this.addressNumber = -1;
 		this.amount = null;
 		this.dtaFile = null;
 		this.exported = false;
+		this.address = "";
 	}
 
-	HistoryItem(EsrResult result, String amount) {
-		this.result = result;
-		this.address = null;
-		this.amount = amount;
-		this.dtaFile = null;
-		this.exported = false;
-	}
+//	HistoryItem(EsrResult result, String amount) {
+//		this.result = result;
+//		this.addressNumber = -1;
+//		this.amount = amount;
+//		this.dtaFile = null;
+//		this.exported = false;
+//	}
+//
+//	HistoryItem(EsrResult result, String amount, int addressNumber) {
+//		this.result = result;
+//		this.addressNumber = addressNumber;
+//		this.amount = amount;
+//		this.dtaFile = null;
+//		this.exported = false;
+//	}
 
-	HistoryItem(EsrResult result, String amount, String address) {
+	HistoryItem(EsrResult result, String amount, int addressNumber, String dtaFile) {
 		this.result = result;
-		this.address = address;
-		this.amount = amount;
-		this.dtaFile = null;
-		this.exported = false;
-	}
-
-	HistoryItem(EsrResult result, String amount, String address, String dtaFile) {
-		this.result = result;
-		this.address = address;
+		this.addressNumber = addressNumber;
 		this.amount = amount;
 		this.dtaFile = dtaFile;
 		this.exported = false;
+		this.address = "";
 	}
 
 	public EsrResult getResult() {
 		return result;
 	}
-
-	public String getAddress() {
-		return address;
-	}  
 
 //	public void setAddress(String address){
 //		this.address = address;
@@ -88,5 +87,21 @@ public final class HistoryItem {
 
 	public String getDTAFilename() {
 		return this.dtaFile;
+	}
+
+	public int getAddressNumber() {
+		return addressNumber;
+	}
+
+	public void setAddressNumber(int addressNumber) {
+		this.addressNumber = addressNumber;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
 	}
 }
