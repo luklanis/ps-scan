@@ -45,6 +45,7 @@ public class PreferencesActivity extends PreferenceActivity implements
   public static final String KEY_SOURCE_LANGUAGE_PREFERENCE = "preferences_source_language";
   public static final String KEY_CHARACTER_WHITELIST = "preferences_character_whitelist";
   public static final String KEY_ONLY_MACRO_FOCUS = "preferences_only_macro_focus";
+  public static final String KEY_ENABLE_TORCH = "preferences_enable_torch";
   public static final String KEY_ADDRESS = "preferences_address";
   public static final String KEY_IBAN = "preferences_iban";
   public static final String KEY_EXECUTION_DAY = "preferences_execution_day";

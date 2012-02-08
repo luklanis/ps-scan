@@ -17,19 +17,8 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <!-- GENERAL SETTINGS -->
-    <PreferenceCategory android:title="@string/preferences_general_title" >
-        <CheckBoxPreference
-            android:key="preferences_only_macro_focus"
-            android:defaultValue="false"
-            android:title="@string/preferences_only_macro_focus_title" />
-
-        <ListPreference
-            android:key="preferences_source_language"
-            android:defaultValue="deu"
-            android:entries="@array/language_names"
-            android:entryValues="@array/iso6393_language_names"
-            android:title="Recognize" />
-    </PreferenceCategory>
+    <!-- <PreferenceCategory android:title="@string/preferences_general_title" >
+    </PreferenceCategory> -->
 
     <!-- DTA FORMAT SETTINGS -->
     <PreferenceCategory android:title="@string/preferences_dta_format_title" >
@@ -66,6 +55,23 @@
             android:defaultValue="false"
             android:key="preferences_vibrate"
             android:title="@string/preferences_vibrate_title" />
+            
+        <CheckBoxPreference
+            android:key="preferences_only_macro_focus"
+            android:defaultValue="false"
+            android:title="@string/preferences_only_macro_focus_title" />
+            
+        <CheckBoxPreference
+            android:key="preferences_enable_torch"
+            android:defaultValue="false"
+            android:title="@string/preferences_enable_torch_title" />
+
+        <ListPreference
+            android:key="preferences_source_language"
+            android:defaultValue="deu"
+            android:entries="@array/language_names"
+            android:entryValues="@array/iso6393_language_names"
+            android:title="Recognize" />
 
         <EditTextPreference
             android:defaultValue=">+ 0123456789"

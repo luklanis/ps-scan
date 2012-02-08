@@ -836,13 +836,10 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 			return false;
 		}
 
-		if(psValidation.finished())
+		if(handler != null)
 		{
-			if(handler != null)
-			{
-				handler.stop();
-				isPaused = true;
-			}
+			handler.stop();
+			isPaused = true;
 		}
 
 		EsrResult result = historyItem.getResult();
@@ -851,7 +848,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		statusViewBottom.setVisibility(View.GONE);
 		statusViewTop.setVisibility(View.GONE);
 		cameraButtonView.setVisibility(View.GONE);
-		viewfinderView.setVisibility(View.GONE);
+		viewfinderView.setVisibility(View.GONE); 
 		resultView.setVisibility(View.VISIBLE);
 
 		ImageView bitmapImageView = (ImageView) findViewById(R.id.image_view);
@@ -907,6 +904,9 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 			reexportButton.setVisibility(View.GONE);
 		}
 
+		Button addressChangeButton = (Button)findViewById(R.id.button_address_change);
+		addressChangeButton.setVisibility(View.VISIBLE);
+
 		if(lastItem.getAddressNumber() != -1){
 			EditText addressEditText = (EditText) findViewById(R.id.esr_result_address);
 			addressEditText.setText(lastItem.getAddress());
@@ -923,6 +923,12 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		List<String> addresses = new ArrayList<String>();
 		addresses.add(getResources().getString(R.string.address_new));
 		addresses.addAll(historyManager.getAddresses(result.getAccount()));
+
+		if(addresses.size() <= 1){		
+			Button addressChangeButton = (Button)findViewById(R.id.button_address_change);
+			addressChangeButton.setVisibility(View.GONE);
+			return;
+		}
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setTitle(R.string.address_dialog_title);
@@ -1013,7 +1019,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 			SpannableStringBuilder ssb = new SpannableStringBuilder(text);
 			for (CharacterStyle c : cs)
 				ssb.setSpan(c, start, end, 0);
-			text = ssb;
+					text = ssb;
 		}
 		return text;
 	}
