@@ -921,8 +921,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 	private void showAddressDialog(Context context) {
 		EsrResult result = lastItem.getResult();
 		List<String> addresses = new ArrayList<String>();
-		addresses.add(getResources().getString(R.string.address_new));
 		addresses.addAll(historyManager.getAddresses(result.getAccount()));
+		addresses.add(getResources().getString(R.string.address_new));
 
 		if(addresses.size() <= 1){		
 			Button addressChangeButton = (Button)findViewById(R.id.button_address_change);
@@ -936,21 +936,20 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				int addressNumber = which - 1;
 
 				EditText addressEditText = (EditText) findViewById(R.id.esr_result_address);
+				String address = historyManager.getAddress(lastItem.getResult().getAccount(), which);
 
-				if(addressNumber != -1){
-					historyManager.updateHistoryItemAddress(lastItem.getResult().getCompleteCode(), addressNumber);
-					String address = historyManager.getAddress(lastItem.getResult().getAccount(), addressNumber);
+				if(address != ""){
+					historyManager.updateHistoryItemAddress(lastItem.getResult().getCompleteCode(), which);
 
 					lastItem.setAddress(address);
-					lastItem.setAddressNumber(addressNumber);
+					lastItem.setAddressNumber(which);
 					addressEditText.setText(lastItem.getAddress());
 				}
 				else{
 					lastItem.setAddress("");
-					lastItem.setAddressNumber(addressNumber);
+					lastItem.setAddressNumber(-1);
 					addressEditText.setText(lastItem.getAddress());
 				}
 			}

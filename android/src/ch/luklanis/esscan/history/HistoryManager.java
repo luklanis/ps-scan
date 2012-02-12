@@ -20,6 +20,7 @@ package ch.luklanis.esscan.history;
 import ch.luklanis.esscan.paymentslip.EsrResult;
 
 import android.app.Activity;
+import android.content.ClipData.Item;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -142,21 +143,27 @@ public final class HistoryManager {
 					null, 
 					null, 
 					DBHelper.HISTORY_TIMESTAMP_COL + " DESC");
-			cursor.move(number + 1);
-			String text = cursor.getString(0);
-			long timestamp = cursor.getLong(1);
-			int addressNumber = cursor.getInt(2);
-			String amount = cursor.getString(3);
-			String dtaFile = cursor.getString(4);
 
-			EsrResult result = new EsrResult(text, timestamp);
-			HistoryItem item = new HistoryItem(result, amount, addressNumber, dtaFile); 
+			if(cursor.move(number + 1)){
+				String text = cursor.getString(0);
+				long timestamp = cursor.getLong(1);
+				int addressNumber = cursor.getInt(2);
+				String amount = cursor.getString(3);
+				String dtaFile = cursor.getString(4);
 
-			if(addressNumber != -1)
-			{
-				item.setAddress(getAddress(result.getAccount(), addressNumber));
+				EsrResult result = new EsrResult(text, timestamp);
+				HistoryItem item = new HistoryItem(result, amount, addressNumber, dtaFile); 
+
+				if(addressNumber != -1)
+				{
+					item.setAddress(getAddress(result.getAccount(), addressNumber));
+				}
+
+				return item;
 			}
-			return item;
+			else{
+				return null;
+			}
 		} finally {
 			close(cursor, db);
 		}
@@ -219,6 +226,7 @@ public final class HistoryManager {
 				ContentValues values = new ContentValues();
 				values.put(DBHelper.HISTORY_CODE_ROW_COL, result.getCompleteCode());
 				values.put(DBHelper.HISTORY_TIMESTAMP_COL, result.getTimestamp());
+				values.put(DBHelper.HISTORY_ADDRESS_COL, -1);
 
 				// Insert the new entry into the DB.
 				db.insert(DBHelper.HISTORY_TABLE_NAME, DBHelper.HISTORY_TIMESTAMP_COL, values);
@@ -429,7 +437,7 @@ public final class HistoryManager {
 					null,
 					null,
 					DBHelper.ADDRESS_TIMESTAMP_COL + " DESC");
-			
+
 			if(cursor.move(number + 1)){
 				ContentValues values = new ContentValues();
 				values.put(DBHelper.ADDRESS_ADDRESS_COL, address);
