@@ -66,12 +66,12 @@
             android:defaultValue="false"
             android:title="@string/preferences_enable_torch_title" />
 
-        <ListPreference
+        <!-- <ListPreference
             android:key="preferences_source_language"
             android:defaultValue="deu"
             android:entries="@array/language_names"
             android:entryValues="@array/iso6393_language_names"
-            android:title="Recognize" />
+            android:title="Recognize" /> -->
 
         <EditTextPreference
             android:defaultValue=">+ 0123456789"
