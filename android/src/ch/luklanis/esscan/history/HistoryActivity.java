@@ -89,7 +89,7 @@ public final class HistoryActivity extends ListActivity {
 	public boolean onContextItemSelected(MenuItem item) {
 		int position = item.getItemId();
 		historyManager.deleteHistoryItem(position);
-		recreate();
+		reload();
 		return true;
 	}
 
@@ -159,10 +159,10 @@ public final class HistoryActivity extends ListActivity {
 				setOKAlert(R.string.msg_unmount_usb);
 			} else {
 				String dtaFileName = dtaFile.getLastPathSegment();
-				
+
 				new HistoryExportUpdateAsyncTask(this.historyManager, dtaFileName)
 				.execute(historyItems.toArray(new HistoryItem[historyItems.size()]));
-				
+
 				Intent intent = new Intent(Intent.ACTION_SEND, Uri.parse("mailto:"));
 				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
 				String subject = getResources().getString(R.string.history_email_as_dta_title);
@@ -191,5 +191,10 @@ public final class HistoryActivity extends ListActivity {
 		builder.setMessage(id);
 		builder.setPositiveButton(R.string.button_ok, null);
 		builder.show();
+	}
+
+	private void reload(){
+		startActivity(getIntent()); 
+		finish();
 	}
 }
