@@ -89,7 +89,7 @@ public final class HistoryActivity extends ListActivity {
 	public boolean onContextItemSelected(MenuItem item) {
 		int position = item.getItemId();
 		historyManager.deleteHistoryItem(position);
-		finish();
+		recreate();
 		return true;
 	}
 
