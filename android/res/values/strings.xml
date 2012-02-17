@@ -68,4 +68,6 @@
   <string name="preferences_vibrate_title">Vibrate</string>
   <string name="preferences_execution_day_title">Execution day</string>
   <string name="preferences_execution_day_summary">Day of pay execution every month</string>
+  <string name="help_button_done">Done</string>
+  <string name="help_button_back">Back</string>
 </resources>
