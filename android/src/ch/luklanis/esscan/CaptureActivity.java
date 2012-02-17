@@ -653,6 +653,12 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 			startActivityForResult(intent, HISTORY_REQUEST_CODE);
 			break;
 		}
+		case R.id.menu_help: {
+			intent = new Intent(this, HelpActivity.class);
+			intent.putExtra(HelpActivity.REQUESTED_PAGE_KEY, HelpActivity.ABOUT_PAGE);
+			startActivity(intent);
+			break;
+		}
 		case R.id.menu_about: {
 			intent = new Intent(this, HelpActivity.class);
 			intent.putExtra(HelpActivity.REQUESTED_PAGE_KEY, HelpActivity.ABOUT_PAGE);
