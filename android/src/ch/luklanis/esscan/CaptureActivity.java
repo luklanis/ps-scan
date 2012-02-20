@@ -655,7 +655,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		}
 		case R.id.menu_help: {
 			intent = new Intent(this, HelpActivity.class);
-			intent.putExtra(HelpActivity.REQUESTED_PAGE_KEY, HelpActivity.ABOUT_PAGE);
+			intent.putExtra(HelpActivity.REQUESTED_PAGE_KEY, HelpActivity.DEFAULT_PAGE);
 			startActivity(intent);
 			break;
 		}

@@ -55,7 +55,6 @@
             android:name=".CaptureActivity"
             android:configChanges="keyboardHidden|orientation"
             android:screenOrientation="landscape"
-            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
             android:windowSoftInputMode="stateAlwaysHidden" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
