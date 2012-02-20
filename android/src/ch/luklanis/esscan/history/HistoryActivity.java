@@ -57,7 +57,7 @@ public final class HistoryActivity extends ListActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		List<HistoryItem> items = historyManager.buildHistoryItems();
+		List<HistoryItem> items = historyManager.buildHistoryItemsForCSV();
 		adapter.clear();
 		for (HistoryItem item : items) {
 			adapter.add(item);
@@ -143,7 +143,7 @@ public final class HistoryActivity extends ListActivity {
 			builder.show();
 			break;
 		case R.id.history_menu_send_dta:
-			List<HistoryItem> historyItems = historyManager.buildHistoryItems();
+			List<HistoryItem> historyItems = historyManager.buildHistoryItemsForDTA();
 			DTAFileCreator dtaFileCreator = new DTAFileCreator(this);
 			String error = dtaFileCreator.getFirstError(historyItems);
 

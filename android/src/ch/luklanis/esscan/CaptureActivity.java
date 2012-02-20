@@ -367,6 +367,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		});
 
 		Button amountSaveButton = (Button) findViewById(R.id.button_result_save);
+		
+		Activity self = this;
 		amountSaveButton.setOnClickListener(new Button.OnClickListener() {
 			public void onClick(View v) {
 				boolean somethingSaved = false;
@@ -952,6 +954,10 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 					lastItem.setAddress(address);
 					lastItem.setAddressNumber(which);
 					addressEditText.setText(lastItem.getAddress());
+					
+					Toast toast = Toast.makeText(CaptureActivity.this, R.string.msg_saved, Toast.LENGTH_SHORT);
+					toast.setGravity(Gravity.BOTTOM, 0, 0);
+					toast.show();
 				}
 				else{
 					lastItem.setAddress("");

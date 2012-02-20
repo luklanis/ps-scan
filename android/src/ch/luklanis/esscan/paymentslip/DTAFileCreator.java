@@ -67,7 +67,7 @@ public class DTAFileCreator {
 		List<HistoryItem> filteredHistoryItem = new ArrayList<HistoryItem>();
 
 		for (HistoryItem historyItem : historyItems) {
-			if(!historyItem.getExported() && historyItem.getResult().getCurrency() == "CHF"){
+			if(historyItem.getResult().getCurrency() == "CHF"){
 				filteredHistoryItem.add(historyItem);
 			}
 		}

@@ -95,20 +95,41 @@ public final class HistoryManager {
 		}
 	}
 
-	public List<HistoryItem> buildHistoryItems() {
+	public List<HistoryItem> buildHistoryItemsForDTA() {
+		return buildHistoryItems(true);
+	}
+
+	public List<HistoryItem> buildHistoryItemsForCSV() {
+		return buildHistoryItems(false);
+	}
+
+	public List<HistoryItem> buildHistoryItems(boolean onlyUnexported) {
 		SQLiteOpenHelper helper = new DBHelper(activity);
 		List<HistoryItem> items = new ArrayList<HistoryItem>();
 		SQLiteDatabase db = null;
 		Cursor cursor = null;
 		try {
 			db = helper.getReadableDatabase();
+			
+			if(onlyUnexported){
 			cursor = db.query(DBHelper.HISTORY_TABLE_NAME, 
 					HISTORY_COLUMNS, 
-					null, 
+					DBHelper.HISTORY_FILE_NAME_COL + "!= NULL", 
 					null, 
 					null, 
 					null, 
 					DBHelper.HISTORY_TIMESTAMP_COL + " DESC");
+			} 
+			else{
+				cursor = db.query(DBHelper.HISTORY_TABLE_NAME, 
+						HISTORY_COLUMNS, 
+						null, 
+						null, 
+						null, 
+						null, 
+						DBHelper.HISTORY_TIMESTAMP_COL + " DESC");
+				
+			}
 			while (cursor.moveToNext()) {
 				String code_row = cursor.getString(0);
 				long timestamp = cursor.getLong(1);
