@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:background="@color/help_button_view"
         android:gravity="center"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:padding="4dip" >
 
         <Button
