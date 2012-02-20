@@ -219,7 +219,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		//		ocrResultView = (TextView) findViewById(R.id.ocr_result_text_view);
 		//		registerForContextMenu(ocrResultView);
 
-		cameraManager = new CameraManager(getApplication());
+		cameraManager = new CameraManager(this);
 		viewfinderView.setCameraManager(cameraManager);
 
 		// Set listener to change the size of the viewfinder rectangle.

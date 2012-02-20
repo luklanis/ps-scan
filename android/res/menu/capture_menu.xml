@@ -10,9 +10,10 @@
           android:showAsAction="ifRoom" />
     <item android:id="@+id/menu_help"
           android:icon="@android:drawable/ic_menu_help"
-          android:title="@string/menu_about"
+          android:title="@string/menu_help"
           android:showAsAction="ifRoom" />
     <item android:id="@+id/menu_about"
           android:icon="@android:drawable/ic_menu_info_details"
-          android:title="@string/menu_about" />
+          android:title="@string/menu_about"
+          android:showAsAction="ifRoom" />
 </menu>

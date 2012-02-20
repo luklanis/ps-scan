@@ -17,6 +17,7 @@
 
 package ch.luklanis.esscan.camera;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Point;
@@ -44,7 +45,7 @@ public final class CameraManager {
 	private static final int MAX_FRAME_WIDTH = 800; // originally 480
 	private static final int MAX_FRAME_HEIGHT = 600; // originally 360
 
-	private final Context context;
+	private final Activity activity;
 	private final CameraConfigurationManager configManager;
 	private Camera camera;
 	private Rect framingRect;
@@ -55,6 +56,7 @@ public final class CameraManager {
 	private boolean torchEnabled;
 	private int requestedFramingRectWidth;
 	private int requestedFramingRectHeight;
+	
 	/**
 	 * Preview frames are delivered here, which we pass on to the registered handler. Make sure to
 	 * clear the handler so it will only receive one message.
@@ -64,9 +66,9 @@ public final class CameraManager {
 	/** Autofocus callbacks arrive here, and are dispatched to the Handler which requested them. */
 	private final AutoFocusCallback autoFocusCallback;
 
-	public CameraManager(Context context) {
-		this.context = context;
-		this.configManager = new CameraConfigurationManager(context);
+	public CameraManager(Activity activity) {
+		this.activity = activity;
+		this.configManager = new CameraConfigurationManager(activity);
 		previewCallback = new PreviewCallback(configManager);
 		autoFocusCallback = new AutoFocusCallback();
 		torchEnabled = false;
@@ -99,7 +101,7 @@ public final class CameraManager {
 		}
 		configManager.setDesiredCameraParameters(theCamera);
 
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 		reverseImage = prefs.getBoolean(PreferencesActivity.KEY_REVERSE_IMAGE, false);
 	}
 
@@ -161,7 +163,7 @@ public final class CameraManager {
 			theCamera.setOneShotPreviewCallback(previewCallback);
 
 			if(!torchEnabled){
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 
 				if(prefs.getBoolean(PreferencesActivity.KEY_ENABLE_TORCH, false)){
 					this.configManager.setTorch(theCamera, true);
@@ -178,7 +180,7 @@ public final class CameraManager {
 	 * @param message The message to deliver.
 	 */
 	public void requestAutoFocus(Handler handler, int message) {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 
 		if (camera != null && previewing 
 				&& !prefs.getBoolean(PreferencesActivity.KEY_ONLY_MACRO_FOCUS, false)) {
@@ -199,7 +201,7 @@ public final class CameraManager {
 			if (camera == null) {
 				return null;
 			}
-			Point screenResolution = configManager.getScreenResolution();
+			Point screenResolution = configManager.getPreviewResolution();
 			int width = screenResolution.x * 4/5;
 			if (width < MIN_FRAME_WIDTH) {
 				width = MIN_FRAME_WIDTH;
@@ -227,7 +229,7 @@ public final class CameraManager {
 		if (framingRectInPreview == null) {
 			Rect rect = new Rect(getFramingRect());
 			Point cameraResolution = configManager.getCameraResolution();
-			Point screenResolution = configManager.getScreenResolution();
+			Point screenResolution = configManager.getPreviewResolution();
 			rect.left = rect.left * cameraResolution.x / screenResolution.x;
 			rect.right = rect.right * cameraResolution.x / screenResolution.x;
 			rect.top = rect.top * cameraResolution.y / screenResolution.y;
@@ -245,7 +247,7 @@ public final class CameraManager {
 	 */
 	public void adjustFramingRect(int deltaWidth, int deltaHeight) {
 		if (initialized) {
-			Point screenResolution = configManager.getScreenResolution();
+			Point screenResolution = configManager.getPreviewResolution();
 
 			// Set maximum and minimum sizes
 			if ((framingRect.width() + deltaWidth > screenResolution.x - 4) || (framingRect.width() + deltaWidth < 50)) {
