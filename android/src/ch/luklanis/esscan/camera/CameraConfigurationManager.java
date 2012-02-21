@@ -59,7 +59,7 @@ final class CameraConfigurationManager {
 	 */
 	void initFromCameraParameters(Camera camera) {
 		Camera.Parameters parameters = camera.getParameters();
-		WindowManager manager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+//		WindowManager manager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
 
 		SurfaceView previewView = (SurfaceView) activity.findViewById(R.id.preview_view);
 		int width = previewView.getWidth();

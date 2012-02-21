@@ -57,7 +57,6 @@ import android.preference.PreferenceManager;
 import android.text.ClipboardManager;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
-import android.text.TextWatcher;
 import android.text.style.CharacterStyle;
 import android.util.Log;
 import android.view.Gravity;
@@ -69,7 +68,6 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -368,7 +366,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
 		Button amountSaveButton = (Button) findViewById(R.id.button_result_save);
 		
-		Activity self = this;
 		amountSaveButton.setOnClickListener(new Button.OnClickListener() {
 			public void onClick(View v) {
 				boolean somethingSaved = false;
