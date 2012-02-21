@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (C) 2010 ZXing authors
+ Copyright (C) 2012 Lukas Landis
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ -->
+<resources>
+  <string name="app_name">ESR Scanner</string>
+  <string name="address_dialog_title">Adresse auswählen</string>
+  <string name="address_new">Neue Adresse eingeben</string>
+  <string name="button_cancel">Abbrechen</string>
+  <string name="button_ok">OK</string>
+  <string name="button_save">Speichern</string>
+  <string name="button_export_again">Nochmal</string>
+  <string name="button_change">Andere</string>
+  <string name="history_clear_text">Verlauf löschen</string>
+  <string name="history_send_dta">Verlauf als Zahlungsauftrag (DTA) versenden</string>
+  <string name="history_send">Verlauf senden</string>
+  <string name="history_email_title">ESR Scanner Verlauf</string>
+  <string name="history_email_as_dta_title">Zahlungsauftrag gesendet von ESR Scanner</string>
+  <string name="history_title">Verlauf</string>
+  <string name="history_clear_one_history_text">Einzahlungsschein löschen</string>
+  <string name="history_empty">Leer</string>
+  <string name="history_empty_detail">Bis jetzt sind keine Einzahlungsscheine gescannt worden</string>
+  <string name="menu_about">Über</string>
+  <string name="menu_help">Hilfe</string>
+  <string name="menu_history">Verlauf</string>
+  <string name="menu_settings">Einstellungen</string>
+  <string name="menu_share">Teilen</string>
+  <string name="msg_sure">Bist du sicher?</string>
+  <string name="msg_unmount_usb">Entschuldige, die SD Karte ist nicht erreichbar</string>
+  <string name="msg_address_line_to_long">Das DTA Format erlaubt nur 20 Zeichen pro Zeile und instgesamt 4 Zeilen. Beim Export wird abgeschnitten.</string>
+  <string name="msg_saved">Erfolgreich gespeichert!</string>
+  <string name="msg_amount_not_valid">Betrag ist ungültig.</string>
+  <string name="msg_amount_is_empty">Bitte fülle noch den Betrag für %s aus.</string>
+  <string name="msg_own_iban_is_not_set">Um ein Zahlungsauftrag zu erstellen, wird deine eigene IBAN benötigt. Du kannst sie in den Einstellungen angeben.</string>
+  <string name="msg_own_iban_is_not_valid">Die IBAN ist ungültig. Sie muss aus der Schweiz sein und die Prüfziffer muss stimmen.</string>
+  <string name="msg_own_address_is_not_set">Um ein Zahlungsauftrag zu erstellen, wird deine eigene Adresse benötigt. Du kannst sie in den Einstellungen angeben.</string>
+  <string name="esr_result_account">Konto</string>
+  <string name="esr_result_address">Adresse</string>
+  <string name="esr_result_reference_number">Referencznummer</string>
+  <string name="esr_result_amount_not_set">Betrag hier!</string>
+  <string name="button_copy_code_row">Kodierzeile kopieren</string>
+  <string name="button_share_code_row">Kodierzeile teilen</string>
+  <string name="preferences_general_title">Allgemeine Einstellungen</string>
+  <string name="preferences_only_macro_focus_title">Makrofokus</string>
+  <string name="preferences_enable_torch_title">Frontleuchte</string>
+  <string name="preferences_dta_format_title">DTA Einstellungen</string>
+  <string name="preferences_advanced_title">Erweiterte Einstellungen</string>
+  <string name="preferences_play_beep_title">Beepton abspielen</string>
+  <string name="preferences_character_whitelist_title">Zeichen Whitelist</string>
+  <string name="preferences_reverse_image_title">Kamerabild umdrehen</string>
+  <string name="preferences_reverse_image_summary">Aktivieren bei Geräten mit nur einer Frontkamera.</string>
+  <string name="preferences_address_title">Deine Adresse</string>
+  <string name="preferences_address_summary">Mindestens Vor- und Nachname und auf der zweiten Linie PLZ und Ort</string>
+  <string name="preferences_iban_title">Deine IBAN</string>
+  <string name="preferences_vibrate_title">Vibration</string>
+  <string name="preferences_execution_day_title">Ausführungsdatum</string>
+  <string name="preferences_execution_day_summary">Tag im Monat an dem alle Einzahlungen ausgeführt werden sollen</string>
+  <string name="help_button_done">Schliessen</string>
+  <string name="help_button_back">Zurück</string>
+</resources>
