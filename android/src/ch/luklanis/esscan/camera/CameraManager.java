@@ -53,7 +53,6 @@ public final class CameraManager {
 	private boolean initialized;
 	private boolean previewing;
 	private boolean reverseImage;
-	private boolean torchEnabled;
 	private int requestedFramingRectWidth;
 	private int requestedFramingRectHeight;
 	
@@ -71,7 +70,6 @@ public final class CameraManager {
 		this.configManager = new CameraConfigurationManager(activity);
 		previewCallback = new PreviewCallback(configManager);
 		autoFocusCallback = new AutoFocusCallback();
-		torchEnabled = false;
 	}
 
 	/**
@@ -99,9 +97,15 @@ public final class CameraManager {
 				requestedFramingRectHeight = 0;
 			}
 		}
+		
 		configManager.setDesiredCameraParameters(theCamera);
+		
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
+			if(prefs.getBoolean(PreferencesActivity.KEY_ENABLE_TORCH, false)){
+				this.configManager.setTorch(theCamera, true);
+			}
+
 		reverseImage = prefs.getBoolean(PreferencesActivity.KEY_REVERSE_IMAGE, false);
 	}
 
@@ -139,12 +143,10 @@ public final class CameraManager {
 			camera.stopPreview();
 			previewCallback.setHandler(null, 0);
 			autoFocusCallback.setHandler(null, 0);
-			previewing = false;
-		}
-
-		if(camera != null && torchEnabled){
+			
 			this.configManager.setTorch(camera, false);
-			torchEnabled = false;
+			
+			previewing = false;
 		}
 	}
 
@@ -158,18 +160,9 @@ public final class CameraManager {
 	 */
 	public void requestOcrDecode(Handler handler, int message) {
 		Camera theCamera = camera;
-		if (theCamera != null && previewing) {
+		if (theCamera != null && previewing) {			
 			previewCallback.setHandler(handler, message);
 			theCamera.setOneShotPreviewCallback(previewCallback);
-
-			if(!torchEnabled){
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
-
-				if(prefs.getBoolean(PreferencesActivity.KEY_ENABLE_TORCH, false)){
-					this.configManager.setTorch(theCamera, true);
-					torchEnabled = true;
-				}
-			}
 		}
 	}
 
