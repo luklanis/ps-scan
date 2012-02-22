@@ -55,7 +55,7 @@
   <string name="button_share_code_row">Share code row</string>
   <string name="preferences_general_title">General settings</string>
   <string name="preferences_only_macro_focus_title">Use macro focus only</string>
-  <string name="preferences_enable_torch_title">Enable Torch</string>
+  <string name="preferences_enable_torch_title">Enable front light</string>
   <string name="preferences_dta_format_title">DTA format settings</string>
   <string name="preferences_advanced_title">Advanced settings</string>
   <string name="preferences_play_beep_title">Play beep</string>
