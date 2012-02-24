@@ -112,6 +112,11 @@ public final class HelpActivity extends Activity {
 
 			if( page != null && page.length() > 0) {
 				webView.loadUrl(BASE_URL + page);
+				
+				if(page == WHATS_NEW_PAGE || page == ABOUT_PAGE) {
+					backButton.setEnabled(false);
+				}
+				
 			}else {
 				webView.loadUrl(BASE_URL + DEFAULT_PAGE);
 			}

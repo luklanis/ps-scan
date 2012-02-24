@@ -114,7 +114,7 @@ public final class HistoryManager {
 			if(onlyUnexported){
 			cursor = db.query(DBHelper.HISTORY_TABLE_NAME, 
 					HISTORY_COLUMNS, 
-					DBHelper.HISTORY_FILE_NAME_COL + "!= NULL", 
+					DBHelper.HISTORY_FILE_NAME_COL + " is NULL", 
 					null, 
 					null, 
 					null, 
@@ -136,6 +136,7 @@ public final class HistoryManager {
 				int addressNumber = cursor.getInt(2);
 				String amount = cursor.getString(3);
 				String dtaFile = cursor.getString(4);
+
 				EsrResult result = new EsrResult(code_row, timestamp);
 				HistoryItem item = new HistoryItem(result, amount, addressNumber, dtaFile); 
 
