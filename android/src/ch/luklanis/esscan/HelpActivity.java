@@ -63,9 +63,11 @@ public final class HelpActivity extends Activity {
 	}
 
 	private static final Collection<String> TRANSLATED_HELP_ASSET_LANGUAGES =
-			Arrays.asList("en");
+			Arrays.asList("en", "de");
 
-	private static final String BASE_URL = "file:///android_asset/html-"
+	private static final String BASE_URL = "file:///android_asset/html";
+
+	private static final String BASE_HELP_URL = BASE_URL + "-"
 			+ (TRANSLATED_HELP_ASSET_LANGUAGES.contains(LANGUAGE) ? LANGUAGE : DEFAULT_LANGUAGE) +"/";
 
 	private WebView webView;
@@ -111,17 +113,22 @@ public final class HelpActivity extends Activity {
 			String page = intent.getStringExtra(REQUESTED_PAGE_KEY);
 
 			if( page != null && page.length() > 0) {
-				webView.loadUrl(BASE_URL + page);
+				
+				if(page == DEFAULT_PAGE || page == ABOUT_PAGE) {
+					webView.loadUrl(BASE_HELP_URL + page);
+				} else {
+					webView.loadUrl(BASE_URL + "/" + page);
+				}
 				
 				if(page == WHATS_NEW_PAGE || page == ABOUT_PAGE) {
 					backButton.setEnabled(false);
 				}
 				
 			}else {
-				webView.loadUrl(BASE_URL + DEFAULT_PAGE);
+				webView.loadUrl(BASE_HELP_URL + DEFAULT_PAGE);
 			}
 		}else {
-			webView.loadUrl(BASE_URL + DEFAULT_PAGE); 
+			webView.loadUrl(BASE_HELP_URL + DEFAULT_PAGE); 
 		}
 	}
 
