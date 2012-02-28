@@ -70,6 +70,8 @@ public final class HelpActivity extends Activity {
 	private static final String BASE_HELP_URL = BASE_URL + "-"
 			+ (TRANSLATED_HELP_ASSET_LANGUAGES.contains(LANGUAGE) ? LANGUAGE : DEFAULT_LANGUAGE) +"/";
 
+//	private static final String BASE_HELP_URL = BASE_URL + "-de/";
+
 	private WebView webView;
 
 	private final Button.OnClickListener backListener = new Button.OnClickListener() {
@@ -114,14 +116,15 @@ public final class HelpActivity extends Activity {
 
 			if( page != null && page.length() > 0) {
 				
-				if(page == DEFAULT_PAGE || page == ABOUT_PAGE) {
+				if(page.equals(DEFAULT_PAGE) || page.equals(ABOUT_PAGE)) {
 					webView.loadUrl(BASE_HELP_URL + page);
 				} else {
 					webView.loadUrl(BASE_URL + "/" + page);
 				}
 				
-				if(page == WHATS_NEW_PAGE || page == ABOUT_PAGE) {
-					backButton.setEnabled(false);
+				if(page.equals(WHATS_NEW_PAGE) || page.equals(ABOUT_PAGE)) {
+//					backButton.setEnabled(false);
+					backButton.setVisibility(View.GONE);
 				}
 				
 			}else {
