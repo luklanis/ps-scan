@@ -909,11 +909,13 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 			reexportButton.setVisibility(View.GONE);
 		}
 
-		Button addressChangeButton = (Button)findViewById(R.id.button_address_change);
+		Button addressChangeButton = (Button) findViewById(R.id.button_address_change);
 		addressChangeButton.setVisibility(View.VISIBLE);
 
+		EditText addressEditText = (EditText) findViewById(R.id.esr_result_address);
+		addressEditText.setText("");
+
 		if(lastItem.getAddressNumber() != -1){
-			EditText addressEditText = (EditText) findViewById(R.id.esr_result_address);
 			addressEditText.setText(lastItem.getAddress());
 		}
 		else{
