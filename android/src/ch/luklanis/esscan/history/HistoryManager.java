@@ -458,7 +458,7 @@ public final class HistoryManager {
 					new String[] { account },
 					null,
 					null,
-					DBHelper.ADDRESS_TIMESTAMP_COL + " DESC");
+					DBHelper.ADDRESS_TIMESTAMP_COL);
 
 			if(cursor.move(number + 1)){
 				ContentValues values = new ContentValues();
@@ -485,7 +485,7 @@ public final class HistoryManager {
 					new String[] { account },
 					null,
 					null,
-					DBHelper.ADDRESS_TIMESTAMP_COL + " DESC");
+					DBHelper.ADDRESS_TIMESTAMP_COL);
 			if (cursor.moveToNext()) {
 				number = cursor.getInt(0);
 			}
@@ -518,7 +518,7 @@ public final class HistoryManager {
 					new String[] { account },
 					null,
 					null,
-					DBHelper.ADDRESS_TIMESTAMP_COL + " DESC");
+					DBHelper.ADDRESS_TIMESTAMP_COL);
 			while (cursor.moveToNext()) {
 				addresses.add(cursor.getString(2));
 			}
@@ -555,7 +555,7 @@ public final class HistoryManager {
 					new String[] { account },
 					null,
 					null,
-					DBHelper.ADDRESS_TIMESTAMP_COL + " DESC");
+					DBHelper.ADDRESS_TIMESTAMP_COL);
 			if (cursor.move(addressNumber + 1)) {
 				return cursor.getString(2);
 			}
