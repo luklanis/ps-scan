@@ -339,15 +339,15 @@ public final class ViewfinderView extends View {
     canvas.drawRect(frame.left, frame.bottom - 1, frame.right + 1, frame.bottom + 1, paint);
 
     // Draw the framing rect corner UI elements
-    paint.setColor(cornerColor);
-    canvas.drawRect(frame.left - 15, frame.top - 15, frame.left + 15, frame.top, paint);
-    canvas.drawRect(frame.left - 15, frame.top, frame.left, frame.top + 15, paint);
-    canvas.drawRect(frame.right - 15, frame.top - 15, frame.right + 15, frame.top, paint);
-    canvas.drawRect(frame.right, frame.top - 15, frame.right + 15, frame.top + 15, paint);
-    canvas.drawRect(frame.left - 15, frame.bottom, frame.left + 15, frame.bottom + 15, paint);
-    canvas.drawRect(frame.left - 15, frame.bottom - 15, frame.left, frame.bottom, paint);
-    canvas.drawRect(frame.right - 15, frame.bottom, frame.right + 15, frame.bottom + 15, paint);
-    canvas.drawRect(frame.right, frame.bottom - 15, frame.right + 15, frame.bottom + 15, paint);  
+//    paint.setColor(cornerColor);
+//    canvas.drawRect(frame.left - 15, frame.top - 15, frame.left + 15, frame.top, paint);
+//    canvas.drawRect(frame.left - 15, frame.top, frame.left, frame.top + 15, paint);
+//    canvas.drawRect(frame.right - 15, frame.top - 15, frame.right + 15, frame.top, paint);
+//    canvas.drawRect(frame.right, frame.top - 15, frame.right + 15, frame.top + 15, paint);
+//    canvas.drawRect(frame.left - 15, frame.bottom, frame.left + 15, frame.bottom + 15, paint);
+//    canvas.drawRect(frame.left - 15, frame.bottom - 15, frame.left, frame.bottom, paint);
+//    canvas.drawRect(frame.right - 15, frame.bottom, frame.right + 15, frame.bottom + 15, paint);
+//    canvas.drawRect(frame.right, frame.bottom - 15, frame.right + 15, frame.bottom + 15, paint);  
 
 
     // Request another update at the animation interval, but don't repaint the entire viewfinder mask.
