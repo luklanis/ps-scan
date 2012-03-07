@@ -229,6 +229,11 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
 				//        clipboardManager.setPrimaryClip(ClipData.newPlainText("ocrResult", ocrResultView.getText()));
 				//      if (clipboardManager.hasPrimaryClip()) {
+				if (clipboardManager.hasText()) {
+					Toast toast = Toast.makeText(v.getContext(), R.string.msg_copied, Toast.LENGTH_SHORT);
+					toast.setGravity(Gravity.BOTTOM, 0, 0);
+					toast.show();
+				}
 			}
 		});
 
@@ -341,7 +346,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 				}
 
 				if(somethingSaved){
-					Toast toast = Toast.makeText(CaptureActivity.this, R.string.msg_saved, Toast.LENGTH_SHORT);
+					Toast toast = Toast.makeText(v.getContext(), R.string.msg_saved, Toast.LENGTH_SHORT);
 					toast.setGravity(Gravity.BOTTOM, 0, 0);
 					toast.show();
 				}
