@@ -261,7 +261,8 @@
                     android:background="@drawable/edit_text_background"
                     android:padding="4dip"
                     android:text="@string/button_copy_code_row"
-                    android:textColor="@color/result_text" />
+                    android:textColor="@color/result_text"
+                    android:textSize="14sp" />
 
                 <!--
                      <Button

@@ -141,7 +141,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 	//private TextView statusViewTop;
 	private View statusViewTop;
 	private TextView ocrResultView;
-	private View cameraButtonView;
 	private View resultView;
 	private HistoryItem lastItem;
 	private boolean hasSurface;
@@ -178,193 +177,175 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 	public PsValidation getValidation(){
 		return psValidation;
 	}
+	
+	private final Button.OnClickListener resultCopyListener = new Button.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+			clipboardManager.setText(lastItem.getResult().getCompleteCode());
+
+			//        clipboardManager.setPrimaryClip(ClipData.newPlainText("ocrResult", ocrResultView.getText()));
+			//      if (clipboardManager.hasPrimaryClip()) {
+			if (clipboardManager.hasText()) {
+				Toast toast = Toast.makeText(v.getContext(), R.string.msg_copied, Toast.LENGTH_SHORT);
+				toast.setGravity(Gravity.BOTTOM, 0, 0);
+				toast.show();
+			}
+		}
+	};
+	
+	private final Button.OnClickListener exportAgainListener = new Button.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+			builder.setMessage(R.string.msg_sure);
+			builder.setNeutralButton(R.string.button_cancel, null);
+			builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					historyManager.updateHistoryItemFileName(lastItem.getResult().getCompleteCode(), null);
+
+					Button reexportButton = (Button) findViewById(R.id.button_export_again);
+
+					TextView dtaFilenameTextView = (TextView) findViewById(R.id.esr_result_dta_file);
+					dtaFilenameTextView.setText("");
+					reexportButton.setVisibility(View.GONE);
+				}
+			});
+			builder.show();
+		}
+	};
+	
+	private final Button.OnClickListener saveListener = new Button.OnClickListener() {
+		public void onClick(View v) {
+			boolean somethingSaved = false;
+
+			if(lastItem.getResult().getAmount() == ""){
+				EditText amountEditText = (EditText) findViewById(R.id.esr_result_amount);
+				String newAmount = amountEditText.getText().toString().replace(',', '.');
+				try {
+					float newAmountTemp = Float.parseFloat(newAmount);
+					newAmountTemp *= 100;
+					newAmountTemp -= (newAmountTemp % 5);
+					newAmountTemp /= 100;
+
+					newAmount = String.valueOf(newAmountTemp);
+
+					if(newAmount.indexOf('.') == newAmount.length() - 2){
+						newAmount += "0";
+					}
+
+					if(historyManager == null){
+						Log.e(TAG, "onClick: historyManager is null!");
+						return;
+					}
+
+					historyManager.updateHistoryItemAmount(lastItem.getResult().getCompleteCode(), 
+							newAmount);
+					amountEditText.setText(newAmount);
+
+					somethingSaved = true;
+				} catch (NumberFormatException e) {
+					setOKAlert(v.getContext(), R.string.msg_amount_not_valid);
+				}
+			}
+
+			EditText addressEditText = (EditText) findViewById(R.id.esr_result_address);
+			String address = addressEditText.getText().toString();
+			if(address.length() > 0){
+
+				int error = DTAFileCreator.validateAddress(address);
+				if(error != 0){
+					setOKAlert(v.getContext(), error);
+				}
+
+				if (lastItem.getAddressNumber() == -1) {
+					historyManager.updateHistoryItemAddress(lastItem.getResult().getCompleteCode(), 
+							historyManager.addAddress(lastItem.getResult().getAccount(), address));
+				}
+				else{
+					historyManager.updateAddress(lastItem.getResult().getAccount(), 
+							lastItem.getAddressNumber(), address);
+				}
+
+				somethingSaved = true;
+			}
+
+			if(somethingSaved){
+				Toast toast = Toast.makeText(v.getContext(), R.string.msg_saved, Toast.LENGTH_SHORT);
+				toast.setGravity(Gravity.BOTTOM, 0, 0);
+				toast.show();
+			}
+		}
+	};
+	
+	private final Button.OnClickListener addressChangeListener = new Button.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			showAddressDialog(v.getContext());
+		}
+	};
 
 	@Override
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
 
-		checkFirstLaunch();
-
-		//		if (isFirstLaunch) {
-		//			setDefaultPreferences();
-		//		}
-
 		Window window = getWindow();
 		window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		// requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
 		setContentView(R.layout.capture);
-
-		viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_view);
-		cameraButtonView = findViewById(R.id.camera_button_view);
-		resultView = findViewById(R.id.result_view);
-
-		statusViewTop = findViewById(R.id.status_view_top);
-
-		statusViewBottom = (TextView) findViewById(R.id.status_view_bottom);
-		registerForContextMenu(statusViewBottom);
-
-		handler = null;
-		lastItem = null;
+		
 		hasSurface = false;
+		historyManager = new HistoryManager(this);
+	    historyManager.trimHistory();
+	    
 		beepManager = new BeepManager(this);
 
-		psValidation = new EsrValidation();
-		this.lastValidationStep = psValidation.getCurrentStep();
-
-		historyManager = new HistoryManager(this);
-
-		//		ocrResultView = (TextView) findViewById(R.id.ocr_result_text_view);
-		//		registerForContextMenu(ocrResultView);
-
-		cameraManager = new CameraManager(this);
-		viewfinderView.setCameraManager(cameraManager);
-
 		Button resultCopy = (Button)findViewById(R.id.button_copy_code_row);
-		resultCopy.setOnClickListener(new Button.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-				clipboardManager.setText(lastItem.getResult().getCompleteCode());
-
-				//        clipboardManager.setPrimaryClip(ClipData.newPlainText("ocrResult", ocrResultView.getText()));
-				//      if (clipboardManager.hasPrimaryClip()) {
-				if (clipboardManager.hasText()) {
-					Toast toast = Toast.makeText(v.getContext(), R.string.msg_copied, Toast.LENGTH_SHORT);
-					toast.setGravity(Gravity.BOTTOM, 0, 0);
-					toast.show();
-				}
-			}
-		});
-
-		//		Button resultShare = (Button)findViewById(R.id.button_share_code_row);
-		//		resultShare.setOnClickListener(new Button.OnClickListener() {
-		//			@Override
-		//			public void onClick(View v) {
-		//				Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-		//				sharingIntent.setType("text/plain");
-		//				sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "ESR code");
-		//
-		//				EsrResult result = lastItem.getResult();
-		//				String text = result.getAccount() 
-		//						+ "\r\n" + result.getCurrency() 
-		//						+ " " + lastItem.getAmount()
-		//						+ "\r\n\r\n" + result.getCompleteCode();
-		//
-		//				sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, text);
-		//
-		//				startActivity(Intent.createChooser(sharingIntent, "Share via"));
-		//			}
-		//		});
+		resultCopy.setOnClickListener(resultCopyListener);
 
 		Button exportAgainButton = (Button)findViewById(R.id.button_export_again);
-		exportAgainButton.setOnClickListener(new Button.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-				builder.setMessage(R.string.msg_sure);
-				builder.setNeutralButton(R.string.button_cancel, null);
-				builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						historyManager.updateHistoryItemFileName(lastItem.getResult().getCompleteCode(), null);
-
-						Button reexportButton = (Button) findViewById(R.id.button_export_again);
-
-						TextView dtaFilenameTextView = (TextView) findViewById(R.id.esr_result_dta_file);
-						dtaFilenameTextView.setText("");
-						reexportButton.setVisibility(View.GONE);
-					}
-				});
-				builder.show();
-			}
-		});
+		exportAgainButton.setOnClickListener(exportAgainListener);
 
 		Button addressChangeButton = (Button)findViewById(R.id.button_address_change);
-		addressChangeButton.setOnClickListener(new Button.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				showAddressDialog(v.getContext());
-			}
-		});
+		addressChangeButton.setOnClickListener(addressChangeListener);
 
 		Button amountSaveButton = (Button) findViewById(R.id.button_result_save);
-		
-		amountSaveButton.setOnClickListener(new Button.OnClickListener() {
-			public void onClick(View v) {
-				boolean somethingSaved = false;
+		amountSaveButton.setOnClickListener(saveListener);
 
-				if(lastItem.getResult().getAmount() == ""){
-					EditText amountEditText = (EditText) findViewById(R.id.esr_result_amount);
-					String newAmount = amountEditText.getText().toString().replace(',', '.');
-					try {
-						float newAmountTemp = Float.parseFloat(newAmount);
-						newAmountTemp *= 100;
-						newAmountTemp -= (newAmountTemp % 5);
-						newAmountTemp /= 100;
-
-						newAmount = String.valueOf(newAmountTemp);
-
-						if(newAmount.indexOf('.') == newAmount.length() - 2){
-							newAmount += "0";
-						}
-
-						if(historyManager == null){
-							Log.e(TAG, "onClick: historyManager is null!");
-							return;
-						}
-
-						historyManager.updateHistoryItemAmount(lastItem.getResult().getCompleteCode(), 
-								newAmount);
-						amountEditText.setText(newAmount);
-
-						somethingSaved = true;
-					} catch (NumberFormatException e) {
-						setOKAlert(v.getContext(), R.string.msg_amount_not_valid);
-					}
-				}
-
-				EditText addressEditText = (EditText) findViewById(R.id.esr_result_address);
-				String address = addressEditText.getText().toString();
-				if(address.length() > 0){
-
-					int error = DTAFileCreator.validateAddress(address);
-					if(error != 0){
-						setOKAlert(v.getContext(), error);
-					}
-
-					if (lastItem.getAddressNumber() == -1) {
-						historyManager.updateHistoryItemAddress(lastItem.getResult().getCompleteCode(), 
-								historyManager.addAddress(lastItem.getResult().getAccount(), address));
-					}
-					else{
-						historyManager.updateAddress(lastItem.getResult().getAccount(), 
-								lastItem.getAddressNumber(), address);
-					}
-
-					somethingSaved = true;
-				}
-
-				if(somethingSaved){
-					Toast toast = Toast.makeText(v.getContext(), R.string.msg_saved, Toast.LENGTH_SHORT);
-					toast.setGravity(Gravity.BOTTOM, 0, 0);
-					toast.show();
-				}
-			}
-		});
-
-		isEngineReady = false;
+		showHelpOnFirstLaunch();
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();   
+
+		cameraManager = new CameraManager(this);
+
+		viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_view);
+		viewfinderView.setCameraManager(cameraManager);
+		
+		resultView = findViewById(R.id.result_view);
+		statusViewTop = findViewById(R.id.status_view_top);
+
+		statusViewBottom = (TextView) findViewById(R.id.status_view_bottom);
+		registerForContextMenu(statusViewBottom);
+
+		psValidation = new EsrValidation();
+		this.lastValidationStep = psValidation.getCurrentStep();
+
+		isEngineReady = false;
+		
 		resetStatusView();
 		psValidation.gotoBeginning();
 		this.lastValidationStep = psValidation.getCurrentStep();
 
 		String previousSourceLanguageCodeOcr = sourceLanguageCodeOcr;
 		int previousOcrEngineMode = ocrEngineMode;
+
+		handler = null;
+		lastItem = null;
 
 		retrievePreferences();
 
@@ -776,7 +757,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		// Turn off capture-related UI elements
 		statusViewBottom.setVisibility(View.GONE);
 		statusViewTop.setVisibility(View.GONE);
-		cameraButtonView.setVisibility(View.GONE);
 		viewfinderView.setVisibility(View.GONE); 
 		resultView.setVisibility(View.VISIBLE);
 
@@ -1008,7 +988,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		statusViewTop.setVisibility(View.VISIBLE);
 
 		viewfinderView.setVisibility(View.VISIBLE);
-		cameraButtonView.setVisibility(View.VISIBLE);
 
 		lastItem = null;
 		Log.i(TAG, "resetStatusView: set lastItem to null");
@@ -1069,7 +1048,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 	 * run. The easiest way to do this is to check android:versionCode from the manifest, and compare
 	 * it to a value stored as a preference.
 	 */
-	private boolean checkFirstLaunch() {
+	private boolean showHelpOnFirstLaunch() {
 		try {
 			PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), 0);
 			int currentVersion = info.versionCode;
