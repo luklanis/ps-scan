@@ -24,9 +24,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.ContextMenu;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -37,7 +34,14 @@ import ch.luklanis.esscan.paymentslip.DTAFileCreator;
 
 import java.util.List;
 
-public final class HistoryActivity extends ListActivity {
+import com.actionbarsherlock.ActionBarSherlock;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockListActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+
+public final class HistoryActivity extends SherlockListActivity {
 	//  private static final int SEND_ID = Menu.FIRST;
 	//  private static final int CLEAR_ID = Menu.FIRST + 1;
 
@@ -86,7 +90,7 @@ public final class HistoryActivity extends ListActivity {
 	}
 
 	@Override
-	public boolean onContextItemSelected(MenuItem item) {
+	public boolean onContextItemSelected(android.view.MenuItem item) {
 		int position = item.getItemId();
 		historyManager.deleteHistoryItem(position);
 		reload();
@@ -97,7 +101,7 @@ public final class HistoryActivity extends ListActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		//    super.onCreateOptionsMenu(menu);
 		if (historyManager.hasHistoryItems()) {
-			MenuInflater inflater = getMenuInflater();
+			MenuInflater inflater = getSupportMenuInflater();
 			inflater.inflate(R.menu.history_menu, menu);
 			//      menu.add(0, SEND_ID, 0, R.string.history_send).setIcon(android.R.drawable.ic_menu_share);
 			//      menu.add(0, CLEAR_ID, 0, R.string.history_clear_text).setIcon(android.R.drawable.ic_menu_delete);

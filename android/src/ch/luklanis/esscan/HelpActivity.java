@@ -20,6 +20,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
 
+import com.actionbarsherlock.app.SherlockActivity;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
@@ -40,7 +42,7 @@ import android.widget.Button;
  * 
  * The code for this class was adapted from the ZXing project: http://code.google.com/p/zxing
  */
-public final class HelpActivity extends Activity {
+public final class HelpActivity extends SherlockActivity {
 
 	private static final String TAG = HelpActivity.class.getSimpleName();
 
@@ -94,7 +96,7 @@ public final class HelpActivity extends Activity {
 		setContentView(R.layout.help);
 
 		webView = (WebView)findViewById(R.id.help_contents);
-		webView.setWebViewClient(new HelpClient(this));
+		webView.setWebViewClient(new HelpClient((Activity)this));
 
 		Intent intent = getIntent();
 

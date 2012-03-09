@@ -20,6 +20,10 @@ package ch.luklanis.esscan;
 
 import ch.luklanis.esscan.BeepManager;
 
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.googlecode.tesseract.android.TessBaseAPI;
 
 import ch.luklanis.esscan.camera.CameraManager;
@@ -35,7 +39,6 @@ import ch.luklanis.esscan.paymentslip.EsrResult;
 import ch.luklanis.esscan.paymentslip.EsrValidation;
 import ch.luklanis.esscan.paymentslip.PsValidation;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 //import android.content.ClipData;
@@ -61,9 +64,6 @@ import android.text.style.CharacterStyle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -88,7 +88,7 @@ import java.util.List;
  * 
  * The code for this class was adapted from the ZXing project: http://code.google.com/p/zxing/
  */
-public final class CaptureActivity extends Activity implements SurfaceHolder.Callback {
+public final class CaptureActivity extends SherlockActivity implements SurfaceHolder.Callback {
 
 	private static final String TAG = CaptureActivity.class.getSimpleName();
 
@@ -532,7 +532,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
+		MenuInflater inflater = getSupportMenuInflater();
 		inflater.inflate(R.menu.capture_menu, menu);
 		//		super.onCreateOptionsMenu(menu);
 		//		menu.add(0, SETTINGS_ID, 0, "Settings").setIcon(android.R.drawable.ic_menu_preferences);
@@ -936,46 +936,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 					text = ssb;
 		}
 		return text;
-	}
-
-	//	@Override
-	//	public void onCreateContextMenu(ContextMenu menu, View v,
-	//			ContextMenuInfo menuInfo) {
-	//		super.onCreateContextMenu(menu, v, menuInfo);
-	//		if (v.equals(ocrResultView)) {
-	//			menu.add(Menu.NONE, OPTIONS_COPY_RECOGNIZED_TEXT_ID, Menu.NONE, "Copy recognized text");
-	//			menu.add(Menu.NONE, OPTIONS_SHARE_RECOGNIZED_TEXT_ID, Menu.NONE, "Share recognized text");
-	//		} 
-	//	}
-
-	@Override
-	public boolean onContextItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-
-		case OPTIONS_COPY_RECOGNIZED_TEXT_ID:
-			ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-			clipboardManager.setText(ocrResultView.getText());
-
-			//			        clipboardManager.setPrimaryClip(ClipData.newPlainText("ocrResult", ocrResultView.getText()));
-			//			      if (clipboardManager.hasPrimaryClip()) {
-
-			if(clipboardManager.hasText()){
-				Toast toast = Toast.makeText(this, "Text copied.", Toast.LENGTH_LONG);
-				toast.setGravity(Gravity.BOTTOM, 0, 0);
-				toast.show();
-			}
-			return true;
-		case OPTIONS_SHARE_RECOGNIZED_TEXT_ID:
-			Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-			sharingIntent.setType("text/plain");
-			sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "ESR code");
-			sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, ocrResultView.getText());
-
-			startActivity(Intent.createChooser(sharingIntent, "Share via"));
-			return true;
-		default:
-			return super.onContextItemSelected(item);
-		}
 	}
 
 	/**

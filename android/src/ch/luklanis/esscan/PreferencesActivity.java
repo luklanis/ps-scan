@@ -16,6 +16,8 @@
  */
 package ch.luklanis.esscan;
 
+import com.actionbarsherlock.app.SherlockPreferenceActivity;
+
 import ch.luklanis.esscan.paymentslip.DTAFileCreator;
 
 import android.app.AlertDialog;
@@ -25,7 +27,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 
 /**
@@ -36,7 +37,7 @@ import android.preference.PreferenceManager;
  * 
  * The code for this class was adapted from the ZXing project: http://code.google.com/p/zxing
  */
-public class PreferencesActivity extends PreferenceActivity implements
+public class PreferencesActivity extends SherlockPreferenceActivity implements
 OnSharedPreferenceChangeListener {
 
 	// Preference keys not carried over from ZXing project
