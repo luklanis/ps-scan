@@ -26,6 +26,7 @@ import android.hardware.Camera;
 import android.preference.PreferenceManager;
 import android.util.Log;
 //import android.view.Display;
+import android.view.Display;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 
@@ -59,22 +60,27 @@ final class CameraConfigurationManager {
 	 */
 	void initFromCameraParameters(Camera camera) {
 		Camera.Parameters parameters = camera.getParameters();
-//		WindowManager manager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+		WindowManager manager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
 
 		SurfaceView previewView = (SurfaceView) activity.findViewById(R.id.preview_view);
 		int width = previewView.getWidth();
 		int height = previewView.getHeight();
 
-		//    Display display = manager.getDefaultDisplay();
-		//    int width = display.getWidth();
-		//    int height = display.getHeight();
+	    Display display = manager.getDefaultDisplay();
+	    int screenWidth = display.getWidth();
+	    int screenHeight = display.getHeight();
 		// We're landscape-only, and have apparently seen issues with display thinking it's portrait 
 		// when waking from sleep. If it's not landscape, assume it's mistaken and reverse them:
+	    if (screenWidth < screenHeight) {
+	    	int temp = screenWidth;
+	    	screenWidth = screenHeight;
+	    	screenHeight = temp;
+	    }
+	    
 		if (width < height) {
 			Log.i(TAG, "Display reports portrait orientation; assuming this is incorrect");
-			int temp = width;
-			width = height;
-			height = temp;
+			height = (screenHeight - (screenWidth - height));
+			width = screenWidth;
 		}
 		previewResolution = new Point(width, height);
 		Log.i(TAG, "Preview resolution: " + previewResolution);

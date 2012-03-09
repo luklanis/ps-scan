@@ -1039,10 +1039,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		viewfinderView.drawViewfinder();
 	}
 
-	static boolean getFirstLaunch() {
-		return isFirstLaunch;
-	}
-
 	/**
 	 * We want the help screen to be shown automatically the first time a new version of the app is
 	 * run. The easiest way to do this is to check android:versionCode from the manifest, and compare
@@ -1054,11 +1050,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 			int currentVersion = info.versionCode;
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 			int lastVersion = prefs.getInt(PreferencesActivity.KEY_HELP_VERSION_SHOWN, 0);
-			if (lastVersion == 0) {
-				isFirstLaunch = true;
-			} else {
-				isFirstLaunch = false;
-			}
+
 			if (currentVersion > lastVersion) {
 
 				// Record the last version for which we last displayed the What's New (Help) page
