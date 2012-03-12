@@ -43,9 +43,6 @@ import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.SubMenu;
 
 public final class HistoryActivity extends SherlockListActivity {
-	private static final int SEND_DTA_ID = Menu.FIRST;
-	private static final int SEND_ID = Menu.FIRST + 1;
-	//  private static final int CLEAR_ID = Menu.FIRST + 2;
 
 	private HistoryManager historyManager;
 	private HistoryItemAdapter adapter;
