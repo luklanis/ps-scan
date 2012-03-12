@@ -298,8 +298,10 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		setContentView(R.layout.capture);
 		
 		//Load partially transparent black background
-//        getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.ab_bg_black));                
-		getSupportActionBar().setDisplayUseLogoEnabled(false);
+//        getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.ab_bg_black));  
+		
+		// Hide Icon in ActionBar
+		getSupportActionBar().setDisplayShowHomeEnabled(false);
 		
 		hasSurface = false;
 		historyManager = new HistoryManager(this);
