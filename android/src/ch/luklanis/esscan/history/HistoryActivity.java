@@ -50,6 +50,10 @@ public final class HistoryActivity extends SherlockListActivity {
 	@Override
 	protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
+		
+		// Hide Icon in ActionBar
+		getSupportActionBar().setDisplayShowHomeEnabled(false);
+		
 		this.historyManager = new HistoryManager(this);  
 		adapter = new HistoryItemAdapter(this);
 		setListAdapter(adapter);

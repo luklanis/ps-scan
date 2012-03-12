@@ -71,6 +71,10 @@ OnSharedPreferenceChangeListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		// Hide Icon in ActionBar
+		getSupportActionBar().setDisplayShowHomeEnabled(false);
+		
 		addPreferencesFromResource(R.xml.preferences);
 
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);

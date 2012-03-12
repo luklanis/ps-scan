@@ -94,6 +94,9 @@ public final class HelpActivity extends SherlockActivity {
 	protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
 		setContentView(R.layout.help);
+		
+		// Hide Icon in ActionBar
+		getSupportActionBar().setDisplayShowHomeEnabled(false);
 
 		webView = (WebView)findViewById(R.id.help_contents);
 		webView.setWebViewClient(new HelpClient((Activity)this));
