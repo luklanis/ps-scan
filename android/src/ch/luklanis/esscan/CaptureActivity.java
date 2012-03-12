@@ -288,6 +288,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 	@Override
 	public void onCreate(Bundle icicle) {
+		requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 		super.onCreate(icicle);
 
 		Window window = getWindow();
@@ -295,6 +296,10 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		// requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
 		setContentView(R.layout.capture);
+		
+		//Load partially transparent black background
+//        getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.ab_bg_black));                
+		getSupportActionBar().setDisplayUseLogoEnabled(false);
 		
 		hasSurface = false;
 		historyManager = new HistoryManager(this);

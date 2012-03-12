@@ -284,6 +284,7 @@
         android:layout_height="fill_parent" >
 
         <LinearLayout
+            android:paddingTop="48dip"
             android:id="@+id/status_view_top"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -314,20 +315,6 @@
                 android:textColor="@color/status_text"
                 android:textSize="14sp" />
         </LinearLayout>
-
-        <ch.luklanis.esscan.camera.ShutterButton
-            android:id="@+id/shutter_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="8dip"
-            android:layout_marginTop="8dip"
-            android:background="@drawable/shutter_button"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center_vertical"
-            android:scaleType="center"
-            android:visibility="gone" />
 
         <TextView
             android:id="@+id/status_view_bottom"

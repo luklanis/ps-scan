@@ -28,6 +28,10 @@
   <item type="id" name="ocr_decode"/>
   <item type="id" name="esr_decode_succeeded"/>
   
+  <item type="id" name="history_menu_clear"/>
+  <item type="id" name="history_menu_send_csv"/>
+  <item type="id" name="history_menu_send_dta"/>
+  
   <item type="id" name="quit"/>
   <item type="id" name="restart_preview"/>
   <item type="id" name="esr_show_history_item"/>
