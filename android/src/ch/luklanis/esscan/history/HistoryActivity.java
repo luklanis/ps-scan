@@ -40,10 +40,12 @@ import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.SubMenu;
 
 public final class HistoryActivity extends SherlockListActivity {
-	//  private static final int SEND_ID = Menu.FIRST;
-	//  private static final int CLEAR_ID = Menu.FIRST + 1;
+	private static final int SEND_DTA_ID = Menu.FIRST;
+	private static final int SEND_ID = Menu.FIRST + 1;
+	//  private static final int CLEAR_ID = Menu.FIRST + 2;
 
 	private HistoryManager historyManager;
 	private HistoryItemAdapter adapter;
@@ -105,6 +107,13 @@ public final class HistoryActivity extends SherlockListActivity {
 			inflater.inflate(R.menu.history_menu, menu);
 			//      menu.add(0, SEND_ID, 0, R.string.history_send).setIcon(android.R.drawable.ic_menu_share);
 			//      menu.add(0, CLEAR_ID, 0, R.string.history_clear_text).setIcon(android.R.drawable.ic_menu_delete);
+			SubMenu exportMenu = menu.addSubMenu(R.string.history_export);
+			exportMenu.add(0, R.id.history_menu_send_dta, 0, R.string.history_send_dta);
+			exportMenu.add(0, R.id.history_menu_send_csv, 0, R.string.history_send);
+
+	        MenuItem exportMenuItem = exportMenu.getItem();
+	        exportMenuItem.setIcon(android.R.drawable.ic_menu_share);
+	        exportMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 			return true;
 		}
 		return false;
@@ -113,8 +122,7 @@ public final class HistoryActivity extends SherlockListActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		//      case SEND_ID:
-		case R.id.history_menu_send:
+		case R.id.history_menu_send_csv:
 			CharSequence history = historyManager.buildHistory();
 			Uri historyFile = HistoryManager.saveHistory(history.toString());
 			if (historyFile == null) {
@@ -130,7 +138,6 @@ public final class HistoryActivity extends SherlockListActivity {
 				startActivity(intent);
 			}
 			break;
-			//      case CLEAR_ID:
 		case R.id.history_menu_clear:
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setMessage(R.string.msg_sure);
