@@ -69,6 +69,7 @@ final class CameraConfigurationManager {
 	    Display display = manager.getDefaultDisplay();
 	    int screenWidth = display.getWidth();
 	    int screenHeight = display.getHeight();
+	    
 		// We're landscape-only, and have apparently seen issues with display thinking it's portrait 
 		// when waking from sleep. If it's not landscape, assume it's mistaken and reverse them:
 	    if (screenWidth < screenHeight) {
@@ -82,6 +83,7 @@ final class CameraConfigurationManager {
 			height = (screenHeight - (screenWidth - height));
 			width = screenWidth;
 		}
+		
 		previewResolution = new Point(width, height);
 		Log.i(TAG, "Preview resolution: " + previewResolution);
 		cameraResolution = findBestPreviewSizeValue(parameters, previewResolution, false);
@@ -102,7 +104,8 @@ final class CameraConfigurationManager {
 
 		if(prefs.getBoolean(PreferencesActivity.KEY_ONLY_MACRO_FOCUS, false)){
 			focusMode = findSettableValue(parameters.getSupportedFocusModes(),
-					Camera.Parameters.FOCUS_MODE_MACRO);
+					Camera.Parameters.FOCUS_MODE_MACRO,
+					Camera.Parameters.FOCUS_MODE_AUTO);
 		}
 		else{
 			focusMode = findSettableValue(parameters.getSupportedFocusModes(),

@@ -56,7 +56,8 @@
   <string name="button_copy_code_row">Copy code row</string>
   <string name="button_share_code_row">Share code row</string>
   <string name="preferences_general_title">General settings</string>
-  <string name="preferences_only_macro_focus_title">Use macro focus only</string>
+  <string name="preferences_only_macro_focus_title">Macro focus</string>
+  <string name="preferences_only_macro_focus_summary">Try macro focus if supported from device. Otherwise auto focus will be set.</string>
   <string name="preferences_enable_torch_title">Enable front light</string>
   <string name="preferences_dta_format_title">DTA format settings</string>
   <string name="preferences_advanced_title">Advanced settings</string>

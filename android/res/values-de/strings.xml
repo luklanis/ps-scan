@@ -56,6 +56,7 @@
   <string name="button_share_code_row">Kodierzeile teilen</string>
   <string name="preferences_general_title">Allgemeine Einstellungen</string>
   <string name="preferences_only_macro_focus_title">Makrofokus</string>
+  <string name="preferences_only_macro_focus_summary">Versuche Makrofokus. Wenn er vom Gerät nicht unterstützt wird, dann wird automatisch Autofokus genommen.</string>
   <string name="preferences_enable_torch_title">Frontleuchte</string>
   <string name="preferences_dta_format_title">DTA Einstellungen</string>
   <string name="preferences_advanced_title">Erweiterte Einstellungen</string>
