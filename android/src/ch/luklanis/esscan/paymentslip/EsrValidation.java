@@ -76,15 +76,15 @@ public class EsrValidation extends PsValidation {
 	@Override
 	public boolean validate(String text) {
 		try{
-			text = getRelatedText(text);	
+			String related = getRelatedText(text);	
 
-			if(text.charAt(text.length() - 1) != CONTROL_CHARS_IN_STEP[currentStep] 
-					|| (text.length() != VALID_LENGTHS_IN_STEP[currentStep][0] 
-							&& text.length() != VALID_LENGTHS_IN_STEP[currentStep][1])){
+			if(related.charAt(related.length() - 1) != CONTROL_CHARS_IN_STEP[currentStep] 
+					|| (related.length() != VALID_LENGTHS_IN_STEP[currentStep][0] 
+							&& related.length() != VALID_LENGTHS_IN_STEP[currentStep][1])){
 				return false;
 			}
 
-			int[] digits = getDigitsFromText(text, text.length() - 1);
+			int[] digits = getDigitsFromText(related, related.length() - 1);
 			int[] withoutCheckDigit = new int[digits.length - 1];
 
 			for(int i = 0; i < withoutCheckDigit.length; i++){
@@ -94,7 +94,7 @@ public class EsrValidation extends PsValidation {
 			int checkDigit = getCheckDigit(withoutCheckDigit);
 
 			if(checkDigit == digits[digits.length - 1]){
-				completeCode[currentStep] = String.format(STEP_FORMAT[currentStep], text);
+				completeCode[currentStep] = String.format(STEP_FORMAT[currentStep], related);
 				return true;
 			}
 		}
