@@ -76,7 +76,9 @@ public class EsrValidation extends PsValidation {
 	@Override
 	public boolean validate(String text) {
 		try{
+			// Log.d(TAG, String.format("text: %s", text));
 			String related = getRelatedText(text);	
+			// Log.d(TAG, String.format("related: %s", related));
 
 			if(related.charAt(related.length() - 1) != CONTROL_CHARS_IN_STEP[currentStep] 
 					|| (related.length() != VALID_LENGTHS_IN_STEP[currentStep][0] 
@@ -121,7 +123,7 @@ public class EsrValidation extends PsValidation {
 		relatedText = text.replaceAll("\\s", "");
 		
 		if(currentStep > 0){
-			int indexOfControlCharBefore = text.indexOf(String.valueOf(CONTROL_CHARS_IN_STEP[currentStep-1]));
+			int indexOfControlCharBefore = relatedText.indexOf(String.valueOf(CONTROL_CHARS_IN_STEP[currentStep-1]));
 			
 			if(indexOfControlCharBefore != -1 && indexOfControlCharBefore < (relatedText.length() - 1)){
 				relatedText = relatedText.substring(indexOfControlCharBefore + 1);
