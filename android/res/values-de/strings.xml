@@ -70,7 +70,9 @@
   <string name="preferences_vibrate_title">Vibration</string>
   <string name="preferences_execution_day_title">Ausführungsdatum</string>
   <string name="preferences_execution_day_summary">Tag im Monat an dem alle Einzahlungen ausgeführt werden sollen</string>
-  <string name="preferences_show_ocr_result">OCR Ergebnis zeigen</string>
+  <string name="preferences_show_ocr_result_title">OCR Ergebnis zeigen</string>
+  <string name="preferences_email_address_title">Email Adresse</string>
+  <string name="preferences_email_address_summary"></string>
   <string name="help_button_done">Schliessen</string>
   <string name="help_button_back">Zurück</string>
 </resources>

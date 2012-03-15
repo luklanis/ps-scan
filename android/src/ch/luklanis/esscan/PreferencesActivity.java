@@ -48,6 +48,7 @@ OnSharedPreferenceChangeListener {
 	public static final String KEY_ADDRESS = "preferences_address";
 	public static final String KEY_IBAN = "preferences_iban";
 	public static final String KEY_EXECUTION_DAY = "preferences_execution_day";
+	public static final String KEY_EMAIL_ADDRESS = "preferences_email_address";
 
 	// Preference keys carried over from ZXing project
 	public static final String KEY_REVERSE_IMAGE = "preferences_reverse_image";

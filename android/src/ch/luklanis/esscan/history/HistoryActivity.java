@@ -21,14 +21,18 @@ import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 import android.view.ContextMenu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import ch.luklanis.esscan.CaptureActivity;
 import ch.luklanis.esscan.Intents;
+import ch.luklanis.esscan.PreferencesActivity;
 import ch.luklanis.esscan.R;
 import ch.luklanis.esscan.paymentslip.DTAFileCreator;
 
@@ -158,6 +162,8 @@ public final class HistoryActivity extends SherlockListActivity {
 			List<HistoryItem> historyItems = historyManager.buildHistoryItemsForDTA();
 			DTAFileCreator dtaFileCreator = new DTAFileCreator(this);
 			String error = dtaFileCreator.getFirstError(historyItems);
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+			String[] recipients = new String[]{prefs.getString(PreferencesActivity.KEY_EMAIL_ADDRESS, "")};
 
 			if(error != ""){
 				setOKAlert(error);
@@ -178,6 +184,7 @@ public final class HistoryActivity extends SherlockListActivity {
 				Intent intent = new Intent(Intent.ACTION_SEND, Uri.parse("mailto:"));
 				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
 				String subject = getResources().getString(R.string.history_email_as_dta_title);
+				intent.putExtra(Intent.EXTRA_EMAIL, recipients);
 				intent.putExtra(Intent.EXTRA_SUBJECT, subject);
 				intent.putExtra(Intent.EXTRA_TEXT, subject);
 				intent.putExtra(Intent.EXTRA_STREAM, dtaFile);

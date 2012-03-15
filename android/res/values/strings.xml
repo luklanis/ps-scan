@@ -71,7 +71,9 @@
   <string name="preferences_vibrate_title">Vibrate</string>
   <string name="preferences_execution_day_title">Execution day</string>
   <string name="preferences_execution_day_summary">Day of pay execution every month</string>
-  <string name="preferences_show_ocr_result">Show OCR result</string>
+  <string name="preferences_show_ocr_result_title">Show OCR result</string>
+  <string name="preferences_email_address_title">Email address</string>
+  <string name="preferences_email_address_summary"></string>
   <string name="help_button_done">Done</string>
   <string name="help_button_back">Back</string>
 </resources>

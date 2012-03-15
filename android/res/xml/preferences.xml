@@ -42,6 +42,11 @@
             android:title="@string/preferences_execution_day_title"
             android:summary="@string/preferences_execution_day_summary" />
         
+        <EditTextPreference
+            android:defaultValue=""
+            android:key="preferences_email_address"
+            android:title="@string/preferences_email_address_title" />
+        
     </PreferenceCategory>
 
     <!-- ADVANCED SETTINGS -->
@@ -87,7 +92,7 @@
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="preferences_show_ocr_result"
-            android:title="@string/preferences_show_ocr_result" />
+            android:title="@string/preferences_show_ocr_result_title" />
     </PreferenceCategory>
 
 </PreferenceScreen>
