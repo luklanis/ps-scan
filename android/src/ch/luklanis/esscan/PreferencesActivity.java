@@ -55,6 +55,7 @@ OnSharedPreferenceChangeListener {
 	public static final String KEY_VIBRATE = "preferences_vibrate";
 
 	public static final String KEY_HELP_VERSION_SHOWN = "preferences_help_version_shown";
+	public static final String KEY_SHOW_OCR_RESULT_PREFERENCE = "preferences_show_ocr_result";
 
 	//  private ListPreference listPreferenceSourceLanguage;
 	private EditTextPreference editTextPreferenceCharacterWhitelist;

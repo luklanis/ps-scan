@@ -147,7 +147,7 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
 //    }
 //    
 //	textResult = validation.getCompleteCode() + relatedText;
-    textResult = validation.getCompleteCode();
+    //textResult = validation.getCompleteCode();
       
     ocrResult = new OcrResult(bitmap, textResult, wordConfidences, overallConf, characterBoxes, 
         textlineBoxes, wordBoxes, regionBoxes, (end - start));
@@ -159,10 +159,11 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
     super.onPostExecute(result);
 
     Handler handler = activity.getHandler();
-    if (activity.getValidation().finished() && handler != null) {
+    PsValidation validation = activity.getValidation();
+    if (validation.finished() && handler != null) {
       // Send results for single-shot mode recognition.
       if (result) {
-        Message message = Message.obtain(handler, R.id.esr_decode_succeeded, new EsrResult(ocrResult.getText()));
+        Message message = Message.obtain(handler, R.id.esr_decode_succeeded, new EsrResult(validation.getCompleteCode()));
         message.sendToTarget();
       } 
       

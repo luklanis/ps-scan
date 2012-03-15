@@ -148,7 +148,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	private TessBaseAPI baseApi; // Java interface for the Tesseract OCR engine
 	private String sourceLanguageCodeOcr; // ISO 639-3 language code
 	private String sourceLanguageReadable; // Language name, for example, "English"
-	private int pageSegmentationMode = TessBaseAPI.PSM_AUTO;
+	private int pageSegmentationMode = TessBaseAPI.PSM_SINGLE_LINE;
 	private int ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
 	private String characterWhitelist;
 
@@ -165,6 +165,8 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	private PsValidation psValidation;
 
 	private int lastValidationStep;
+
+	private boolean showOcrResult;
 
 	Handler getHandler() {
 		return handler;
@@ -303,6 +305,8 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		// Hide Icon in ActionBar
 		getSupportActionBar().setDisplayShowHomeEnabled(false);
 		
+		showOcrResult = false;
+		
 		hasSurface = false;
 		historyManager = new HistoryManager(this);
 	    historyManager.trimHistory();
@@ -343,18 +347,17 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		this.lastValidationStep = psValidation.getCurrentStep();
 
 		isEngineReady = false;
-		
-		resetStatusView();
-		psValidation.gotoBeginning();
-		this.lastValidationStep = psValidation.getCurrentStep();
 
 		String previousSourceLanguageCodeOcr = sourceLanguageCodeOcr;
 		int previousOcrEngineMode = ocrEngineMode;
 
 		handler = null;
-		lastItem = null;
 
 		retrievePreferences();
+		
+		resetStatusView();
+		psValidation.gotoBeginning();
+		this.lastValidationStep = psValidation.getCurrentStep();
 
 		// Set up the camera preview surface.
 		surfaceView = (SurfaceView) findViewById(R.id.preview_view);
@@ -896,6 +899,8 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 				ocrResult.getWordBoundingBoxes(),
 				ocrResult.getTextlineBoundingBoxes(),
 				ocrResult.getRegionBoundingBoxes()));
+		
+		statusViewBottom.setText(ocrResult.getText());
 
 		if(this.psValidation.getCurrentStep() != this.lastValidationStep){
 			this.lastValidationStep = this.psValidation.getCurrentStep();
@@ -953,6 +958,12 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 		refreshStatusView();
 		statusViewTop.setVisibility(View.VISIBLE);
+		
+		statusViewBottom.setText("");
+		
+		if (showOcrResult) {
+			statusViewBottom.setVisibility(View.VISIBLE);
+		}
 
 		viewfinderView.setVisibility(View.VISIBLE);
 
@@ -1059,14 +1070,13 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		// Retrieve from preferences, and set in this Activity, the capture mode preference
 		isContinuousModeActive = true;
 
-		// Retrieve from preferences, and set in this Activity, the page segmentation mode preference
-		pageSegmentationMode = TessBaseAPI.PSM_SINGLE_LINE;
-
 		ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
 
 		characterWhitelist = OcrCharacterHelper.getWhitelist(prefs, sourceLanguageCodeOcr);
 
 		prefs.registerOnSharedPreferenceChangeListener(listener);
+		
+		showOcrResult = prefs.getBoolean(PreferencesActivity.KEY_SHOW_OCR_RESULT_PREFERENCE, false);
 
 		beepManager.updatePrefs();
 	}

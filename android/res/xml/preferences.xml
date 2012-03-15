@@ -83,6 +83,11 @@
             android:key="preferences_reverse_image"
             android:summary="@string/preferences_reverse_image_summary"
             android:title="@string/preferences_reverse_image_title" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="preferences_show_ocr_result"
+            android:title="@string/preferences_show_ocr_result" />
     </PreferenceCategory>
 
 </PreferenceScreen>
