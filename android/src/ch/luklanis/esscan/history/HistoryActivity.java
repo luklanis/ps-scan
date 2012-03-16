@@ -54,10 +54,10 @@ public final class HistoryActivity extends SherlockListActivity {
 	@Override
 	protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
-		
+
 		// Hide Icon in ActionBar
 		getSupportActionBar().setDisplayShowHomeEnabled(false);
-		
+
 		this.historyManager = new HistoryManager(this);  
 		adapter = new HistoryItemAdapter(this);
 		setListAdapter(adapter);
@@ -116,9 +116,9 @@ public final class HistoryActivity extends SherlockListActivity {
 			exportMenu.add(0, R.id.history_menu_send_dta, 0, R.string.history_send_dta);
 			exportMenu.add(0, R.id.history_menu_send_csv, 0, R.string.history_send);
 
-	        MenuItem exportMenuItem = exportMenu.getItem();
-	        exportMenuItem.setIcon(android.R.drawable.ic_menu_share);
-	        exportMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+			MenuItem exportMenuItem = exportMenu.getItem();
+			exportMenuItem.setIcon(android.R.drawable.ic_menu_share);
+			exportMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 			return true;
 		}
 		return false;
@@ -127,14 +127,19 @@ public final class HistoryActivity extends SherlockListActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.history_menu_send_csv:
+		case R.id.history_menu_send_csv: {
 			CharSequence history = historyManager.buildHistory();
 			Uri historyFile = HistoryManager.saveHistory(history.toString());
+
+			String[] recipients = new String[]{PreferenceManager.getDefaultSharedPreferences(this)
+					.getString(PreferencesActivity.KEY_EMAIL_ADDRESS, "")};
+
 			if (historyFile == null) {
 				setOKAlert(R.string.msg_unmount_usb);
 			} else {
 				Intent intent = new Intent(Intent.ACTION_SEND, Uri.parse("mailto:"));
 				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+				intent.putExtra(Intent.EXTRA_EMAIL, recipients);
 				String subject = getResources().getString(R.string.history_email_title);
 				intent.putExtra(Intent.EXTRA_SUBJECT, subject);
 				intent.putExtra(Intent.EXTRA_TEXT, subject);
@@ -142,8 +147,9 @@ public final class HistoryActivity extends SherlockListActivity {
 				intent.setType("text/csv");
 				startActivity(intent);
 			}
-			break;
-		case R.id.history_menu_clear:
+		}
+		break;
+		case R.id.history_menu_clear: {
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setMessage(R.string.msg_sure);
 			builder.setCancelable(true);
@@ -157,13 +163,14 @@ public final class HistoryActivity extends SherlockListActivity {
 			});
 			builder.setNegativeButton(R.string.button_cancel, null);
 			builder.show();
-			break;
-		case R.id.history_menu_send_dta:
+		}
+		break;
+		case R.id.history_menu_send_dta: {
 			List<HistoryItem> historyItems = historyManager.buildHistoryItemsForDTA();
 			DTAFileCreator dtaFileCreator = new DTAFileCreator(this);
 			String error = dtaFileCreator.getFirstError(historyItems);
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-			String[] recipients = new String[]{prefs.getString(PreferencesActivity.KEY_EMAIL_ADDRESS, "")};
+			String[] recipients = new String[]{PreferenceManager.getDefaultSharedPreferences(this)
+					.getString(PreferencesActivity.KEY_EMAIL_ADDRESS, "")};
 
 			if(error != ""){
 				setOKAlert(error);
@@ -183,15 +190,16 @@ public final class HistoryActivity extends SherlockListActivity {
 
 				Intent intent = new Intent(Intent.ACTION_SEND, Uri.parse("mailto:"));
 				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-				String subject = getResources().getString(R.string.history_email_as_dta_title);
 				intent.putExtra(Intent.EXTRA_EMAIL, recipients);
+				String subject = getResources().getString(R.string.history_email_as_dta_title);
 				intent.putExtra(Intent.EXTRA_SUBJECT, subject);
 				intent.putExtra(Intent.EXTRA_TEXT, subject);
 				intent.putExtra(Intent.EXTRA_STREAM, dtaFile);
 				intent.setType("text/plain");
 				startActivity(intent);
 			}
-			break;
+		}
+		break;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
