@@ -45,7 +45,8 @@
         <EditTextPreference
             android:defaultValue=""
             android:key="preferences_email_address"
-            android:title="@string/preferences_email_address_title" />
+            android:title="@string/preferences_email_address_title"
+            android:summary="@string/preferences_email_address_summary" />
         
     </PreferenceCategory>
 
