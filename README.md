@@ -10,6 +10,7 @@ Most of the code making up the core structure of this project has been adapted f
 ## Requires
 
 * Installation of [tess-two](https://github.com/rmtheis/tess-two) as a library project, to act as the OCR engine.
+* Installation of [ActionBarSherlock](https://github.com/JakeWharton/ActionBarSherlock) as a library project.
 
 Installing the APK
 ==================
