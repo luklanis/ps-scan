@@ -125,6 +125,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginRight="4dip"
+                                android:minWidth="84dip"
                                 android:background="@drawable/edit_text_background"
                                 android:inputType="numberDecimal"
                                 android:numeric="decimal"
