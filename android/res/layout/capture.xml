@@ -18,7 +18,8 @@
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:gravity="center" >
 
     <SurfaceView
         android:id="@+id/preview_view"
@@ -125,11 +126,11 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginRight="4dip"
-                                android:minWidth="84dip"
                                 android:background="@drawable/edit_text_background"
                                 android:inputType="numberDecimal"
-                                android:numeric="decimal"
                                 android:maxLength="11"
+                                android:minWidth="84dip"
+                                android:numeric="decimal"
                                 android:padding="4dip"
                                 android:textColor="@color/result_text"
                                 android:textSize="14sp" />
@@ -185,6 +186,7 @@
 
                             <Button
                                 android:id="@+id/button_address_change"
+                                style="?android:attr/buttonStyleSmall"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_alignParentRight="true"
@@ -227,6 +229,7 @@
 
                 <Button
                     android:id="@+id/button_export_again"
+                    style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/edit_text_background"
@@ -246,6 +249,7 @@
 
                 <Button
                     android:id="@+id/button_result_save"
+                    style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="4dip"
@@ -257,6 +261,7 @@
 
                 <Button
                     android:id="@+id/button_copy_code_row"
+                    style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="4dip"
@@ -286,12 +291,12 @@
         android:layout_height="fill_parent" >
 
         <LinearLayout
-            android:paddingTop="48dip"
             android:id="@+id/status_view_top"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:orientation="horizontal" >
+            android:orientation="horizontal"
+            android:paddingTop="48dip" >
 
             <TextView
                 android:id="@+id/status_view_1"

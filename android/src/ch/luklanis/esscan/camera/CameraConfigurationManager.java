@@ -28,10 +28,13 @@ import android.util.Log;
 //import android.view.Display;
 import android.view.Display;
 import android.view.SurfaceView;
+import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 
 import ch.luklanis.esscan.PreferencesActivity;
 import ch.luklanis.esscan.R;
+import ch.luklanis.esscan.ViewfinderView;
 
 import java.util.Collection;
 
@@ -84,9 +87,27 @@ final class CameraConfigurationManager {
 			width = screenWidth;
 		}
 		
+		Point screenResolution = new Point(screenWidth, screenHeight);
+		
+		cameraResolution = findBestPreviewSizeValue(parameters, screenResolution, false);
+		
+		int bestWith = (height / cameraResolution.y) * cameraResolution.x;
+		
+		if (bestWith < screenWidth) {
+			width = bestWith;
+			LayoutParams params = previewView.getLayoutParams();
+			params.width = width;
+			previewView.setLayoutParams(params);
+			
+			ViewfinderView viewfinderView = (ViewfinderView) activity.findViewById(R.id.viewfinder_view);
+			params = viewfinderView.getLayoutParams();
+			params.width = width;
+			viewfinderView.setLayoutParams(params);
+		}
+		
 		previewResolution = new Point(width, height);
 		Log.i(TAG, "Preview resolution: " + previewResolution);
-		cameraResolution = findBestPreviewSizeValue(parameters, previewResolution, false);
+		
 		Log.i(TAG, "Camera resolution: " + cameraResolution);
 	}
 

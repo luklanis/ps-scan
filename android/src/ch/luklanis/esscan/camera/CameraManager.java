@@ -18,7 +18,6 @@
 package ch.luklanis.esscan.camera;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -53,8 +52,6 @@ public final class CameraManager {
 	private boolean initialized;
 	private boolean previewing;
 	private boolean reverseImage;
-	private int requestedFramingRectWidth;
-	private int requestedFramingRectHeight;
 	
 	/**
 	 * Preview frames are delivered here, which we pass on to the registered handler. Make sure to
@@ -91,11 +88,6 @@ public final class CameraManager {
 		if (!initialized) {
 			initialized = true;
 			configManager.initFromCameraParameters(theCamera);
-			if (requestedFramingRectWidth > 0 && requestedFramingRectHeight > 0) {
-				adjustFramingRect(requestedFramingRectWidth, requestedFramingRectHeight);
-				requestedFramingRectWidth = 0;
-				requestedFramingRectHeight = 0;
-			}
 		}
 		
 		configManager.setDesiredCameraParameters(theCamera);
@@ -230,36 +222,6 @@ public final class CameraManager {
 			framingRectInPreview = rect;
 		}
 		return framingRectInPreview;
-	}
-
-	/**
-	 * Changes the size of the framing rect.
-	 * 
-	 * @param deltaWidth Number of pixels to adjust the width
-	 * @param deltaHeight Number of pixels to adjust the height
-	 */
-	public void adjustFramingRect(int deltaWidth, int deltaHeight) {
-		if (initialized) {
-			Point previewResolution = configManager.getPreviewResolution();
-
-			// Set maximum and minimum sizes
-			if ((framingRect.width() + deltaWidth > previewResolution.x - 4) || (framingRect.width() + deltaWidth < 50)) {
-				deltaWidth = 0;
-			}
-			if ((framingRect.height() + deltaHeight > previewResolution.y - 4) || (framingRect.height() + deltaHeight < 50)) {
-				deltaHeight = 0;
-			}
-
-			int newWidth = framingRect.width() + deltaWidth;
-			int newHeight = framingRect.height() + deltaHeight;
-			int leftOffset = (previewResolution.x - newWidth) / 2;
-			int topOffset = (previewResolution.y - newHeight) / 2;
-			framingRect = new Rect(leftOffset, topOffset, leftOffset + newWidth, topOffset + newHeight);
-			framingRectInPreview = null;
-		} else {
-			requestedFramingRectWidth = deltaWidth;
-			requestedFramingRectHeight = deltaHeight;
-		}
 	}
 
 	/**
