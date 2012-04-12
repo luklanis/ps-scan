@@ -813,14 +813,15 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 		String dtaFilename = lastItem.getDTAFilename();
 		Button reexportButton = (Button) findViewById(R.id.button_export_again);
+		TextView dtaFilenameTextView = (TextView) findViewById(R.id.esr_result_dta_file);
 
 		if(dtaFilename != null && dtaFilename != ""){
-			TextView dtaFilenameTextView = (TextView) findViewById(R.id.esr_result_dta_file);
 			dtaFilenameTextView.setText(lastItem.getDTAFilename());
 			reexportButton.setVisibility(View.VISIBLE);
 		}
 		else{
 			reexportButton.setVisibility(View.GONE);
+			dtaFilenameTextView.setText("");
 		}
 
 		Button addressChangeButton = (Button) findViewById(R.id.button_address_change);
