@@ -91,7 +91,7 @@ final class CameraConfigurationManager {
 		
 		cameraResolution = findBestPreviewSizeValue(parameters, screenResolution, false);
 		
-		int bestWith = (height / cameraResolution.y) * cameraResolution.x;
+		int bestWith = (height * cameraResolution.x) / cameraResolution.y;
 		
 		if (bestWith < screenWidth) {
 			width = bestWith;
