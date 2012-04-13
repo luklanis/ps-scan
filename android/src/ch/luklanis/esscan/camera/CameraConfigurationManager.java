@@ -31,6 +31,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
+import android.widget.RelativeLayout;
 
 import ch.luklanis.esscan.PreferencesActivity;
 import ch.luklanis.esscan.R;
@@ -49,6 +50,8 @@ final class CameraConfigurationManager {
 	private static final String TAG = "CameraConfiguration";
 	private static final int MIN_PREVIEW_PIXELS = 320 * 240; // small screen
 	//  private static final int MAX_PREVIEW_PIXELS = 800 * 480; // large/HD screen
+
+	private static final boolean SCALE_PREVIEW_VIEW = false;
 
 	private final Activity activity;
 	private Point previewResolution;
@@ -69,45 +72,57 @@ final class CameraConfigurationManager {
 		int width = previewView.getWidth();
 		int height = previewView.getHeight();
 
-	    Display display = manager.getDefaultDisplay();
-	    int screenWidth = display.getWidth();
-	    int screenHeight = display.getHeight();
-	    
+		Display display = manager.getDefaultDisplay();
+		int screenWidth = display.getWidth();
+		int screenHeight = display.getHeight();
+
 		// We're landscape-only, and have apparently seen issues with display thinking it's portrait 
 		// when waking from sleep. If it's not landscape, assume it's mistaken and reverse them:
-	    if (screenWidth < screenHeight) {
-	    	int temp = screenWidth;
-	    	screenWidth = screenHeight;
-	    	screenHeight = temp;
-	    }
-	    
+		if (screenWidth < screenHeight) {
+			int temp = screenWidth;
+			screenWidth = screenHeight;
+			screenHeight = temp;
+		}
+
 		if (width < height) {
 			Log.i(TAG, "Display reports portrait orientation; assuming this is incorrect");
 			height = (screenHeight - (screenWidth - height));
 			width = screenWidth;
 		}
-		
+
 		Point screenResolution = new Point(screenWidth, screenHeight);
-		
+
 		cameraResolution = findBestPreviewSizeValue(parameters, screenResolution, false);
-		
-		int bestWith = (height * cameraResolution.x) / cameraResolution.y;
-		
-		if (bestWith < screenWidth) {
-			width = bestWith;
-			LayoutParams params = previewView.getLayoutParams();
-			params.width = width;
-			previewView.setLayoutParams(params);
-			
+
+		if (SCALE_PREVIEW_VIEW) {
+			int bestWith = (height * cameraResolution.x) / cameraResolution.y;
+
+			if (bestWith < screenWidth) {
+				RelativeLayout scalableView = (RelativeLayout) activity.findViewById(R.id.scalable_view);
+				
+				width = bestWith;
+
+				LayoutParams params = scalableView.getLayoutParams();
+				params.width = width;
+				scalableView.setLayoutParams(params);
+			}
+		}
+		else {
 			ViewfinderView viewfinderView = (ViewfinderView) activity.findViewById(R.id.viewfinder_view);
+			
+			height = screenResolution.y;
+			LayoutParams params = previewView.getLayoutParams();
+			params.height = height;
+			previewView.setLayoutParams(params);
+
 			params = viewfinderView.getLayoutParams();
-			params.width = width;
+			params.height = height;
 			viewfinderView.setLayoutParams(params);
 		}
-		
+
 		previewResolution = new Point(width, height);
 		Log.i(TAG, "Preview resolution: " + previewResolution);
-		
+
 		Log.i(TAG, "Camera resolution: " + cameraResolution);
 	}
 

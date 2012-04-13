@@ -20,29 +20,33 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <SurfaceView
-        android:id="@+id/preview_view"
+    <RelativeLayout
+        android:id="@+id/scalable_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center" />
+        android:layout_gravity="center" >
 
-    <ch.luklanis.esscan.ViewfinderView
-        android:id="@+id/viewfinder_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:background="#0000" />
+        <SurfaceView
+            android:id="@+id/preview_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
 
-    <LinearLayout
-        android:id="@+id/result_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/result_view"
-        android:orientation="vertical"
-        android:padding="4dip"
-        android:visibility="gone" >
+        <ch.luklanis.esscan.ViewfinderView
+            android:id="@+id/viewfinder_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#0000" />
 
-        <!--
+        <LinearLayout
+            android:id="@+id/result_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/result_view"
+            android:orientation="vertical"
+            android:padding="4dip"
+            android:visibility="gone" >
+
+            <!--
             <LinearLayout
             android:id="@+id/result_view"
             android:layout_width="match_parent"
@@ -51,91 +55,91 @@
             android:background="@color/result_view"
             android:orientation="vertical"
             android:padding="4dip" >
-        -->
+            -->
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="right" >
-
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:orientation="vertical" >
+                android:layout_height="wrap_content"
+                android:gravity="right" >
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal" >
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical" >
 
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginRight="4dip"
-                        android:orientation="vertical" >
-
-                        <ImageView
-                            android:id="@+id/image_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_marginBottom="4dip"
-                            android:adjustViewBounds="true" />
+                        android:orientation="horizontal" >
 
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal" >
+                            android:layout_marginRight="4dip"
+                            android:orientation="vertical" >
 
-                            <TextView
+                            <ImageView
+                                android:id="@+id/image_view"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_marginBottom="4dip"
+                                android:adjustViewBounds="true" />
+
+                            <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginRight="4dip"
-                                android:text="@string/esr_result_account"
-                                android:textColor="@color/result_text"
-                                android:textColorLink="@color/result_text"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
+                                android:orientation="horizontal" >
 
-                            <TextView
-                                android:id="@+id/esr_result_account"
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginRight="4dip"
+                                    android:text="@string/esr_result_account"
+                                    android:textColor="@color/result_text"
+                                    android:textColorLink="@color/result_text"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/esr_result_account"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="@color/result_text"
+                                    android:textColorLink="@color/result_text"
+                                    android:textSize="14sp" />
+                            </LinearLayout>
+
+                            <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textColor="@color/result_text"
-                                android:textColorLink="@color/result_text"
-                                android:textSize="14sp" />
-                        </LinearLayout>
+                                android:orientation="horizontal" >
 
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal" >
+                                <TextView
+                                    android:id="@+id/esr_result_currency"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginRight="4dip"
+                                    android:textColor="@color/result_text"
+                                    android:textColorLink="@color/result_text"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
 
-                            <TextView
-                                android:id="@+id/esr_result_currency"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginRight="4dip"
-                                android:textColor="@color/result_text"
-                                android:textColorLink="@color/result_text"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
+                                <EditText
+                                    android:id="@+id/esr_result_amount"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginRight="4dip"
+                                    android:background="@drawable/edit_text_background"
+                                    android:inputType="numberDecimal"
+                                    android:maxLength="11"
+                                    android:minWidth="84dip"
+                                    android:numeric="decimal"
+                                    android:padding="4dip"
+                                    android:textColor="@color/result_text"
+                                    android:textSize="14sp" />
 
-                            <EditText
-                                android:id="@+id/esr_result_amount"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginRight="4dip"
-                                android:background="@drawable/edit_text_background"
-                                android:inputType="numberDecimal"
-                                android:maxLength="11"
-                                android:minWidth="84dip"
-                                android:numeric="decimal"
-                                android:padding="4dip"
-                                android:textColor="@color/result_text"
-                                android:textSize="14sp" />
-
-                            <!--
+                                <!--
                                  <Button
                                 android:id="@+id/esr_result_amount_save"
                                 android:layout_width="wrap_content"
@@ -143,135 +147,135 @@
                                 android:text="@string/button_save"
                                 android:textSize="14sp"
                                 android:visibility="gone" />
-                            -->
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dip"
-                            android:text="@string/esr_result_reference_number"
-                            android:textColor="@color/result_text"
-                            android:textColorLink="@color/result_text"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/esr_result_reference_number"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/result_text"
-                            android:textColorLink="@color/result_text"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical" >
-
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" >
+                                -->
+                            </LinearLayout>
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_alignParentLeft="true"
-                                android:text="@string/esr_result_address"
+                                android:layout_marginTop="4dip"
+                                android:text="@string/esr_result_reference_number"
                                 android:textColor="@color/result_text"
                                 android:textColorLink="@color/result_text"
                                 android:textSize="14sp"
                                 android:textStyle="bold" />
 
-                            <Button
-                                android:id="@+id/button_address_change"
-                                style="?android:attr/buttonStyleSmall"
+                            <TextView
+                                android:id="@+id/esr_result_reference_number"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_alignParentRight="true"
+                                android:textColor="@color/result_text"
+                                android:textColorLink="@color/result_text"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical" >
+
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content" >
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_alignParentLeft="true"
+                                    android:text="@string/esr_result_address"
+                                    android:textColor="@color/result_text"
+                                    android:textColorLink="@color/result_text"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+
+                                <Button
+                                    android:id="@+id/button_address_change"
+                                    style="?android:attr/buttonStyleSmall"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_alignParentRight="true"
+                                    android:background="@drawable/edit_text_background"
+                                    android:padding="4dip"
+                                    android:text="@string/button_change"
+                                    android:textColor="@color/result_text"
+                                    android:textSize="14sp" />
+                            </RelativeLayout>
+
+                            <EditText
+                                android:id="@+id/esr_result_address"
+                                android:layout_width="170dip"
+                                android:layout_height="match_parent"
+                                android:layout_marginTop="4dip"
                                 android:background="@drawable/edit_text_background"
+                                android:gravity="top"
                                 android:padding="4dip"
-                                android:text="@string/button_change"
                                 android:textColor="@color/result_text"
                                 android:textSize="14sp" />
-                        </RelativeLayout>
-
-                        <EditText
-                            android:id="@+id/esr_result_address"
-                            android:layout_width="170dip"
-                            android:layout_height="match_parent"
-                            android:layout_marginTop="4dip"
-                            android:background="@drawable/edit_text_background"
-                            android:gravity="top"
-                            android:padding="4dip"
-                            android:textColor="@color/result_text"
-                            android:textSize="14sp" />
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
-            </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentLeft="true"
-                android:orientation="horizontal" >
-
-                <TextView
-                    android:id="@+id/esr_result_dta_file"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="4dip"
-                    android:textColor="@color/result_text"
-                    android:textColorLink="@color/result_text"
-                    android:textSize="14sp" />
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:orientation="horizontal" >
 
-                <Button
-                    android:id="@+id/button_export_again"
-                    style="?android:attr/buttonStyleSmall"
+                    <TextView
+                        android:id="@+id/esr_result_dta_file"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="4dip"
+                        android:textColor="@color/result_text"
+                        android:textColorLink="@color/result_text"
+                        android:textSize="14sp" />
+
+                    <Button
+                        android:id="@+id/button_export_again"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/edit_text_background"
+                        android:padding="4dip"
+                        android:text="@string/button_export_again"
+                        android:textColor="@color/result_text"
+                        android:textSize="14sp"
+                        android:visibility="gone" />
+                </LinearLayout>
+
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/edit_text_background"
-                    android:padding="4dip"
-                    android:text="@string/button_export_again"
-                    android:textColor="@color/result_text"
-                    android:textSize="14sp"
-                    android:visibility="gone" />
-            </LinearLayout>
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    android:orientation="horizontal" >
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-                android:orientation="horizontal" >
+                    <Button
+                        android:id="@+id/button_result_save"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="4dip"
+                        android:background="@drawable/edit_text_background"
+                        android:padding="4dip"
+                        android:text="@string/button_save"
+                        android:textColor="@color/result_text"
+                        android:textSize="14sp" />
 
-                <Button
-                    android:id="@+id/button_result_save"
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="4dip"
-                    android:background="@drawable/edit_text_background"
-                    android:padding="4dip"
-                    android:text="@string/button_save"
-                    android:textColor="@color/result_text"
-                    android:textSize="14sp" />
+                    <Button
+                        android:id="@+id/button_copy_code_row"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="4dip"
+                        android:background="@drawable/edit_text_background"
+                        android:padding="4dip"
+                        android:text="@string/button_copy_code_row"
+                        android:textColor="@color/result_text"
+                        android:textSize="14sp" />
 
-                <Button
-                    android:id="@+id/button_copy_code_row"
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="4dip"
-                    android:background="@drawable/edit_text_background"
-                    android:padding="4dip"
-                    android:text="@string/button_copy_code_row"
-                    android:textColor="@color/result_text"
-                    android:textSize="14sp" />
-
-                <!--
+                    <!--
                      <Button
                     android:id="@+id/button_share_code_row"
                     android:layout_width="wrap_content"
@@ -280,61 +284,61 @@
                     android:padding="4dip"
                     android:text="@string/button_share_code_row"
                     android:textColor="@color/result_text" />
-                -->
-            </LinearLayout>
-        </RelativeLayout>
-    </LinearLayout>
-
-    <RelativeLayout
-        android:id="@+id/camera_button_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-
-        <LinearLayout
-            android:id="@+id/status_view_top"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:orientation="horizontal"
-            android:paddingTop="48dip" >
-
-            <TextView
-                android:id="@+id/status_view_1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0100003949753>"
-                android:textColor="@color/status_text"
-                android:textSize="14sp" />
-
-            <TextView
-                android:id="@+id/status_view_2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="210000000003139471430009017+"
-                android:textColor="@color/status_text"
-                android:textSize="14sp" />
-
-            <TextView
-                android:id="@+id/status_view_3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" 010001628>"
-                android:textColor="@color/status_text"
-                android:textSize="14sp" />
+                    -->
+                </LinearLayout>
+            </RelativeLayout>
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/status_view_bottom"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:autoLink="web"
-            android:background="#0000"
-            android:clickable="true"
-            android:text=""
-            android:textColor="@color/status_text"
-            android:textSize="14sp"
-            android:visibility="gone" />
-    </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/camera_button_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
 
+            <LinearLayout
+                android:id="@+id/status_view_top"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:orientation="horizontal"
+                android:paddingTop="48dip" >
+
+                <TextView
+                    android:id="@+id/status_view_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0100003949753>"
+                    android:textColor="@color/status_text"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/status_view_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="210000000003139471430009017+"
+                    android:textColor="@color/status_text"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/status_view_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" 010001628>"
+                    android:textColor="@color/status_text"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/status_view_bottom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:autoLink="web"
+                android:background="#0000"
+                android:clickable="true"
+                android:text=""
+                android:textColor="@color/status_text"
+                android:textSize="14sp"
+                android:visibility="gone" />
+        </RelativeLayout>
+    </RelativeLayout>
 </FrameLayout>
