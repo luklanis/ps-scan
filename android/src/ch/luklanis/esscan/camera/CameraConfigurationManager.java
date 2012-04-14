@@ -28,14 +28,12 @@ import android.util.Log;
 //import android.view.Display;
 import android.view.Display;
 import android.view.SurfaceView;
-import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 
 import ch.luklanis.esscan.PreferencesActivity;
 import ch.luklanis.esscan.R;
-import ch.luklanis.esscan.ViewfinderView;
 
 import java.util.Collection;
 
@@ -108,16 +106,10 @@ final class CameraConfigurationManager {
 			}
 		}
 		else {
-			ViewfinderView viewfinderView = (ViewfinderView) activity.findViewById(R.id.viewfinder_view);
-			
 			height = screenResolution.y;
 			LayoutParams params = previewView.getLayoutParams();
 			params.height = height;
 			previewView.setLayoutParams(params);
-
-			params = viewfinderView.getLayoutParams();
-			params.height = height;
-			viewfinderView.setLayoutParams(params);
 		}
 
 		previewResolution = new Point(width, height);

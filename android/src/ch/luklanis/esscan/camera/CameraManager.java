@@ -27,6 +27,8 @@ import android.preference.PreferenceManager;
 import android.view.SurfaceHolder;
 import ch.luklanis.esscan.PlanarYUVLuminanceSource;
 import ch.luklanis.esscan.PreferencesActivity;
+import ch.luklanis.esscan.R;
+import ch.luklanis.esscan.ViewfinderView;
 
 import java.io.IOException;
 
@@ -199,8 +201,16 @@ public final class CameraManager {
 			} else if (height > MAX_FRAME_HEIGHT) {
 				height = MAX_FRAME_HEIGHT;
 			}
+			
 			int leftOffset = (previewResolution.x - width) / 2;
-			int topOffset = (previewResolution.y - height) / 2;
+			
+			// Camera surface has the same height as the screen. Because of
+			// the Notification- and ActionBar preview's height is less than screen's
+			// so we had to take notice of it in offset calculation
+			ViewfinderView viewfinderView = (ViewfinderView) activity.findViewById(R.id.viewfinder_view);
+			int topOffset = ((previewResolution.y - height) / 2) 
+					- (previewResolution.y - viewfinderView.getHeight());
+			
 			framingRect = new Rect(leftOffset, topOffset, leftOffset + width, topOffset + height);
 		}
 		return framingRect;
