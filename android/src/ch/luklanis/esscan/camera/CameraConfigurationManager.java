@@ -34,6 +34,7 @@ import android.widget.RelativeLayout;
 
 import ch.luklanis.esscan.PreferencesActivity;
 import ch.luklanis.esscan.R;
+import ch.luklanis.esscan.ViewfinderView;
 
 import java.util.Collection;
 
@@ -54,6 +55,7 @@ final class CameraConfigurationManager {
 	private final Activity activity;
 	private Point previewResolution;
 	private Point cameraResolution;
+	private int heightDiff;
 
 	CameraConfigurationManager(Activity activity) {
 		this.activity = activity;
@@ -92,25 +94,16 @@ final class CameraConfigurationManager {
 
 		cameraResolution = findBestPreviewSizeValue(parameters, screenResolution, false);
 
-		if (SCALE_PREVIEW_VIEW) {
-			int bestWith = (height * cameraResolution.x) / cameraResolution.y;
+		height = screenResolution.y;
+		LayoutParams params = previewView.getLayoutParams();
+		params.height = height;
+		previewView.setLayoutParams(params);
 
-			if (bestWith < screenWidth) {
-				RelativeLayout scalableView = (RelativeLayout) activity.findViewById(R.id.scalable_view);
-				
-				width = bestWith;
-
-				LayoutParams params = scalableView.getLayoutParams();
-				params.width = width;
-				scalableView.setLayoutParams(params);
-			}
-		}
-		else {
-			height = screenResolution.y;
-			LayoutParams params = previewView.getLayoutParams();
-			params.height = height;
-			previewView.setLayoutParams(params);
-		}
+		// Camera surface has the same height as the screen. Because of
+		// the Notification- and ActionBar preview's height is less than screen's
+		// so we had to take notice of it in offset calculation
+		ViewfinderView viewfinderView = (ViewfinderView) activity.findViewById(R.id.viewfinder_view);
+		this.heightDiff = height - viewfinderView.getHeight();
 
 		previewResolution = new Point(width, height);
 		Log.i(TAG, "Preview resolution: " + previewResolution);
@@ -161,6 +154,10 @@ final class CameraConfigurationManager {
 		Camera.Parameters parameters = camera.getParameters();
 		doSetTorch(parameters, newSetting);
 		camera.setParameters(parameters);
+	}
+	
+	int getHeightDiff() {
+		return this.heightDiff;
 	}
 
 	private static void doSetTorch(Camera.Parameters parameters, boolean newSetting) {

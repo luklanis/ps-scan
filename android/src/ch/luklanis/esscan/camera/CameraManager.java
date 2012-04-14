@@ -203,13 +203,7 @@ public final class CameraManager {
 			}
 			
 			int leftOffset = (previewResolution.x - width) / 2;
-			
-			// Camera surface has the same height as the screen. Because of
-			// the Notification- and ActionBar preview's height is less than screen's
-			// so we had to take notice of it in offset calculation
-			ViewfinderView viewfinderView = (ViewfinderView) activity.findViewById(R.id.viewfinder_view);
-			int topOffset = ((previewResolution.y - height) / 2) 
-					- (previewResolution.y - viewfinderView.getHeight());
+			int topOffset = ((previewResolution.y - height) / 2);
 			
 			framingRect = new Rect(leftOffset, topOffset, leftOffset + width, topOffset + height);
 		}
@@ -249,7 +243,8 @@ public final class CameraManager {
 			return null;
 		}
 		// Go ahead and assume it's YUV rather than die.
-		return new PlanarYUVLuminanceSource(data, width, height, rect.left, rect.top,
+		return new PlanarYUVLuminanceSource(data, width, height, rect.left, 
+				(rect.top + configManager.getHeightDiff()),
 				rect.width(), rect.height(), reverseImage);
 	}
 
