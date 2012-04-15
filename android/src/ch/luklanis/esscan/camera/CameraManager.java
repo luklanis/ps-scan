@@ -244,7 +244,7 @@ public final class CameraManager {
 		}
 		// Go ahead and assume it's YUV rather than die.
 		return new PlanarYUVLuminanceSource(data, width, height, rect.left, 
-				(rect.top + configManager.getHeightDiff()),
+				(rect.top + (configManager.getHeightDiff() / 2)),
 				rect.width(), rect.height(), reverseImage);
 	}
 
