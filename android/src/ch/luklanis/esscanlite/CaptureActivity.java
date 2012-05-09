@@ -16,9 +16,8 @@
  * limitations under the License.
  */
 
-package ch.luklanis.esscan;
+package ch.luklanis.esscanlite;
 
-import ch.luklanis.esscan.BeepManager;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
@@ -27,17 +26,19 @@ import com.actionbarsherlock.view.MenuItem;
 import com.googlecode.tesseract.android.TessBaseAPI;
 
 import ch.luklanis.esscan.camera.CameraManager;
-import ch.luklanis.esscan.HelpActivity;
-import ch.luklanis.esscan.OcrResult;
-import ch.luklanis.esscan.PreferencesActivity;
-import ch.luklanis.esscan.history.HistoryActivity;
-import ch.luklanis.esscan.history.HistoryItem;
-import ch.luklanis.esscan.history.HistoryManager;
+import ch.luklanis.esscanlite.R;
 import ch.luklanis.esscan.language.LanguageCodeHelper;
 import ch.luklanis.esscan.paymentslip.DTAFileCreator;
 import ch.luklanis.esscan.paymentslip.EsrResult;
 import ch.luklanis.esscan.paymentslip.EsrValidation;
 import ch.luklanis.esscan.paymentslip.PsValidation;
+import ch.luklanis.esscanlite.BeepManager;
+import ch.luklanis.esscanlite.HelpActivity;
+import ch.luklanis.esscanlite.OcrResult;
+import ch.luklanis.esscanlite.PreferencesActivity;
+import ch.luklanis.esscanlite.history.HistoryActivity;
+import ch.luklanis.esscanlite.history.HistoryItem;
+import ch.luklanis.esscanlite.history.HistoryManager;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;

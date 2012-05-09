@@ -19,7 +19,7 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     android:installLocation="preferExternal"
-    package="ch.luklanis.esscan"
+    package="ch.luklanis.esscanlite"
     android:versionCode="13"
     android:versionName="0.6.3" >
 
@@ -74,7 +74,7 @@
         </activity>
         <activity android:name=".PreferencesActivity" />
         <activity
-            android:name=".history.HistoryActivity"
+            android:name=".HistoryActivity"
             android:label="@string/history_title"
             android:stateNotNeeded="true" >
             <intent-filter>

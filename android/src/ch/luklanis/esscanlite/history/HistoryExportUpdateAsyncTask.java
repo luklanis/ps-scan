@@ -1,4 +1,4 @@
-package ch.luklanis.esscan.history;
+package ch.luklanis.esscanlite.history;
 
 import android.os.AsyncTask;
 

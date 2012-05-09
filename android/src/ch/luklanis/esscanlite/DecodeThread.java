@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-package ch.luklanis.esscan;
+package ch.luklanis.esscanlite;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
 
-import ch.luklanis.esscan.CaptureActivity;
+import ch.luklanis.esscanlite.CaptureActivity;
 import android.os.Handler;
 import android.os.Looper;
 import java.util.concurrent.CountDownLatch;

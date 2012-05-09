@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package ch.luklanis.esscan;
+package ch.luklanis.esscanlite;
 
-import ch.luklanis.esscan.BeepManager;
 import com.googlecode.tesseract.android.TessBaseAPI;
 
-import ch.luklanis.esscan.CaptureActivity;
-import ch.luklanis.esscan.OcrRecognizeAsyncTask;
-import ch.luklanis.esscan.R;
+import ch.luklanis.esscanlite.R;
+import ch.luklanis.esscanlite.BeepManager;
+import ch.luklanis.esscanlite.CaptureActivity;
+import ch.luklanis.esscanlite.OcrRecognizeAsyncTask;
 
 import android.os.Handler;
 import android.os.Looper;

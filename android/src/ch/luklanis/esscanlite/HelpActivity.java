@@ -14,11 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ch.luklanis.esscan;
+package ch.luklanis.esscanlite;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
+
+import ch.luklanis.esscanlite.R;
 
 import com.actionbarsherlock.app.SherlockActivity;
 

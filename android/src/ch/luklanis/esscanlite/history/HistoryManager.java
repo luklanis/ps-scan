@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package ch.luklanis.esscan.history;
+package ch.luklanis.esscanlite.history;
 
 import ch.luklanis.esscan.paymentslip.EsrResult;
 

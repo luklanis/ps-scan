@@ -19,7 +19,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.util.Log;
 
-import ch.luklanis.esscan.R;
+import ch.luklanis.esscanlite.R;
 
 /**
  * Class for handling functions relating to converting between standard language

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ch.luklanis.esscan.history;
+package ch.luklanis.esscanlite.history;
 
 import android.app.Activity;
 import android.content.res.Resources;
@@ -25,7 +25,7 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import ch.luklanis.esscan.R;
+import ch.luklanis.esscanlite.R;
 import ch.luklanis.esscan.paymentslip.EsrResult;
 
 import java.util.ArrayList;

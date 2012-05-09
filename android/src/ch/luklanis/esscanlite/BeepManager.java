@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ch.luklanis.esscan;
+package ch.luklanis.esscanlite;
 
 import android.app.Activity;
 import android.content.Context;
@@ -27,6 +27,8 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.io.IOException;
+
+import ch.luklanis.esscanlite.R;
 
 /**
  * Manages beeps and vibrations for {@link CaptureActivity}.

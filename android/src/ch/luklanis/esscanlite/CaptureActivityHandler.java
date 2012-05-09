@@ -14,16 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ch.luklanis.esscan;
+package ch.luklanis.esscanlite;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
 
-import ch.luklanis.esscan.CaptureActivity;
-import ch.luklanis.esscan.R;
+import ch.luklanis.esscanlite.R;
 import ch.luklanis.esscan.camera.CameraManager;
-import ch.luklanis.esscan.history.HistoryItem;
 import ch.luklanis.esscan.paymentslip.EsrResult;
-import ch.luklanis.esscan.OcrResult;
+import ch.luklanis.esscanlite.CaptureActivity;
+import ch.luklanis.esscanlite.OcrResult;
+import ch.luklanis.esscanlite.history.HistoryItem;
 
 import android.os.Handler;
 import android.os.Message;

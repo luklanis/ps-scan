@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package ch.luklanis.esscan.history;
+package ch.luklanis.esscanlite.history;
 
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase;

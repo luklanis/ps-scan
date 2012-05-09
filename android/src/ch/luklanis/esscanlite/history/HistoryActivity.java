@@ -1,5 +1,6 @@
 /*
  * Copyright 2012 ZXing authors
+ * Copyright 2012 Lukas Landis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +15,7 @@
  * limitations under the License.
  */
 
-package ch.luklanis.esscan.history;
+package ch.luklanis.esscanlite.history;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -30,11 +31,11 @@ import android.view.ContextMenu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import ch.luklanis.esscan.CaptureActivity;
-import ch.luklanis.esscan.Intents;
-import ch.luklanis.esscan.PreferencesActivity;
-import ch.luklanis.esscan.R;
+import ch.luklanis.esscanlite.R;
 import ch.luklanis.esscan.paymentslip.DTAFileCreator;
+import ch.luklanis.esscanlite.CaptureActivity;
+import ch.luklanis.esscanlite.Intents;
+import ch.luklanis.esscanlite.PreferencesActivity;
 
 import java.util.List;
 

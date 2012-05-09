@@ -32,9 +32,9 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 
-import ch.luklanis.esscan.PreferencesActivity;
-import ch.luklanis.esscan.R;
-import ch.luklanis.esscan.ViewfinderView;
+import ch.luklanis.esscanlite.R;
+import ch.luklanis.esscanlite.PreferencesActivity;
+import ch.luklanis.esscanlite.ViewfinderView;
 
 import java.util.Collection;
 

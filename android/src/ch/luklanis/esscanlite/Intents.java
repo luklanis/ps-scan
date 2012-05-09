@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ch.luklanis.esscan;
+package ch.luklanis.esscanlite;
 
 /**
  * This class provides the constants to use when sending an Intent to Barcode Scanner.

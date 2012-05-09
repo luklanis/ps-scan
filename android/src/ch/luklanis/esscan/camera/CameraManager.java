@@ -25,10 +25,10 @@ import android.hardware.Camera;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.view.SurfaceHolder;
-import ch.luklanis.esscan.PlanarYUVLuminanceSource;
-import ch.luklanis.esscan.PreferencesActivity;
-import ch.luklanis.esscan.R;
-import ch.luklanis.esscan.ViewfinderView;
+import ch.luklanis.esscanlite.R;
+import ch.luklanis.esscanlite.PlanarYUVLuminanceSource;
+import ch.luklanis.esscanlite.PreferencesActivity;
+import ch.luklanis.esscanlite.ViewfinderView;
 
 import java.io.IOException;
 
