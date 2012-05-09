@@ -74,7 +74,7 @@
         </activity>
         <activity android:name=".PreferencesActivity" />
         <activity
-            android:name=".HistoryActivity"
+            android:name=".history.HistoryActivity"
             android:label="@string/history_title"
             android:stateNotNeeded="true" >
             <intent-filter>

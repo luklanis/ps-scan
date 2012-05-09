@@ -16,7 +16,6 @@
  limitations under the License.
  -->
 <resources>
-  <string name="app_name">ESR Scanner</string>
   <string name="address_dialog_title">Adresse auswählen</string>
   <string name="address_new">Neue Adresse eingeben</string>
   <string name="button_cancel">Abbrechen</string>

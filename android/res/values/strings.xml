@@ -16,7 +16,7 @@
  limitations under the License.
  -->
 <resources>
-  <string name="app_name">ESR Scanner</string>
+  <string name="app_name">ESR Scanner Lite</string>
   <string name="address_dialog_title">Choose an address</string>
   <string name="address_new">Enter a new address</string>
   <string name="button_cancel">Cancel</string>
