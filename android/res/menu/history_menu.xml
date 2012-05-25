@@ -4,12 +4,14 @@
           android:icon="@android:drawable/ic_menu_delete"
           android:title="@string/history_clear_text"
           android:showAsAction="ifRoom" />
-   <!--  <item android:id="@+id/history_menu_send_dta"
-          android:icon="@android:drawable/ic_menu_share"
+    
+   <item android:id="@+id/history_menu_send_dta"
           android:title="@string/history_send_dta" 
-          android:showAsAction="ifRoom" />
+          android:showAsAction="ifRoom"
+        android:actionProviderClass="android.widget.ShareActionProvider" /> 
+        
     <item android:id="@+id/history_menu_send"
           android:icon="@android:drawable/ic_menu_share"
           android:title="@string/history_send" 
-          android:showAsAction="ifRoom" /> -->
+          android:showAsAction="ifRoom" />
 </menu>

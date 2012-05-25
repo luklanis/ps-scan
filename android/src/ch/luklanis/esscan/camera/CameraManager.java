@@ -219,10 +219,14 @@ public final class CameraManager {
 			Rect rect = new Rect(getFramingRect());
 			Point cameraResolution = configManager.getCameraResolution();
 			Point screenResolution = configManager.getPreviewResolution();
-			rect.left = rect.left * cameraResolution.x / screenResolution.x;
-			rect.right = rect.right * cameraResolution.x / screenResolution.x;
-			rect.top = rect.top * cameraResolution.y / screenResolution.y;
-			rect.bottom = rect.bottom * cameraResolution.y / screenResolution.y;
+			
+			float scaleX = (float)cameraResolution.x / (float)screenResolution.x;
+			float scaleY = (float)cameraResolution.y / (float)screenResolution.y;
+			
+			rect.left = (int)(rect.left * scaleX);
+			rect.right = (int)(rect.right * scaleX);
+			rect.top = (int)(rect.top * scaleY);
+			rect.bottom = (int)(rect.bottom * scaleY);
 			framingRectInPreview = rect;
 		}
 		return framingRectInPreview;

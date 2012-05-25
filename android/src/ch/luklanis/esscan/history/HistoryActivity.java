@@ -45,11 +45,13 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.SubMenu;
+import com.actionbarsherlock.widget.ShareActionProvider;
 
 public final class HistoryActivity extends SherlockListActivity {
 
 	private HistoryManager historyManager;
 	private HistoryItemAdapter adapter;
+	private ShareActionProvider mShareActionProvider;
 
 	@Override
 	protected void onCreate(Bundle icicle) {
@@ -108,17 +110,21 @@ public final class HistoryActivity extends SherlockListActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		//    super.onCreateOptionsMenu(menu);
 		if (historyManager.hasHistoryItems()) {
-			MenuInflater inflater = getSupportMenuInflater();
-			inflater.inflate(R.menu.history_menu, menu);
-			//      menu.add(0, SEND_ID, 0, R.string.history_send).setIcon(android.R.drawable.ic_menu_share);
-			//      menu.add(0, CLEAR_ID, 0, R.string.history_clear_text).setIcon(android.R.drawable.ic_menu_delete);
-			SubMenu exportMenu = menu.addSubMenu(R.string.history_export);
-			exportMenu.add(0, R.id.history_menu_send_dta, 0, R.string.history_send_dta);
-			exportMenu.add(0, R.id.history_menu_send_csv, 0, R.string.history_send);
+			getSupportMenuInflater().inflate(R.menu.history_menu, menu);
 
-			MenuItem exportMenuItem = exportMenu.getItem();
-			exportMenuItem.setIcon(android.R.drawable.ic_menu_share);
-			exportMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+//			SubMenu exportMenu = menu.addSubMenu(R.string.history_export);
+//			exportMenu.add(0, R.id.history_menu_send_dta, 0, R.string.history_send_dta);
+//			exportMenu.add(0, R.id.history_menu_send_csv, 0, R.string.history_send);
+
+		    // Locate MenuItem with ShareActionProvider
+		    MenuItem item = menu.findItem(R.id.history_menu_send_dta);
+
+		    // Fetch and store ShareActionProvider
+		    mShareActionProvider = (ShareActionProvider) item.getActionProvider();
+
+//			MenuItem exportMenuItem = exportMenu.getItem();
+//			exportMenuItem.setIcon(android.R.drawable.ic_menu_share);
+//			exportMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 			return true;
 		}
 		return false;
@@ -196,7 +202,8 @@ public final class HistoryActivity extends SherlockListActivity {
 				intent.putExtra(Intent.EXTRA_TEXT, subject);
 				intent.putExtra(Intent.EXTRA_STREAM, dtaFile);
 				intent.setType("text/plain");
-				startActivity(intent);
+				setShareIntent(intent);
+				//startActivity(intent);
 			}
 		}
 		break;
@@ -204,6 +211,13 @@ public final class HistoryActivity extends SherlockListActivity {
 			return super.onOptionsItemSelected(item);
 		}
 		return true;
+	}
+
+	// Call to update the share intent
+	private void setShareIntent(Intent shareIntent) {
+	    if (mShareActionProvider != null) {
+	        mShareActionProvider.setShareIntent(shareIntent);
+	    }
 	}
 
 	private void setOKAlert(String message){

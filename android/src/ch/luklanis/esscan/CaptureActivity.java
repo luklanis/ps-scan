@@ -530,13 +530,8 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 				}
 				return true;
 			}
-		} else if (keyCode == KeyEvent.KEYCODE_FOCUS) {      
-			// Only perform autofocus if user is not holding down the button.
-			if (event.getRepeatCount() == 0) {
-				handler.requestDelayedAutofocus(500L, R.id.user_requested_auto_focus);
-			}
-			return true;
-		}
+		} 
+		
 		return super.onKeyDown(keyCode, event);
 	}
 

@@ -50,7 +50,7 @@
   <string name="msg_own_iban_is_not_valid">IBAN is not valid. It has to be from switzerland.</string>
   <string name="msg_own_address_is_not_set">To create DTA files your own address is needed. Please write it down in Settings.</string>
   <string name="esr_result_account">Account</string>
-  <string name="esr_result_address">Address</string>
+  <string name="esr_result_address">Recipient</string>
   <string name="esr_result_reference_number">Reference Number</string>
   <string name="esr_result_amount_not_set">0.00</string>
   <string name="button_copy_code_row">Copy code row</string>
