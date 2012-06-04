@@ -152,7 +152,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	private int ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
 	private String characterWhitelist;
 
-	private boolean isContinuousModeActive; // Whether we are doing OCR in continuous mode
 	private SharedPreferences prefs;
 	private OnSharedPreferenceChangeListener listener;
 	private ProgressDialog dialog; // for initOcr - language download & unzip
@@ -462,7 +461,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			cameraManager.openDriver(surfaceHolder);
 
 			// Creating the handler starts the preview, which can also throw a RuntimeException.
-			handler = new CaptureActivityHandler(this, cameraManager, baseApi, isContinuousModeActive);
+			handler = new CaptureActivityHandler(this, cameraManager, baseApi);
 
 		} catch (IOException ioe) {
 			showErrorMessage("Error", "Could not initialize camera. Please try restarting device.");
@@ -703,13 +702,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 		if (handler != null) {
 			handler.quitSynchronously();     
-		}
-
-		// Disable continuous mode if we're using Cube. This will prevent bad states for devices 
-		// with low memory that crash when running OCR with Cube, and prevent unwanted delays.
-		if (ocrEngineMode == TessBaseAPI.OEM_CUBE_ONLY || ocrEngineMode == TessBaseAPI.OEM_TESSERACT_CUBE_COMBINED) {
-			Log.d(TAG, "Disabling continuous preview");
-			isContinuousModeActive = false;
 		}
 
 		// Start AsyncTask to install language data and init OCR
@@ -1062,9 +1054,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		// Retrieve from preferences, and set in this Activity, the language preferences
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		setSourceLanguage(prefs.getString(PreferencesActivity.KEY_SOURCE_LANGUAGE_PREFERENCE, "deu"));
-
-		// Retrieve from preferences, and set in this Activity, the capture mode preference
-		isContinuousModeActive = true;
 
 		ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
 
