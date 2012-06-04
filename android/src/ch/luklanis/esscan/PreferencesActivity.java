@@ -57,6 +57,7 @@ OnSharedPreferenceChangeListener {
 
 	public static final String KEY_HELP_VERSION_SHOWN = "preferences_help_version_shown";
 	public static final String KEY_SHOW_OCR_RESULT_PREFERENCE = "preferences_show_ocr_result";
+	public static final String KEY_NOT_SHOW_ALERT = "preferences_not_show_alertid_";
 
 	//  private ListPreference listPreferenceSourceLanguage;
 	private EditTextPreference editTextPreferenceCharacterWhitelist;

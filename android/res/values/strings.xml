@@ -39,6 +39,8 @@
   <string name="menu_history">History</string>
   <string name="menu_settings">Settings</string>
   <string name="menu_share">Share</string>
+  <string name="alert_title_information">Information</string>
+  <string name="alert_dont_show_again">Don\'t show again!</string>
   <string name="msg_sure">Are you sure?</string>
   <string name="msg_unmount_usb">Sorry, the SD card is not accessible.</string>
   <string name="msg_address_line_to_long">The DTA file only allows 20 signs per line and 4 lines. It will cut on export.</string>

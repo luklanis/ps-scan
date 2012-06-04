@@ -8,7 +8,7 @@
    <item android:id="@+id/history_menu_send_dta"
           android:title="@string/history_send_dta" 
           android:showAsAction="ifRoom"
-        android:actionProviderClass="android.widget.ShareActionProvider" /> 
+        android:actionProviderClass="com.actionbarsherlock.widget.ShareActionProvider" /> 
         
     <item android:id="@+id/history_menu_send"
           android:icon="@android:drawable/ic_menu_share"
