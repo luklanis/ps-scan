@@ -21,12 +21,15 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.ContextMenu;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import ch.luklanis.esscanlite.R;
 import ch.luklanis.esscan.paymentslip.DTAFileCreator;
@@ -38,14 +41,18 @@ import java.util.List;
 
 import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.SubMenu;
+import com.actionbarsherlock.widget.ShareActionProvider;
+import com.actionbarsherlock.widget.ShareActionProvider.OnShareTargetSelectedListener;
 
 public final class HistoryActivity extends SherlockListActivity {
 
 	private HistoryManager historyManager;
 	private HistoryItemAdapter adapter;
+	private ShareActionProvider mShareActionProvider;
+	private OnShareTargetSelectedListener shareTargetSelectedListener;
+	private int lastAlertId;
+	private CheckBox dontShowAgainCheckBox;
 
 	@Override
 	protected void onCreate(Bundle icicle) {
@@ -59,6 +66,19 @@ public final class HistoryActivity extends SherlockListActivity {
 		setListAdapter(adapter);
 		ListView listview = getListView();
 		registerForContextMenu(listview);
+
+		this.shareTargetSelectedListener = new OnShareTargetSelectedListener() {
+
+			@Override
+			public boolean onShareTargetSelected(ShareActionProvider source,
+					Intent intent) {
+				Uri dtaFile = getDTAFileUri();
+				if (dtaFile != null) {
+					intent.putExtra(Intent.EXTRA_STREAM, dtaFile);
+				}
+				return true;
+			}
+		};
 	}
 
 	@Override
@@ -71,6 +91,15 @@ public final class HistoryActivity extends SherlockListActivity {
 		}
 		if (adapter.isEmpty()) {
 			adapter.add(new HistoryItem(null));
+		}
+
+		DTAFileCreator dtaFileCreator = new DTAFileCreator(getApplicationContext());
+		int error = dtaFileCreator.getFirstErrorId();
+
+		if(error != 0){
+			setOptionalOKAlert(error);
+		} else {
+			setShareIntent(createShareIntent());
 		}
 	}
 
@@ -102,19 +131,16 @@ public final class HistoryActivity extends SherlockListActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		//    super.onCreateOptionsMenu(menu);
 		if (historyManager.hasHistoryItems()) {
-			MenuInflater inflater = getSupportMenuInflater();
-			inflater.inflate(R.menu.history_menu, menu);
-			//      menu.add(0, SEND_ID, 0, R.string.history_send).setIcon(android.R.drawable.ic_menu_share);
-			//      menu.add(0, CLEAR_ID, 0, R.string.history_clear_text).setIcon(android.R.drawable.ic_menu_delete);
-			SubMenu exportMenu = menu.addSubMenu(R.string.history_export);
-			exportMenu.add(0, R.id.history_menu_send_dta, 0, R.string.history_send_dta);
-			exportMenu.add(0, R.id.history_menu_send_csv, 0, R.string.history_send);
+			getSupportMenuInflater().inflate(R.menu.history_menu, menu);
 
-			MenuItem exportMenuItem = exportMenu.getItem();
-			exportMenuItem.setIcon(android.R.drawable.ic_menu_share);
-			exportMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+			// Locate MenuItem with ShareActionProvider
+			MenuItem item = menu.findItem(R.id.history_menu_send_dta);
+
+			// Fetch and store ShareActionProvider
+			mShareActionProvider = (ShareActionProvider) item.getActionProvider();
+
+			mShareActionProvider.setOnShareTargetSelectedListener(shareTargetSelectedListener);
 			return true;
 		}
 		return false;
@@ -161,45 +187,66 @@ public final class HistoryActivity extends SherlockListActivity {
 			builder.show();
 		}
 		break;
-		case R.id.history_menu_send_dta: {
-			List<HistoryItem> historyItems = historyManager.buildHistoryItemsForDTA();
-			DTAFileCreator dtaFileCreator = new DTAFileCreator(this);
-			String error = dtaFileCreator.getFirstError(historyItems);
-			String[] recipients = new String[]{PreferenceManager.getDefaultSharedPreferences(this)
-					.getString(PreferencesActivity.KEY_EMAIL_ADDRESS, "")};
-
-			if(error != ""){
-				setOKAlert(error);
-				break;
-			}
-
-			CharSequence dta = dtaFileCreator.buildDTA(historyItems);
-
-			Uri dtaFile = DTAFileCreator.saveDTAFile(dta.toString());
-			if (dtaFile == null) {
-				setOKAlert(R.string.msg_unmount_usb);
-			} else {
-				String dtaFileName = dtaFile.getLastPathSegment();
-
-				new HistoryExportUpdateAsyncTask(this.historyManager, dtaFileName)
-				.execute(historyItems.toArray(new HistoryItem[historyItems.size()]));
-
-				Intent intent = new Intent(Intent.ACTION_SEND, Uri.parse("mailto:"));
-				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-				intent.putExtra(Intent.EXTRA_EMAIL, recipients);
-				String subject = getResources().getString(R.string.history_email_as_dta_title);
-				intent.putExtra(Intent.EXTRA_SUBJECT, subject);
-				intent.putExtra(Intent.EXTRA_TEXT, subject);
-				intent.putExtra(Intent.EXTRA_STREAM, dtaFile);
-				intent.setType("text/plain");
-				startActivity(intent);
-			}
-		}
-		break;
+//		case R.id.history_menu_send_dta: {
+//			Uri dtaFile = getDTAFileUri();
+//			if (dtaFile != null) {
+//				Intent intent = createShareIntent();
+//				intent.putExtra(Intent.EXTRA_STREAM, dtaFile);
+//				startActivity(intent);
+//			}
+//		}
+//		break;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
 		return true;
+	}
+
+	private Uri getDTAFileUri() {
+		List<HistoryItem> historyItems = historyManager.buildHistoryItemsForDTA();
+		DTAFileCreator dtaFileCreator = new DTAFileCreator(getApplicationContext());
+		String error = dtaFileCreator.getFirstError(historyItems);
+
+		if(error != ""){
+			setOKAlert(error);
+			return null;
+		}
+
+		CharSequence dta = dtaFileCreator.buildDTA(historyItems);
+
+		Uri dtaFile = DTAFileCreator.saveDTAFile(dta.toString());
+		if (dtaFile == null) {
+			setOKAlert(R.string.msg_unmount_usb);
+			return null;
+		} else {
+			String dtaFileName = dtaFile.getLastPathSegment();
+
+			new HistoryExportUpdateAsyncTask(historyManager, dtaFileName)
+			.execute(historyItems.toArray(new HistoryItem[historyItems.size()]));
+
+			return dtaFile;
+		}
+	}
+
+	private Intent createShareIntent() {
+		Intent intent = new Intent(Intent.ACTION_SEND, Uri.parse("mailto:"));
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+		intent.setType("text/plain");
+		String[] recipients = new String[]{PreferenceManager.getDefaultSharedPreferences(this)
+				.getString(PreferencesActivity.KEY_EMAIL_ADDRESS, "")};
+		intent.putExtra(Intent.EXTRA_EMAIL, recipients);
+		String subject = getResources().getString(R.string.history_email_as_dta_title);
+		intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+		intent.putExtra(Intent.EXTRA_TEXT, subject);
+
+		return intent;
+	}
+
+	// Call to update the share intent
+	private void setShareIntent(Intent shareIntent) {
+		if (mShareActionProvider != null) {
+			mShareActionProvider.setShareIntent(shareIntent);
+		}
 	}
 
 	private void setOKAlert(String message){
@@ -207,6 +254,36 @@ public final class HistoryActivity extends SherlockListActivity {
 		builder.setMessage(message);
 		builder.setPositiveButton(R.string.button_ok, null);
 		builder.show();
+	}
+
+	private void setOptionalOKAlert(int id) {
+		int dontShow = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt(PreferencesActivity.KEY_NOT_SHOW_ALERT + String.valueOf(id), 0);
+
+		if (dontShow == 0) {
+			lastAlertId = id;
+
+			LayoutInflater inflater = getLayoutInflater();
+			final View checkboxLayout = inflater.inflate(R.layout.dont_show_again, null);
+			dontShowAgainCheckBox = (CheckBox)checkboxLayout.findViewById(R.id.dont_show_again_checkbox);
+			
+			AlertDialog.Builder builder = new AlertDialog.Builder(this)
+			.setTitle(R.string.alert_title_information)
+			.setMessage(lastAlertId)
+			.setView(checkboxLayout)
+			.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					if (dontShowAgainCheckBox.isChecked()){
+						Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+						editor.putInt(PreferencesActivity.KEY_NOT_SHOW_ALERT + String.valueOf(lastAlertId), 1);
+						editor.apply();
+					}
+				}
+			});
+
+			builder.show();
+		}
 	}
 
 	private void setOKAlert(int id){

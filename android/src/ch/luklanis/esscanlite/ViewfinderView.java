@@ -67,7 +67,6 @@ public final class ViewfinderView extends View {
   private final Paint paint;
   private final int maskColor;
   private final int frameColor;
-  private final int cornerColor;
   private OcrResultText resultText;
   private String[] words;
   private List<Rect> wordBoundingBoxes;
@@ -87,7 +86,6 @@ public final class ViewfinderView extends View {
     Resources resources = getResources();
     maskColor = resources.getColor(R.color.viewfinder_mask);
     frameColor = resources.getColor(R.color.viewfinder_frame);
-    cornerColor = resources.getColor(R.color.viewfinder_corners);
 
     //    bounds = new Rect();
     previewFrame = new Rect();

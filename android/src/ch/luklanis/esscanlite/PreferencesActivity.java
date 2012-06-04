@@ -58,6 +58,7 @@ OnSharedPreferenceChangeListener {
 
 	public static final String KEY_HELP_VERSION_SHOWN = "preferences_help_version_shown";
 	public static final String KEY_SHOW_OCR_RESULT_PREFERENCE = "preferences_show_ocr_result";
+	public static final String KEY_NOT_SHOW_ALERT = "preferences_not_show_alertid_";
 
 	//  private ListPreference listPreferenceSourceLanguage;
 	private EditTextPreference editTextPreferenceCharacterWhitelist;
@@ -163,7 +164,7 @@ OnSharedPreferenceChangeListener {
 		editTextPreferenceCharacterWhitelist.setSummary(sharedPreferences.getString(KEY_CHARACTER_WHITELIST, OcrCharacterHelper.getDefaultWhitelist("deu")));
 
 		// Set up a listener whenever a key changes
-		getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+		PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
 	}
 
 	/**
@@ -173,7 +174,7 @@ OnSharedPreferenceChangeListener {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+		PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
 	}
 
 	private void setOKAlert(int id){

@@ -30,7 +30,7 @@ import ch.luklanis.esscanlite.R;
 import ch.luklanis.esscanlite.PreferencesActivity;
 import ch.luklanis.esscanlite.history.HistoryItem;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Environment;
@@ -42,10 +42,10 @@ public class DTAFileCreator {
 	private static final String TAG = DTAFileCreator.class.getName();
 	private static final String NEWLINE_PATTERN = "[\\r\\n]+";
 	private static final String SPACE_PATTERN = "\\s";
-	private Activity activity;
+	private Context context;
 
-	public DTAFileCreator(Activity activity){
-		this.activity = activity;
+	public DTAFileCreator(Context context){
+		this.context = context;
 	}
 
 	/**
@@ -65,7 +65,7 @@ public class DTAFileCreator {
 		StringBuilder dtaText = new StringBuilder(1000);
 
 		String today = getDateFormated(new Date(System.currentTimeMillis()));
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
 		String iban = prefs.getString(PreferencesActivity.KEY_IBAN, "").replaceAll(SPACE_PATTERN, "");
 
@@ -306,38 +306,50 @@ public class DTAFileCreator {
 		return 0;
 	}
 
-	public String getFirstError(List<HistoryItem> historyItems){
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
+	public int getFirstErrorId() {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
 		String iban = prefs.getString(PreferencesActivity.KEY_IBAN, "").replaceAll("\\s", "");
 
 		if(iban == ""){
-			return activity.getResources().getString(R.string.msg_own_iban_is_not_set);
+			return R.string.msg_own_iban_is_not_set;
 		}
 
 		if(validateIBAN(iban) != 0){
-			return activity.getResources().getString(R.string.msg_own_iban_is_not_valid);
+			return R.string.msg_own_iban_is_not_valid;
 		}
 
 		String[] ownAddress = prefs.getString(PreferencesActivity.KEY_ADDRESS, "").split(NEWLINE_PATTERN);
 
 		if(ownAddress.length < 2){
-			return activity.getResources().getString(R.string.msg_own_address_is_not_set);
+			return R.string.msg_own_address_is_not_set;
 		}
 
-		List<HistoryItem> items = new ArrayList<HistoryItem>();
+		return 0;
+	}
 
-		for (HistoryItem historyItem : historyItems) {
-			if(historyItem.getResult().getCurrency() == "CHF"){
-				items.add(historyItem);
+	public String getFirstError(List<HistoryItem> historyItems){
+		int error = getFirstErrorId();
+
+		if(error != 0){
+			return context.getResources().getString(error);
+		}
+		
+		if (historyItems != null) {
+			List<HistoryItem> items = new ArrayList<HistoryItem>();
+	
+			for (HistoryItem historyItem : historyItems) {
+				if(historyItem.getResult().getCurrency() == "CHF"){
+					items.add(historyItem);
+				}
 			}
-		}
-
-		for (int i = 0; i < items.size(); i++) {
-			HistoryItem item = items.get(i);
-
-			if(nullToEmpty(item.getAmount()) == ""){
-				return String.format(activity.getResources().getString(R.string.msg_amount_is_empty), item.getResult().getAccount());
+	
+			for (int i = 0; i < items.size(); i++) {
+				HistoryItem item = items.get(i);
+	
+				if(nullToEmpty(item.getAmount()) == ""){
+					return String.format(context.getResources().getString(R.string.msg_amount_is_empty), item.getResult().getAccount());
+				}
 			}
 		}
 
@@ -353,7 +365,7 @@ public class DTAFileCreator {
 		Date now = new Date(System.currentTimeMillis());
 		SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd");
 
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		String day = prefs.getString(PreferencesActivity.KEY_EXECUTION_DAY, "26");
 
 		Calendar nowCalendar = Calendar.getInstance();

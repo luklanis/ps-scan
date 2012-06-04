@@ -201,8 +201,10 @@ public final class HistoryManager {
 					ID_COL_PROJECTION,
 					null, null, null, null,
 					DBHelper.HISTORY_TIMESTAMP_COL + " DESC");
-			cursor.move(number + 1);
-			db.delete(DBHelper.HISTORY_TABLE_NAME, DBHelper.ID_COL + '=' + cursor.getString(0), null);
+			
+			if (cursor.move(number + 1)) {
+				db.delete(DBHelper.HISTORY_TABLE_NAME, DBHelper.ID_COL + '=' + cursor.getString(0), null);
+			}
 		} finally {
 			close(cursor, db);
 		}
