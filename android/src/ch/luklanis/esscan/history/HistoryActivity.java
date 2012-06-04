@@ -18,14 +18,11 @@ package ch.luklanis.esscan.history;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -33,7 +30,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.ListView;
-import android.widget.TextView;
 import ch.luklanis.esscan.CaptureActivity;
 import ch.luklanis.esscan.Intents;
 import ch.luklanis.esscan.PreferencesActivity;
@@ -42,13 +38,9 @@ import ch.luklanis.esscan.paymentslip.DTAFileCreator;
 
 import java.util.List;
 
-import com.actionbarsherlock.ActionBarSherlock;
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.SubMenu;
 import com.actionbarsherlock.widget.ShareActionProvider;
 import com.actionbarsherlock.widget.ShareActionProvider.OnShareTargetSelectedListener;
 
@@ -138,13 +130,8 @@ public final class HistoryActivity extends SherlockListActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		//    super.onCreateOptionsMenu(menu);
 		if (historyManager.hasHistoryItems()) {
 			getSupportMenuInflater().inflate(R.menu.history_menu, menu);
-
-			//			SubMenu exportMenu = menu.addSubMenu(R.string.history_export);
-			//			exportMenu.add(0, R.id.history_menu_send_dta, 0, R.string.history_send_dta);
-			//			exportMenu.add(0, R.id.history_menu_send_csv, 0, R.string.history_send);
 
 			// Locate MenuItem with ShareActionProvider
 			MenuItem item = menu.findItem(R.id.history_menu_send_dta);
@@ -153,10 +140,6 @@ public final class HistoryActivity extends SherlockListActivity {
 			mShareActionProvider = (ShareActionProvider) item.getActionProvider();
 
 			mShareActionProvider.setOnShareTargetSelectedListener(shareTargetSelectedListener);
-
-			//			MenuItem exportMenuItem = exportMenu.getItem();
-			//			exportMenuItem.setIcon(android.R.drawable.ic_menu_share);
-			//			exportMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 			return true;
 		}
 		return false;
@@ -203,15 +186,15 @@ public final class HistoryActivity extends SherlockListActivity {
 			builder.show();
 		}
 		break;
-		case R.id.history_menu_send_dta: {
-			Uri dtaFile = getDTAFileUri();
-			if (dtaFile != null) {
-				Intent intent = createShareIntent();
-				intent.putExtra(Intent.EXTRA_STREAM, dtaFile);
-				startActivity(intent);
-			}
-		}
-		break;
+//		case R.id.history_menu_send_dta: {
+//			Uri dtaFile = getDTAFileUri();
+//			if (dtaFile != null) {
+//				Intent intent = createShareIntent();
+//				intent.putExtra(Intent.EXTRA_STREAM, dtaFile);
+//				startActivity(intent);
+//			}
+//		}
+//		break;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -281,9 +264,6 @@ public final class HistoryActivity extends SherlockListActivity {
 			LayoutInflater inflater = getLayoutInflater();
 			final View checkboxLayout = inflater.inflate(R.layout.dont_show_again, null);
 			dontShowAgainCheckBox = (CheckBox)checkboxLayout.findViewById(R.id.dont_show_again_checkbox);
-
-//			TextView tv = (TextView)checkboxLayout.findViewById(R.id.dont_show_again_message);
-//			tv.setText(lastAlertId);
 			
 			AlertDialog.Builder builder = new AlertDialog.Builder(this)
 			.setTitle(R.string.alert_title_information)
