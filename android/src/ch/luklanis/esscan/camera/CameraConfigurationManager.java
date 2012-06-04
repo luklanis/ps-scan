@@ -30,7 +30,6 @@ import android.view.Display;
 import android.view.SurfaceView;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
-import android.widget.RelativeLayout;
 
 import ch.luklanis.esscan.PreferencesActivity;
 import ch.luklanis.esscan.R;
@@ -104,6 +103,10 @@ final class CameraConfigurationManager {
 		// so we had to take notice of it in offset calculation
 		ViewfinderView viewfinderView = (ViewfinderView) activity.findViewById(R.id.viewfinder_view);
 		this.heightDiff = height - viewfinderView.getHeight();
+		
+		if (height != cameraResolution.y) {
+			this.heightDiff += (cameraResolution.y - height) / 2;
+		}
 
 		previewResolution = new Point(width, height);
 		Log.i(TAG, "Preview resolution: " + previewResolution);
