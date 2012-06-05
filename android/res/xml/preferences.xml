@@ -95,6 +95,12 @@
             android:defaultValue="false"
             android:key="preferences_show_ocr_result"
             android:title="@string/preferences_show_ocr_result_title" />
+            
+        <CheckBoxPreference
+            android:key="preferences_enable_stream_mode"
+            android:defaultValue="false"
+            android:title="@string/preferences_enable_stream_mode_title"
+            android:summary="@string/preferences_enable_stream_mode_summary" />
     </PreferenceCategory>
 
 </PreferenceScreen>

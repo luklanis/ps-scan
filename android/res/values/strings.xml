@@ -76,6 +76,8 @@
   <string name="preferences_show_ocr_result_title">Show OCR result</string>
   <string name="preferences_email_address_title">Default email address</string>
   <string name="preferences_email_address_summary"></string>
+  <string name="preferences_enable_stream_mode_title">Enable stream mode</string>
+  <string name="preferences_enable_stream_mode_summary">Sends the recognized code row to the browser plugin</string>
   <string name="help_button_done">Done</string>
   <string name="help_button_back">Back</string>
 </resources>

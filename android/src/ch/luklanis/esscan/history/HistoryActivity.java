@@ -20,7 +20,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -274,9 +273,10 @@ public final class HistoryActivity extends SherlockListActivity {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					if (dontShowAgainCheckBox.isChecked()){
-						Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
-						editor.putInt(PreferencesActivity.KEY_NOT_SHOW_ALERT + String.valueOf(lastAlertId), 1);
-						editor.apply();
+						PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+						.edit()
+						.putInt(PreferencesActivity.KEY_NOT_SHOW_ALERT + String.valueOf(lastAlertId), 1)
+						.apply();
 					}
 				}
 			});
