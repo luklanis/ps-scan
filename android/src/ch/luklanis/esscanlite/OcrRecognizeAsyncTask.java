@@ -38,13 +38,6 @@ import android.util.Log;
  * success/failure message.
  */
 final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
-
-//  private static final boolean PERFORM_EDGE_THRESHOLDING = false; 
-//  private static final boolean PERFORM_FISHER_THRESHOLDING = false; 
-//  private static final boolean PERFORM_OTSU_THRESHOLDING = false; 
-//  private static final boolean PERFORM_SOBEL_THRESHOLDING = false; 
-  
-//  private static final boolean PERFORM_PSEUDOTRANSLATION = false;
   
   private CaptureActivity activity;
   private TessBaseAPI baseApi;
@@ -80,38 +73,18 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
     end = start;
     
     try {
-//      if (PERFORM_EDGE_THRESHOLDING) {
-//        Pix thresholdedImage = Thresholder.edgeAdaptiveThreshold(ReadFile.readBitmap(bitmap), 32, 64, 32, 1);
-//        Log.e("OcrRecognizeAsyncTask", "thresholding completed. converting to bmp. size:" + bitmap.getWidth() + "x" + bitmap.getHeight());
-//        bitmap = WriteFile.writeBitmap(thresholdedImage);
-//      }
-//      if (PERFORM_FISHER_THRESHOLDING) {
-//        Pix thresholdedImage = Thresholder.fisherAdaptiveThreshold(ReadFile.readBitmap(bitmap), 48, 48, 0.1F, 2.5F);
-//        Log.e("OcrRecognizeAsyncTask", "thresholding completed. converting to bmp. size:" + bitmap.getWidth() + "x" + bitmap.getHeight());
-//        bitmap = WriteFile.writeBitmap(thresholdedImage);
-//      }
-//      if (PERFORM_OTSU_THRESHOLDING) {
-//        Pix thresholdedImage = Binarize.otsuAdaptiveThreshold(ReadFile.readBitmap(bitmap), 64, 64, 2, 2, 0.1F);
-//        Log.e("OcrRecognizeAsyncTask", "thresholding completed. converting to bmp. size:" + bitmap.getWidth() + "x" + bitmap.getHeight());
-//        bitmap = WriteFile.writeBitmap(thresholdedImage);
-//      }
-//      if (PERFORM_SOBEL_THRESHOLDING) {
-//        Pix thresholdedImage = Thresholder.sobelEdgeThreshold(ReadFile.readBitmap(bitmap), 64);
-//        Log.e("OcrRecognizeAsyncTask", "thresholding completed. converting to bmp. size:" + bitmap.getWidth() + "x" + bitmap.getHeight());
-//        bitmap = WriteFile.writeBitmap(thresholdedImage);
-//      }
-      Log.i("OcrRecognizeAsyncTask", "converted to bitmap. doing setImage()...");
+      // Log.i("OcrRecognizeAsyncTask", "converted to bitmap. doing setImage()...");
       baseApi.setImage(bitmap);
       
-      Log.i("OcrRecognizeAsyncTask", "setImage() completed");
+      // Log.i("OcrRecognizeAsyncTask", "setImage() completed");
       textResult = baseApi.getUTF8Text();
-      Log.i("OcrRecognizeAsyncTask", "getUTF8Text() completed");
+      // Log.i("OcrRecognizeAsyncTask", "getUTF8Text() completed");
       wordConfidences = baseApi.wordConfidences();
       overallConf = baseApi.meanConfidence();
       end = System.currentTimeMillis();
     } catch (RuntimeException e) {
-      Log.e("OcrRecognizeAsyncTask", "Caught RuntimeException in request to Tesseract. Setting state to CONTINUOUS_STOPPED.");
-      e.printStackTrace();
+      Log.e("OcrRecognizeAsyncTask", "Caught RuntimeException in request to Tesseract. Setting state to CONTINUOUS_STOPPED.", e);
+      
       try {
         baseApi.clear();
         activity.stopHandler();
@@ -135,20 +108,11 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
     
     PsValidation validation = activity.getValidation();
     
-//    String relatedText = "";
-    
     while(validation.validate(textResult)){
     	if(!validation.nextStep()){
     		break;
     	}
     }
-    
-//    if(!validation.finished()){
-//    	relatedText = validation.getRelatedText();
-//    }
-//    
-//	textResult = validation.getCompleteCode() + relatedText;
-    //textResult = validation.getCompleteCode();
       
     ocrResult = new OcrResult(bitmap, textResult, wordConfidences, overallConf, characterBoxes, 
         textlineBoxes, wordBoxes, regionBoxes, (end - start));
