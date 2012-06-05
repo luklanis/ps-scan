@@ -20,7 +20,6 @@ package ch.luklanis.esscan.history;
 import ch.luklanis.esscan.paymentslip.EsrResult;
 
 import android.app.Activity;
-import android.content.ClipData.Item;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;

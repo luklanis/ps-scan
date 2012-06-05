@@ -31,8 +31,8 @@ import android.view.SurfaceView;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 
-import ch.luklanis.esscan.PreferencesActivity;
 import ch.luklanis.esscan.R;
+import ch.luklanis.esscan.PreferencesActivity;
 import ch.luklanis.esscan.ViewfinderView;
 
 import java.util.Collection;
@@ -68,8 +68,8 @@ final class CameraConfigurationManager {
 		WindowManager manager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
 
 		SurfaceView previewView = (SurfaceView) activity.findViewById(R.id.preview_view);
-		int width = previewView.getWidth();
-		int height = previewView.getHeight();
+		int previewWidth = previewView.getWidth();
+		int previewHeight = previewView.getHeight();
 
 		Display display = manager.getDefaultDisplay();
 		int screenWidth = display.getWidth();
@@ -83,32 +83,40 @@ final class CameraConfigurationManager {
 			screenHeight = temp;
 		}
 
-		if (width < height) {
+		// Camera surface has the same height as the screen. Because of
+		// the Notification- and ActionBar preview's height is less than screen's
+		// so we had to take notice of it in offset calculation
+		this.heightDiff = screenHeight - previewHeight;
+
+		if (previewWidth < previewHeight) {
 			Log.i(TAG, "Display reports portrait orientation; assuming this is incorrect");
-			height = (screenHeight - (screenWidth - height));
-			width = screenWidth;
+			previewWidth = screenWidth;
+			
+			this.heightDiff = screenWidth - previewHeight;
+			previewHeight = (screenHeight - (screenWidth - previewHeight));
 		}
 
 		Point screenResolution = new Point(screenWidth, screenHeight);
 
 		cameraResolution = findBestPreviewSizeValue(parameters, screenResolution, false);
 
-		height = screenResolution.y;
 		LayoutParams params = previewView.getLayoutParams();
-		params.height = height;
+		params.height = screenHeight;
 		previewView.setLayoutParams(params);
-
-		// Camera surface has the same height as the screen. Because of
-		// the Notification- and ActionBar preview's height is less than screen's
-		// so we had to take notice of it in offset calculation
-		ViewfinderView viewfinderView = (ViewfinderView) activity.findViewById(R.id.viewfinder_view);
-		this.heightDiff = height - viewfinderView.getHeight();
 		
-		if (height != cameraResolution.y) {
-			this.heightDiff += (cameraResolution.y - height) / 2;
+		previewHeight = screenHeight;
+		
+		int cameraHeight = cameraResolution.y;
+		
+		if (cameraHeight > cameraResolution.x) {
+			cameraHeight = cameraResolution.x;
+		}
+		
+		if (screenHeight != cameraHeight) {
+			this.heightDiff += (cameraResolution.y - screenHeight) / 2;
 		}
 
-		previewResolution = new Point(width, height);
+		previewResolution = new Point(previewWidth, previewHeight);
 		Log.i(TAG, "Preview resolution: " + previewResolution);
 
 		Log.i(TAG, "Camera resolution: " + cameraResolution);
