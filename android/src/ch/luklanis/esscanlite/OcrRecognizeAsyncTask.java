@@ -23,8 +23,6 @@ import ch.luklanis.esscan.paymentslip.PsValidation;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
 
-//import ch.luklanis.esscan.language.PseudoTranslator;
-
 import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.graphics.Rect;

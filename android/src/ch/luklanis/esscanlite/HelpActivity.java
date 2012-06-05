@@ -129,7 +129,7 @@ public final class HelpActivity extends SherlockActivity {
 					webView.loadUrl(BASE_URL + "/" + page);
 				}
 				
-				if(page.equals(WHATS_NEW_PAGE) || page.equals(ABOUT_PAGE)) {
+				if(page.equals(WHATS_NEW_PAGE) || page.equals(ABOUT_PAGE) || page.equals(DEFAULT_PAGE)) {
 //					backButton.setEnabled(false);
 					backButton.setVisibility(View.GONE);
 				}
