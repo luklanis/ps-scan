@@ -84,7 +84,7 @@
             </intent-filter>
         </activity>
         
-        <service android:name="ESRSender" />
+        <service android:name=".codesend.ESRSender" android:label="Code row send service"></service>
     </application>
 
 </manifest>

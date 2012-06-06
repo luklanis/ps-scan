@@ -9,9 +9,11 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.util.Log;
 
 public class AcceptSocketsAsync extends AsyncTask<String, Integer, Boolean> {
 
+	private static final String TAG = AcceptSocketsAsync.class.getPackage().getName() + "." + AcceptSocketsAsync.class.getName();
 	private Context context;
 	private int port;
 
@@ -21,6 +23,8 @@ public class AcceptSocketsAsync extends AsyncTask<String, Integer, Boolean> {
 	public AcceptSocketsAsync(Context context, int port){
 		this.context = context;
 		this.port = port;
+		
+		this.sockets = new ArrayList<Socket>();
 	}
 
 	public ArrayList<Socket> getAcceptedSockets() {
@@ -32,9 +36,10 @@ public class AcceptSocketsAsync extends AsyncTask<String, Integer, Boolean> {
 		ConnectivityManager connManager = (ConnectivityManager) this.context.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo info = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
-		if (!info.isConnected()) {
-			return false;
-		}
+//		if (!info.isConnected()) {
+//			Log.w(TAG, "Wifi is not connected!");
+//			return false;
+//		}
 
 		try {
 			this.server = new ServerSocket(port);
@@ -46,8 +51,7 @@ public class AcceptSocketsAsync extends AsyncTask<String, Integer, Boolean> {
 
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log.e(TAG, "Open a server socket failed!", e);
 		}
 
 		return true;

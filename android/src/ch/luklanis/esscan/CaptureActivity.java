@@ -791,6 +791,12 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	boolean showResult(HistoryItem historyItem) {
 		lastItem = historyItem;
 
+		if(handler != null)
+		{
+			handler.stop();
+			isPaused = true;
+		}
+
 		try {
 			// Test whether the result is null
 			lastItem.getResult().getCompleteCode();
@@ -802,13 +808,16 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			return false;
 		}
 
-		if(handler != null)
-		{
-			handler.stop();
-			isPaused = true;
-		}
-
 		EsrResult result = historyItem.getResult();
+		
+		if(enableStreamMode && this.serviceIsBound) {
+			this.mBoundService.sendToListeners(result.getCompleteCode());
+			
+			psValidation.gotoBeginning();
+			this.lastValidationStep = psValidation.getCurrentStep();
+			resumeContinuousDecoding();
+			return true;
+		}
 
 		// Turn off capture-related UI elements
 		statusViewBottom.setVisibility(View.GONE);
