@@ -48,9 +48,10 @@ public final class HistoryActivity extends SherlockListActivity {
 	private HistoryManager historyManager;
 	private HistoryItemAdapter adapter;
 	private ShareActionProvider mShareActionProvider;
-	private OnShareTargetSelectedListener shareTargetSelectedListener;
 	private int lastAlertId;
 	private CheckBox dontShowAgainCheckBox;
+	private boolean exportDTAPossible;
+	private DTAFileCreator dtaFileCreator;
 
 	@Override
 	protected void onCreate(Bundle icicle) {
@@ -65,18 +66,7 @@ public final class HistoryActivity extends SherlockListActivity {
 		ListView listview = getListView();
 		registerForContextMenu(listview);
 
-		this.shareTargetSelectedListener = new OnShareTargetSelectedListener() {
-
-			@Override
-			public boolean onShareTargetSelected(ShareActionProvider source,
-					Intent intent) {
-				Uri dtaFile = getDTAFileUri();
-				if (dtaFile != null) {
-					intent.putExtra(Intent.EXTRA_STREAM, dtaFile);
-				}
-				return true;
-			}
-		};
+		this.dtaFileCreator = new DTAFileCreator(getApplicationContext());
 	}
 
 	@Override
@@ -90,14 +80,14 @@ public final class HistoryActivity extends SherlockListActivity {
 		if (adapter.isEmpty()) {
 			adapter.add(new HistoryItem(null));
 		}
-
-		DTAFileCreator dtaFileCreator = new DTAFileCreator(getApplicationContext());
+		
 		int error = dtaFileCreator.getFirstErrorId();
 
 		if(error != 0){
+			this.exportDTAPossible = false;
 			setOptionalOKAlert(error);
 		} else {
-			setShareIntent(createShareIntent());
+			this.exportDTAPossible = true;
 		}
 	}
 
@@ -135,10 +125,27 @@ public final class HistoryActivity extends SherlockListActivity {
 			// Locate MenuItem with ShareActionProvider
 			MenuItem item = menu.findItem(R.id.history_menu_send_dta);
 
-			// Fetch and store ShareActionProvider
-			mShareActionProvider = (ShareActionProvider) item.getActionProvider();
+			if(this.exportDTAPossible) {
+				// Fetch and store ShareActionProvider
+				mShareActionProvider = (ShareActionProvider) item.getActionProvider();
 
-			mShareActionProvider.setOnShareTargetSelectedListener(shareTargetSelectedListener);
+				mShareActionProvider.setOnShareTargetSelectedListener(new OnShareTargetSelectedListener() {
+
+					@Override
+					public boolean onShareTargetSelected(ShareActionProvider source,
+							Intent intent) {
+						if(createDTAFile()) {
+						startActivity(intent);
+						}
+						return true;
+					}
+				});
+				
+				setShareIntent(createShareIntent());
+			} else {
+				item.setVisible(false);
+			}
+			
 			return true;
 		}
 		return false;
@@ -185,44 +192,42 @@ public final class HistoryActivity extends SherlockListActivity {
 			builder.show();
 		}
 		break;
-//		case R.id.history_menu_send_dta: {
-//			Uri dtaFile = getDTAFileUri();
-//			if (dtaFile != null) {
-//				Intent intent = createShareIntent();
-//				intent.putExtra(Intent.EXTRA_STREAM, dtaFile);
-//				startActivity(intent);
-//			}
-//		}
-//		break;
+		//		case R.id.history_menu_send_dta: {
+		//			Uri dtaFile = getDTAFileUri();
+		//			if (dtaFile != null) {
+		//				Intent intent = createShareIntent();
+		//				intent.putExtra(Intent.EXTRA_STREAM, dtaFile);
+		//				startActivity(intent);
+		//			}
+		//		}
+		//		break;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
 		return true;
 	}
 
-	private Uri getDTAFileUri() {
+	private boolean createDTAFile() {
 		List<HistoryItem> historyItems = historyManager.buildHistoryItemsForDTA();
-		DTAFileCreator dtaFileCreator = new DTAFileCreator(getApplicationContext());
 		String error = dtaFileCreator.getFirstError(historyItems);
 
 		if(error != ""){
 			setOKAlert(error);
-			return null;
+			return false;
 		}
 
 		CharSequence dta = dtaFileCreator.buildDTA(historyItems);
 
-		Uri dtaFile = DTAFileCreator.saveDTAFile(dta.toString());
-		if (dtaFile == null) {
+		if (!dtaFileCreator.saveDTAFile(dta.toString())) {
 			setOKAlert(R.string.msg_unmount_usb);
-			return null;
+			return false;
 		} else {
-			String dtaFileName = dtaFile.getLastPathSegment();
+			String dtaFileName = dtaFileCreator.getDTAFileUri().getLastPathSegment();
 
 			new HistoryExportUpdateAsyncTask(historyManager, dtaFileName)
 			.execute(historyItems.toArray(new HistoryItem[historyItems.size()]));
 
-			return dtaFile;
+			return true;
 		}
 	}
 
@@ -236,6 +241,8 @@ public final class HistoryActivity extends SherlockListActivity {
 		String subject = getResources().getString(R.string.history_email_as_dta_title);
 		intent.putExtra(Intent.EXTRA_SUBJECT, subject);
 		intent.putExtra(Intent.EXTRA_TEXT, subject);
+		
+		intent.putExtra(Intent.EXTRA_STREAM, this.dtaFileCreator.getDTAFileUri());
 
 		return intent;
 	}
@@ -263,7 +270,7 @@ public final class HistoryActivity extends SherlockListActivity {
 			LayoutInflater inflater = getLayoutInflater();
 			final View checkboxLayout = inflater.inflate(R.layout.dont_show_again, null);
 			dontShowAgainCheckBox = (CheckBox)checkboxLayout.findViewById(R.id.dont_show_again_checkbox);
-			
+
 			AlertDialog.Builder builder = new AlertDialog.Builder(this)
 			.setTitle(R.string.alert_title_information)
 			.setMessage(lastAlertId)
