@@ -43,9 +43,22 @@ public class DTAFileCreator {
 	private static final String NEWLINE_PATTERN = "[\\r\\n]+";
 	private static final String SPACE_PATTERN = "\\s";
 	private Context context;
+	private String fileName;
+	private File historyFile;
+	private File historyRoot;
 
 	public DTAFileCreator(Context context){
 		this.context = context;
+
+		File bsRoot = new File(Environment.getExternalStorageDirectory(), "ESRScan");
+		
+		historyRoot = new File(bsRoot, "DTA");
+		fileName = "DTA-" + System.currentTimeMillis() + ".001";
+		historyFile = new File(historyRoot, fileName);
+	}
+	
+	public Uri getDTAFileUri() {
+		return Uri.parse("file://" + historyFile.getAbsolutePath());
 	}
 
 	/**
@@ -203,23 +216,20 @@ public class DTAFileCreator {
 		return dtaText;
 	}
 
-	public static Uri saveDTAFile(String dta) {
-		File bsRoot = new File(Environment.getExternalStorageDirectory(), "ESRScan");
-		File historyRoot = new File(bsRoot, "DTA");
+	public boolean saveDTAFile(String dta) {
 		if (!historyRoot.exists() && !historyRoot.mkdirs()) {
 			Log.w(TAG, "Couldn't make dir " + historyRoot);
-			return null;
+			return false;
 		}
-		String fileName = "DTA-" + System.currentTimeMillis() + ".001";
-		File historyFile = new File(historyRoot, fileName);
+		
 		OutputStreamWriter out = null;
 		try {
 			out = new OutputStreamWriter(new FileOutputStream(historyFile), Charset.forName("ISO-8859-1"));
 			out.write(dta);
-			return Uri.parse("file://" + historyFile.getAbsolutePath());
+			return true;
 		} catch (IOException ioe) {
 			Log.w(TAG, "Couldn't access file " + historyFile + " due to " + ioe);
-			return null;
+			return false;
 		} finally {
 			if (out != null) {
 				try {

@@ -42,7 +42,6 @@
         android:required="false" />
 
     <uses-permission android:name="android.permission.CAMERA" />
-    <!-- <uses-permission android:name="android.permission.INTERNET" /> -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
@@ -81,6 +80,8 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        
+        <service android:name=".codesend.ESRSender" android:label="Code row send service"></service>
     </application>
 
 </manifest>

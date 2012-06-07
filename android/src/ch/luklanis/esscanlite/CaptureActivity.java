@@ -26,7 +26,6 @@ import com.actionbarsherlock.view.MenuItem;
 import com.googlecode.tesseract.android.TessBaseAPI;
 
 import ch.luklanis.esscan.camera.CameraManager;
-import ch.luklanis.esscanlite.R;
 import ch.luklanis.esscan.language.LanguageCodeHelper;
 import ch.luklanis.esscan.paymentslip.DTAFileCreator;
 import ch.luklanis.esscan.paymentslip.EsrResult;
@@ -123,11 +122,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	/** Length of time before the next autofocus request, if the last request failed. Used in CaptureActivityHandler. */
 	static final long AUTOFOCUS_FAILURE_INTERVAL_MS = 1000L;
 
-	// Options menu, for copy to clipboard
-	private static final int OPTIONS_COPY_RECOGNIZED_TEXT_ID = Menu.FIRST;
-
-	private static final int OPTIONS_SHARE_RECOGNIZED_TEXT_ID = Menu.FIRST + 1;
-
 	public static final int HISTORY_REQUEST_CODE = 0x0000bacc;
 
 	private CameraManager cameraManager;
@@ -176,7 +170,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	public PsValidation getValidation(){
 		return psValidation;
 	}
-	
+
 	private final Button.OnClickListener resultCopyListener = new Button.OnClickListener() {
 		@Override
 		public void onClick(View v) {
@@ -192,7 +186,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			}
 		}
 	};
-	
+
 	private final Button.OnClickListener exportAgainListener = new Button.OnClickListener() {
 		@Override
 		public void onClick(View v) {
@@ -214,7 +208,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			builder.show();
 		}
 	};
-	
+
 	private final Button.OnClickListener saveListener = new Button.OnClickListener() {
 		public void onClick(View v) {
 			boolean somethingSaved = false;
@@ -277,7 +271,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			}
 		}
 	};
-	
+
 	private final Button.OnClickListener addressChangeListener = new Button.OnClickListener() {
 		@Override
 		public void onClick(View v) {
@@ -295,19 +289,19 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		// requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
 		setContentView(R.layout.capture);
-		
+
 		//Load partially transparent black background
-//        getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.ab_bg_black));  
-		
+		//        getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.ab_bg_black));  
+
 		// Hide Icon in ActionBar
 		getSupportActionBar().setDisplayShowHomeEnabled(false);
-		
+
 		showOcrResult = false;
-		
+
 		hasSurface = false;
 		historyManager = new HistoryManager(this);
-	    historyManager.trimHistory();
-	    
+		historyManager.trimHistory();
+
 		beepManager = new BeepManager(this);
 
 		Button resultCopy = (Button)findViewById(R.id.button_copy_code_row);
@@ -321,8 +315,8 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 		Button amountSaveButton = (Button) findViewById(R.id.button_result_save);
 		amountSaveButton.setOnClickListener(saveListener);
-
-		showHelpOnFirstLaunch();
+		
+		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 	}
 
 	@Override
@@ -333,7 +327,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 		viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_view);
 		viewfinderView.setCameraManager(cameraManager);
-		
+
 		resultView = findViewById(R.id.result_view);
 		statusViewTop = findViewById(R.id.status_view_top);
 
@@ -351,7 +345,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		handler = null;
 
 		retrievePreferences();
-		
+
 		resetStatusView();
 		psValidation.gotoBeginning();
 		this.lastValidationStep = psValidation.getCurrentStep();
@@ -498,6 +492,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		if (baseApi != null) {
 			baseApi.end();
 		}
+		
 		super.onDestroy();
 	}
 
@@ -528,7 +523,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 				return true;
 			}
 		} 
-		
+
 		return super.onKeyDown(keyCode, event);
 	}
 
@@ -730,6 +725,12 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	boolean showResult(HistoryItem historyItem) {
 		lastItem = historyItem;
 
+		if(handler != null)
+		{
+			handler.stop();
+			isPaused = true;
+		}
+
 		try {
 			// Test whether the result is null
 			lastItem.getResult().getCompleteCode();
@@ -739,12 +740,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			toast.show();
 			resumeContinuousDecoding();
 			return false;
-		}
-
-		if(handler != null)
-		{
-			handler.stop();
-			isPaused = true;
 		}
 
 		EsrResult result = historyItem.getResult();
@@ -853,7 +848,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 					lastItem.setAddress(address);
 					lastItem.setAddressNumber(which);
 					addressEditText.setText(lastItem.getAddress());
-					
+
 					Toast toast = Toast.makeText(CaptureActivity.this, R.string.msg_saved, Toast.LENGTH_SHORT);
 					toast.setGravity(Gravity.BOTTOM, 0, 0);
 					toast.show();
@@ -885,7 +880,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 				ocrResult.getWordBoundingBoxes(),
 				ocrResult.getTextlineBoundingBoxes(),
 				ocrResult.getRegionBoundingBoxes()));
-		
+
 		statusViewBottom.setText(ocrResult.getText());
 
 		if(this.psValidation.getCurrentStep() != this.lastValidationStep){
@@ -931,7 +926,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			SpannableStringBuilder ssb = new SpannableStringBuilder(text);
 			for (CharacterStyle c : cs)
 				ssb.setSpan(c, start, end, 0);
-					text = ssb;
+			text = ssb;
 		}
 		return text;
 	}
@@ -944,9 +939,9 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 		refreshStatusView();
 		statusViewTop.setVisibility(View.VISIBLE);
-		
+
 		statusViewBottom.setText("");
-		
+
 		if (showOcrResult) {
 			statusViewBottom.setVisibility(View.VISIBLE);
 		}
@@ -1047,8 +1042,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	 * Gets values from shared preferences and sets the corresponding data members in this activity.
 	 */
 	private void retrievePreferences() {
-		prefs = PreferenceManager.getDefaultSharedPreferences(this);
-
 		// Retrieve from preferences, and set in this Activity, the language preferences
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		setSourceLanguage(prefs.getString(PreferencesActivity.KEY_SOURCE_LANGUAGE_PREFERENCE, "deu"));
@@ -1058,22 +1051,10 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		characterWhitelist = OcrCharacterHelper.getWhitelist(prefs, sourceLanguageCodeOcr);
 
 		prefs.registerOnSharedPreferenceChangeListener(listener);
-		
+
 		showOcrResult = prefs.getBoolean(PreferencesActivity.KEY_SHOW_OCR_RESULT_PREFERENCE, false);
 
 		beepManager.updatePrefs();
-	}
-
-	/**
-	 * Sets default values for preferences. To be called the first time this app is run.
-	 */
-	private void setDefaultPreferences() {
-		prefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-		// Character whitelist
-		prefs.edit().putString(PreferencesActivity.KEY_CHARACTER_WHITELIST, 
-				OcrCharacterHelper.getDefaultWhitelist(
-						prefs.getString(PreferencesActivity.KEY_SOURCE_LANGUAGE_PREFERENCE, "deu"))).commit();
 	}
 
 	/**

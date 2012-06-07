@@ -1,5 +1,7 @@
 .settings
 .svn
+*~
+.orig
 ant.properties
 local.properties
 orig-build.xml

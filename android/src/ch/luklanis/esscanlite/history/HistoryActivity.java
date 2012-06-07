@@ -21,16 +21,17 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.ContextMenu;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.ListView;
+import android.widget.Toast;
 import ch.luklanis.esscanlite.R;
 import ch.luklanis.esscan.paymentslip.DTAFileCreator;
 import ch.luklanis.esscanlite.CaptureActivity;
@@ -50,9 +51,9 @@ public final class HistoryActivity extends SherlockListActivity {
 	private HistoryManager historyManager;
 	private HistoryItemAdapter adapter;
 	private ShareActionProvider mShareActionProvider;
-	private OnShareTargetSelectedListener shareTargetSelectedListener;
 	private int lastAlertId;
 	private CheckBox dontShowAgainCheckBox;
+	private DTAFileCreator dtaFileCreator;
 
 	@Override
 	protected void onCreate(Bundle icicle) {
@@ -67,18 +68,7 @@ public final class HistoryActivity extends SherlockListActivity {
 		ListView listview = getListView();
 		registerForContextMenu(listview);
 
-		this.shareTargetSelectedListener = new OnShareTargetSelectedListener() {
-
-			@Override
-			public boolean onShareTargetSelected(ShareActionProvider source,
-					Intent intent) {
-				Uri dtaFile = getDTAFileUri();
-				if (dtaFile != null) {
-					intent.putExtra(Intent.EXTRA_STREAM, dtaFile);
-				}
-				return true;
-			}
-		};
+		this.dtaFileCreator = new DTAFileCreator(getApplicationContext());
 	}
 
 	@Override
@@ -93,13 +83,11 @@ public final class HistoryActivity extends SherlockListActivity {
 			adapter.add(new HistoryItem(null));
 		}
 
-		DTAFileCreator dtaFileCreator = new DTAFileCreator(getApplicationContext());
 		int error = dtaFileCreator.getFirstErrorId();
 
 		if(error != 0){
 			setOptionalOKAlert(error);
 		} else {
-			setShareIntent(createShareIntent());
 		}
 	}
 
@@ -137,10 +125,29 @@ public final class HistoryActivity extends SherlockListActivity {
 			// Locate MenuItem with ShareActionProvider
 			MenuItem item = menu.findItem(R.id.history_menu_send_dta);
 
-			// Fetch and store ShareActionProvider
-			mShareActionProvider = (ShareActionProvider) item.getActionProvider();
+			if(dtaFileCreator.getFirstErrorId() == 0) {
+				// Fetch and store ShareActionProvider
+				mShareActionProvider = (ShareActionProvider) item.getActionProvider();
 
-			mShareActionProvider.setOnShareTargetSelectedListener(shareTargetSelectedListener);
+				mShareActionProvider.setOnShareTargetSelectedListener(new OnShareTargetSelectedListener() {
+
+					@Override
+					public boolean onShareTargetSelected(ShareActionProvider source,
+							Intent intent) {
+						if(createDTAFile()) {
+							startActivity(intent);
+							return true;
+						} else {
+							return false;
+						}
+					}
+				});
+
+				setShareIntent(createShareIntent());
+			} else {
+				item.setVisible(false);
+			}
+
 			return true;
 		}
 		return false;
@@ -187,44 +194,52 @@ public final class HistoryActivity extends SherlockListActivity {
 			builder.show();
 		}
 		break;
-//		case R.id.history_menu_send_dta: {
-//			Uri dtaFile = getDTAFileUri();
-//			if (dtaFile != null) {
-//				Intent intent = createShareIntent();
-//				intent.putExtra(Intent.EXTRA_STREAM, dtaFile);
-//				startActivity(intent);
-//			}
-//		}
-//		break;
+		//		case R.id.history_menu_send_dta: {
+		//			Uri dtaFile = getDTAFileUri();
+		//			if (dtaFile != null) {
+		//				Intent intent = createShareIntent();
+		//				intent.putExtra(Intent.EXTRA_STREAM, dtaFile);
+		//				startActivity(intent);
+		//			}
+		//		}
+		//		break;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
 		return true;
 	}
 
-	private Uri getDTAFileUri() {
+	private boolean createDTAFile() {
 		List<HistoryItem> historyItems = historyManager.buildHistoryItemsForDTA();
-		DTAFileCreator dtaFileCreator = new DTAFileCreator(getApplicationContext());
 		String error = dtaFileCreator.getFirstError(historyItems);
 
 		if(error != ""){
 			setOKAlert(error);
-			return null;
+			return false;
 		}
 
 		CharSequence dta = dtaFileCreator.buildDTA(historyItems);
 
-		Uri dtaFile = DTAFileCreator.saveDTAFile(dta.toString());
-		if (dtaFile == null) {
+		if (!dtaFileCreator.saveDTAFile(dta.toString())) {
 			setOKAlert(R.string.msg_unmount_usb);
-			return null;
+			return false;
 		} else {
-			String dtaFileName = dtaFile.getLastPathSegment();
+			Uri dtaFileUri = dtaFileCreator.getDTAFileUri();
+			String dtaFileName = dtaFileUri.getLastPathSegment();
 
 			new HistoryExportUpdateAsyncTask(historyManager, dtaFileName)
 			.execute(historyItems.toArray(new HistoryItem[historyItems.size()]));
+			
+			this.dtaFileCreator = new DTAFileCreator(getApplicationContext());
+			
+			Toast toast = Toast.makeText(this, 
+					String.format(getResources().getString(R.string.msg_dta_saved), 
+							dtaFileUri.getPath()), 
+							Toast.LENGTH_LONG);
+			toast.setGravity(Gravity.BOTTOM, 0, 0);
+			toast.show();
 
-			return dtaFile;
+			return true;
 		}
 	}
 
@@ -238,6 +253,8 @@ public final class HistoryActivity extends SherlockListActivity {
 		String subject = getResources().getString(R.string.history_email_as_dta_title);
 		intent.putExtra(Intent.EXTRA_SUBJECT, subject);
 		intent.putExtra(Intent.EXTRA_TEXT, subject);
+
+		intent.putExtra(Intent.EXTRA_STREAM, this.dtaFileCreator.getDTAFileUri());
 
 		return intent;
 	}
@@ -265,7 +282,7 @@ public final class HistoryActivity extends SherlockListActivity {
 			LayoutInflater inflater = getLayoutInflater();
 			final View checkboxLayout = inflater.inflate(R.layout.dont_show_again, null);
 			dontShowAgainCheckBox = (CheckBox)checkboxLayout.findViewById(R.id.dont_show_again_checkbox);
-			
+
 			AlertDialog.Builder builder = new AlertDialog.Builder(this)
 			.setTitle(R.string.alert_title_information)
 			.setMessage(lastAlertId)
@@ -275,9 +292,10 @@ public final class HistoryActivity extends SherlockListActivity {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					if (dontShowAgainCheckBox.isChecked()){
-						Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
-						editor.putInt(PreferencesActivity.KEY_NOT_SHOW_ALERT + String.valueOf(lastAlertId), 1);
-						editor.apply();
+						PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+						.edit()
+						.putInt(PreferencesActivity.KEY_NOT_SHOW_ALERT + String.valueOf(lastAlertId), 1)
+						.apply();
 					}
 				}
 			});
