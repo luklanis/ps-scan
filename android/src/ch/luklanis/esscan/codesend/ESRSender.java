@@ -27,7 +27,7 @@ public class ESRSender extends Service {
 	private static final int SERVER_PORT = 8765;
 	private static final String TAG = ESRSender.class.getPackage().getName() + "." + ESRSender.class.getName();
 	private final IBinder binder = new LocalBinder();
-//	private AcceptSocketsAsync acceptSocketsAsync = null;
+	//	private AcceptSocketsAsync acceptSocketsAsync = null;
 
 	private ServerSocket server;
 	private ArrayList<Socket> sockets;
@@ -43,7 +43,7 @@ public class ESRSender extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		// TODO Auto-generated method stub
 		super.onStartCommand(intent, flags, startId);
-		
+
 		this.sockets = new ArrayList<Socket>();
 
 		Runnable runnable = new Runnable() {
@@ -53,37 +53,41 @@ public class ESRSender extends Service {
 				ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 				NetworkInfo info = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
-//				if (!info.isConnected()) {
-//					Log.w(TAG, "Wifi is not connected!");
-//					return false;
-//				}
+				//				if (!info.isConnected()) {
+				//					Log.w(TAG, "Wifi is not connected!");
+				//					return false;
+				//				}
 
 				try {
 					server = new ServerSocket(SERVER_PORT);
 
-					while(true) {
-						Socket socket = server.accept();
-						sockets.add(socket);
-					}
-
 
 				} catch (IOException e) {
 					Log.e(TAG, "Open a server socket failed!", e);
+				}
+
+				while(true) {
+					Socket socket;
+					try {
+						socket = server.accept();
+						sockets.add(socket);
+					} catch (IOException e) {
+					}
 				} 
 			}
 		};
-		
+
 		new Thread(runnable).start();
-//		if (acceptSocketsAsync == null) {
-//			acceptSocketsAsync = new AcceptSocketsAsync(getApplicationContext(), SERVER_PORT);
-//			acceptSocketsAsync.execute("");
-//		}
+		//		if (acceptSocketsAsync == null) {
+		//			acceptSocketsAsync = new AcceptSocketsAsync(getApplicationContext(), SERVER_PORT);
+		//			acceptSocketsAsync.execute("");
+		//		}
 
 		return START_STICKY;
 	}
 
 	public void sendToListeners(String... messages) {
-//		ArrayList<Socket> sockets = this.acceptSocketsAsync.getAcceptedSockets();
+		//		ArrayList<Socket> sockets = this.acceptSocketsAsync.getAcceptedSockets();
 
 		ArrayList<DataOutputStream> dataOutputStreams = new ArrayList<DataOutputStream>();
 
@@ -101,8 +105,8 @@ public class ESRSender extends Service {
 
 	@Override
 	public void onDestroy() {
-//		acceptSocketsAsync.cancel(true);
-//		acceptSocketsAsync = null;
+		//		acceptSocketsAsync.cancel(true);
+		//		acceptSocketsAsync = null;
 		try {
 			this.server.close();
 			
@@ -111,7 +115,7 @@ public class ESRSender extends Service {
 			}
 		} catch (IOException e) {
 		}
-		
+
 		super.onDestroy();
 	}
 }
