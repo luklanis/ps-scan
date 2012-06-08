@@ -32,6 +32,7 @@ import ch.luklanis.esscanlite.history.HistoryItem;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -349,25 +350,37 @@ public class DTAFileCreator {
 
 	public String getFirstError(List<HistoryItem> historyItems){
 		int error = getFirstErrorId();
+		
+		Resources res = context.getResources();
 
 		if(error != 0){
-			return context.getResources().getString(error);
+			return res.getString(error);
 		}
 		
 		if (historyItems != null) {
 			List<HistoryItem> items = new ArrayList<HistoryItem>();
+			
+			boolean nothingToExport = true;
 	
 			for (HistoryItem historyItem : historyItems) {
 				if(historyItem.getResult().getCurrency() == "CHF"){
 					items.add(historyItem);
 				}
+				
+				if(historyItem.getDTAFilename() == null) {
+					nothingToExport = false;
+				}
+			}
+			
+			if (nothingToExport) {
+				return res.getString(R.string.msg_nothing_to_export);
 			}
 	
 			for (int i = 0; i < items.size(); i++) {
 				HistoryItem item = items.get(i);
 	
 				if(nullToEmpty(item.getAmount()) == ""){
-					return String.format(context.getResources().getString(R.string.msg_amount_is_empty), item.getResult().getAccount());
+					return String.format(res.getString(R.string.msg_amount_is_empty), item.getResult().getAccount());
 				}
 			}
 		}

@@ -45,6 +45,7 @@
   <string name="msg_saved">Erfolgreich gespeichert!</string>
   <string name="msg_dta_saved">DTA Datei gespeichert unter %s</string>
   <string name="msg_copied">Erfolgreich kopiert!</string>
+  <string name="msg_nothing_to_export">Alle Zahlungen wurden schon mal exportiert.</string>
   <string name="msg_amount_not_valid">Betrag ist ungültig.</string>
   <string name="msg_amount_is_empty">Bitte fülle noch den Betrag für %s aus.</string>
   <string name="msg_own_iban_is_not_set">Um ein Zahlungsauftrag zu erstellen, wird deine eigene IBAN benötigt. Du kannst sie in den Einstellungen angeben.</string>

@@ -47,6 +47,7 @@
   <string name="msg_saved">Successfully saved</string>
   <string name="msg_dta_saved">DTA file saved in %s</string>
   <string name="msg_copied">Successfully copied</string>
+  <string name="msg_nothing_to_export">No payment to export.</string>
   <string name="msg_amount_not_valid">Amount is not valid.</string>
   <string name="msg_amount_is_empty">Please set the amount for the transfer to %s first.</string>
   <string name="msg_own_iban_is_not_set">To create DTA files your own IBAN is needed. Please write it down in Settings.</string>

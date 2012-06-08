@@ -373,6 +373,8 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			// We already have the engine initialized, so just start the camera.
 			resumeOCR();
 		}
+
+		showHelpOnFirstLaunch();
 	}
 
 	/** 
