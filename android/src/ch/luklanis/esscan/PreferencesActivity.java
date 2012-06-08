@@ -136,7 +136,8 @@ OnSharedPreferenceChangeListener {
 			editTextPreferenceCharacterWhitelist.setSummary(sharedPreferences.getString(key, OcrCharacterHelper.getDefaultWhitelist("deu")));
 
 		} else if (key.equals(KEY_IBAN)){
-			String iban = sharedPreferences.getString(key, "");
+			String iban = sharedPreferences.getString(key, "").toUpperCase();
+			sharedPreferences.edit().putString(key, iban).commit();
 
 			int warning = DTAFileCreator.validateIBAN(iban);
 			if (warning != 0){

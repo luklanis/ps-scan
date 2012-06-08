@@ -18,8 +18,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     android:installLocation="preferExternal"
     package="ch.luklanis.esscan"
-    android:versionCode="14"
-    android:versionName="0.6.4" >
+    android:versionCode="15"
+    android:versionName="0.6.5" >
 
     <uses-sdk
         android:minSdkVersion="10"
