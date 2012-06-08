@@ -278,8 +278,17 @@ public class DTAFileCreator {
 		for(int i=0; i<iban.length();i++){
 			char ibanChar = iban.charAt(i);
 			
-			if(ibanChar < '0' || ibanChar > '9'){
+			if(ibanChar < '0' || ibanChar > '9') {
+				if (i != 17 && i != 18) {
+		    		return R.string.msg_own_iban_is_not_valid;
+				}
+				
 				int ibanLetter = 10 + (ibanChar - 'A');
+
+				if(ibanLetter < 10 || ibanLetter > ('Z' - 'A')) {
+		    		return R.string.msg_own_iban_is_not_valid;
+				}
+				
 				ibanNumber.append(ibanLetter);
 			}
 			else{
