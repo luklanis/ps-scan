@@ -127,17 +127,19 @@ public final class HistoryActivity extends SherlockListActivity {
 			if(dtaFileCreator.getFirstErrorId() == 0) {
 				// Fetch and store ShareActionProvider
 				mShareActionProvider = (ShareActionProvider) item.getActionProvider();
+				
+				mShareActionProvider.setShareHistoryFileName(ShareActionProvider.DEFAULT_SHARE_HISTORY_FILE_NAME);
 
 				mShareActionProvider.setOnShareTargetSelectedListener(new OnShareTargetSelectedListener() {
 
 					@Override
 					public boolean onShareTargetSelected(ShareActionProvider source,
-							Intent intent) {
+							Intent intent) {						
 						if(createDTAFile()) {
-							startActivity(intent);
-							return true;
-						} else {
 							return false;
+						} else {
+							// Do nothing so we have to return true that says we handled the intent
+							return true;
 						}
 					}
 				});
