@@ -129,7 +129,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	private ViewfinderView viewfinderView;
 	private SurfaceView surfaceView;
 	private SurfaceHolder surfaceHolder;
-	private TextView statusViewBottom;
+	private TextView statusViewBottomLeft;
 	//private TextView statusViewTop;
 	private View statusViewTop;
 	private TextView ocrResultView;
@@ -315,7 +315,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 		Button amountSaveButton = (Button) findViewById(R.id.button_result_save);
 		amountSaveButton.setOnClickListener(saveListener);
-		
+
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 	}
 
@@ -331,8 +331,9 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		resultView = findViewById(R.id.result_view);
 		statusViewTop = findViewById(R.id.status_view_top);
 
-		statusViewBottom = (TextView) findViewById(R.id.status_view_bottom);
-		registerForContextMenu(statusViewBottom);
+		statusViewBottomLeft = (TextView) findViewById(R.id.status_view_bottom_left);
+
+		statusViewBottomRight = (TextView) findViewById(R.id.status_view_bottom_right);
 
 		psValidation = new EsrValidation();
 		this.lastValidationStep = psValidation.getCurrentStep();
@@ -494,7 +495,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		if (baseApi != null) {
 			baseApi.end();
 		}
-		
+
 		super.onDestroy();
 	}
 
@@ -746,8 +747,10 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 		EsrResult result = historyItem.getResult();
 
+
 		// Turn off capture-related UI elements
-		statusViewBottom.setVisibility(View.GONE);
+		statusViewBottomLeft.setVisibility(View.GONE);
+		statusViewBottomRight.setVisibility(View.GONE);
 		statusViewTop.setVisibility(View.GONE);
 		viewfinderView.setVisibility(View.GONE); 
 		resultView.setVisibility(View.VISIBLE);
@@ -883,7 +886,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 				ocrResult.getTextlineBoundingBoxes(),
 				ocrResult.getRegionBoundingBoxes()));
 
-		statusViewBottom.setText(ocrResult.getText());
+		statusViewBottomLeft.setText(ocrResult.getText());
 
 		if(this.psValidation.getCurrentStep() != this.lastValidationStep){
 			this.lastValidationStep = this.psValidation.getCurrentStep();
@@ -942,10 +945,14 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		refreshStatusView();
 		statusViewTop.setVisibility(View.VISIBLE);
 
-		statusViewBottom.setText("");
+		statusViewBottomLeft.setText("");
 
 		if (showOcrResult) {
-			statusViewBottom.setVisibility(View.VISIBLE);
+			statusViewBottomLeft.setVisibility(View.VISIBLE);
+		}
+		
+		if (enableStreamMode) {
+			statusViewBottomRight.setVisibility(View.VISIBLE);
 		}
 
 		viewfinderView.setVisibility(View.VISIBLE);

@@ -235,7 +235,7 @@ public final class HistoryActivity extends SherlockListActivity {
 			this.dtaFileCreator = new DTAFileCreator(getApplicationContext());
 			
 			Toast toast = Toast.makeText(this, 
-					String.format(getResources().getString(R.string.msg_dta_saved), 
+					getResources().getString(R.string.msg_dta_saved, 
 							dtaFileUri.getPath()), 
 							Toast.LENGTH_LONG);
 			toast.setGravity(Gravity.BOTTOM, 0, 0);

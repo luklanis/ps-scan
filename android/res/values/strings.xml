@@ -82,4 +82,5 @@
   <string name="preferences_enable_stream_mode_summary">Sends the recognized code row to the browser plugin (only available on paid version)</string>
   <string name="help_button_done">Done</string>
   <string name="help_button_back">Back</string>
+  <string name="status_view_ip_address">IP Address: %s</string>
 </resources>
