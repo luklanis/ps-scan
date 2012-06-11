@@ -2,9 +2,13 @@ package ch.luklanis.esscan.codesend;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 
 import android.app.Service;
 import android.content.Context;
@@ -27,11 +31,9 @@ public class ESRSender extends Service {
 	private static final int SERVER_PORT = 8765;
 	private static final String TAG = ESRSender.class.getPackage().getName() + "." + ESRSender.class.getName();
 	private final IBinder binder = new LocalBinder();
-	//	private AcceptSocketsAsync acceptSocketsAsync = null;
 
 	private ServerSocket server;
 	private ArrayList<Socket> sockets;
-	private Handler handler = new Handler();
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -45,26 +47,24 @@ public class ESRSender extends Service {
 		super.onStartCommand(intent, flags, startId);
 
 		this.sockets = new ArrayList<Socket>();
+		
+		ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo info = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+
+		//				if (!info.isConnected()) {
+		//					Log.w(TAG, "Wifi is not connected!");
+		//					return false;
+		//				}
+
+		try {
+			server = new ServerSocket(SERVER_PORT);
+		} catch (IOException e) {
+			Log.e(TAG, "Open a server socket failed!", e);
+		}
 
 		Runnable runnable = new Runnable() {
-
 			@Override
 			public void run() {
-				ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-				NetworkInfo info = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-
-				//				if (!info.isConnected()) {
-				//					Log.w(TAG, "Wifi is not connected!");
-				//					return false;
-				//				}
-
-				try {
-					server = new ServerSocket(SERVER_PORT);
-
-
-				} catch (IOException e) {
-					Log.e(TAG, "Open a server socket failed!", e);
-				}
 
 				while(true) {
 					Socket socket;
@@ -78,17 +78,28 @@ public class ESRSender extends Service {
 		};
 
 		new Thread(runnable).start();
-		//		if (acceptSocketsAsync == null) {
-		//			acceptSocketsAsync = new AcceptSocketsAsync(getApplicationContext(), SERVER_PORT);
-		//			acceptSocketsAsync.execute("");
-		//		}
 
 		return START_STICKY;
 	}
+	
+	public String getLocalIpAddress() {
+	    try {
+	        for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+	            NetworkInterface intf = en.nextElement();
+	            for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+	                InetAddress inetAddress = enumIpAddr.nextElement();
+	                if (!inetAddress.isLoopbackAddress() && inetAddress.getAddress().length == 4) {
+	                    return inetAddress.getHostAddress();
+	                }
+	            }
+	        }
+	    } catch (SocketException ex) {
+	        Log.e(TAG, ex.toString());
+	    }
+	    return null;
+	}
 
 	public void sendToListeners(String... messages) {
-		//		ArrayList<Socket> sockets = this.acceptSocketsAsync.getAcceptedSockets();
-
 		ArrayList<DataOutputStream> dataOutputStreams = new ArrayList<DataOutputStream>();
 
 		for(Socket socket : this.sockets) {
@@ -105,8 +116,6 @@ public class ESRSender extends Service {
 
 	@Override
 	public void onDestroy() {
-		//		acceptSocketsAsync.cancel(true);
-		//		acceptSocketsAsync = null;
 		try {
 			this.server.close();
 			

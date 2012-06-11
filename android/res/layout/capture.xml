@@ -29,7 +29,7 @@
         <SurfaceView
             android:id="@+id/preview_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent" />
 
         <ch.luklanis.esscan.ViewfinderView
             android:id="@+id/viewfinder_view"
@@ -328,17 +328,31 @@
             </LinearLayout>
 
             <TextView
-                android:id="@+id/status_view_bottom"
+                android:id="@+id/status_view_bottom_left"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:autoLink="web"
+                android:layout_alignParentLeft="true"
                 android:background="#0000"
-                android:clickable="true"
+                android:padding="4dip"
+                android:text=""
+                android:textColor="@color/status_text"
+                android:textSize="14sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/status_view_bottom_right"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:background="#0000"
+                android:padding="4dip"
                 android:text=""
                 android:textColor="@color/status_text"
                 android:textSize="14sp"
                 android:visibility="gone" />
         </RelativeLayout>
     </RelativeLayout>
+
 </FrameLayout>

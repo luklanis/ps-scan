@@ -19,18 +19,15 @@
     </style>
 
     <!-- JavaScript and HTML must be in separate files for security. -->
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-    <script src="popup.js"></script>
+    <script src="jquery.min.js"></script>
+    <script src="options.js"></script>
   </head>
   <body>
     <div id="outer">
         <p>
           <span>IP Address:</span>
           <input id="ipAddress" type="text" spellcheck="false">
-          <span onClick="save($('#ipAddress'))">Save</span>
-        </p>
-        <p>
-          <span onClick="connect()">Connect</span>
+          <span id="saveButton" style="font-weight:bold; color:blue; cursor:pointer">Save</span>
         </p>
     </div>
   </body>

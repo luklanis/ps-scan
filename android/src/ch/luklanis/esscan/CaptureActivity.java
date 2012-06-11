@@ -133,7 +133,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	private ViewfinderView viewfinderView;
 	private SurfaceView surfaceView;
 	private SurfaceHolder surfaceHolder;
-	private TextView statusViewBottom;
+	private TextView statusViewBottomLeft;
 	//private TextView statusViewTop;
 	private View statusViewTop;
 	private TextView ocrResultView;
@@ -284,13 +284,16 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		}
 	};
 
-	private ESRSender mBoundService;
+	private ESRSender boundService;
 
 	private ServiceConnection serviceConnection = new ServiceConnection() {
 
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
-			mBoundService = ((ESRSender.LocalBinder)service).getService();
+			boundService = ((ESRSender.LocalBinder)service).getService();
+
+			statusViewBottomRight.setText(getResources().getString(R.string.status_view_ip_address, boundService.getLocalIpAddress()));
+			statusViewBottomRight.setVisibility(View.VISIBLE);
 		}
 
 		@Override
@@ -299,11 +302,13 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			// unexpectedly disconnected -- that is, its process crashed.
 			// Because it is running in our same process, we should never
 			// see this happen.
-			mBoundService = null;
+			boundService = null;
 		}
 	};
 
 	private boolean serviceIsBound;
+
+	private TextView statusViewBottomRight;
 
 	@Override
 	public void onCreate(Bundle icicle) {
@@ -341,7 +346,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 		Button amountSaveButton = (Button) findViewById(R.id.button_result_save);
 		amountSaveButton.setOnClickListener(saveListener);
-		
+
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
 		enableStreamMode = this.prefs.getBoolean(PreferencesActivity.KEY_ENABLE_STREAM_MODE, false);
@@ -363,8 +368,9 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		resultView = findViewById(R.id.result_view);
 		statusViewTop = findViewById(R.id.status_view_top);
 
-		statusViewBottom = (TextView) findViewById(R.id.status_view_bottom);
-		registerForContextMenu(statusViewBottom);
+		statusViewBottomLeft = (TextView) findViewById(R.id.status_view_bottom_left);
+
+		statusViewBottomRight = (TextView) findViewById(R.id.status_view_bottom_right);
 
 		psValidation = new EsrValidation();
 		this.lastValidationStep = psValidation.getCurrentStep();
@@ -406,14 +412,17 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			resumeOCR();
 		}
 
-		// Start service if resumed from preferences
-		if (!enableStreamMode) {
-			enableStreamMode = this.prefs.getBoolean(PreferencesActivity.KEY_ENABLE_STREAM_MODE, false);
-	
-			if (enableStreamMode) {
-				startService(new Intent(this, ESRSender.class));
-			}
+		boolean newEnableStreamMode = this.prefs.getBoolean(PreferencesActivity.KEY_ENABLE_STREAM_MODE, false);
+
+		// Start/stop service if resumed from preferences
+		if (!enableStreamMode && newEnableStreamMode) {
+			startService(new Intent(this, ESRSender.class));
+		} else if (enableStreamMode && !newEnableStreamMode) {
+			doUnbindService();
+			stopService(new Intent(this, ESRSender.class));
 		}
+		
+		enableStreamMode = newEnableStreamMode;
 
 		if (enableStreamMode) {
 			doBindService();
@@ -537,9 +546,9 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			SurfaceHolder surfaceHolder = surfaceView.getHolder();
 			surfaceHolder.removeCallback(this);
 		}
-		
+
 		doUnbindService();
-		
+
 		super.onPause();
 	}
 
@@ -554,11 +563,11 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		if(enableStreamMode) {
 			stopService(new Intent(this, ESRSender.class));
 		}
-		
+
 		if (baseApi != null) {
 			baseApi.end();
 		}
-		
+
 		super.onDestroy();
 	}
 
@@ -809,10 +818,10 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		}
 
 		EsrResult result = historyItem.getResult();
-		
+
 		if(enableStreamMode && this.serviceIsBound) {
-			this.mBoundService.sendToListeners(result.getCompleteCode());
-			
+			this.boundService.sendToListeners(result.getCompleteCode());
+
 			psValidation.gotoBeginning();
 			this.lastValidationStep = psValidation.getCurrentStep();
 			resumeContinuousDecoding();
@@ -820,7 +829,8 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		}
 
 		// Turn off capture-related UI elements
-		statusViewBottom.setVisibility(View.GONE);
+		statusViewBottomLeft.setVisibility(View.GONE);
+		statusViewBottomRight.setVisibility(View.GONE);
 		statusViewTop.setVisibility(View.GONE);
 		viewfinderView.setVisibility(View.GONE); 
 		resultView.setVisibility(View.VISIBLE);
@@ -956,7 +966,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 				ocrResult.getTextlineBoundingBoxes(),
 				ocrResult.getRegionBoundingBoxes()));
 
-		statusViewBottom.setText(ocrResult.getText());
+		statusViewBottomLeft.setText(ocrResult.getText());
 
 		if(this.psValidation.getCurrentStep() != this.lastValidationStep){
 			this.lastValidationStep = this.psValidation.getCurrentStep();
@@ -1015,10 +1025,14 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		refreshStatusView();
 		statusViewTop.setVisibility(View.VISIBLE);
 
-		statusViewBottom.setText("");
+		statusViewBottomLeft.setText("");
 
 		if (showOcrResult) {
-			statusViewBottom.setVisibility(View.VISIBLE);
+			statusViewBottomLeft.setVisibility(View.VISIBLE);
+		}
+		
+		if (enableStreamMode) {
+			statusViewBottomRight.setVisibility(View.VISIBLE);
 		}
 
 		viewfinderView.setVisibility(View.VISIBLE);
