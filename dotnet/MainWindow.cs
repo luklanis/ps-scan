@@ -67,19 +67,11 @@
         void tcpReceive_DataReceived(string text)
         {
             this.simulator.TextEntry(text);
-            //// InvokeRequired required compares the thread ID of the
-            //// calling thread to the thread ID of the creating thread.
-            //// If these threads are different, it returns true.
-            //if (this.textBox1.InvokeRequired)
-            //{
-            //    TcpReceive.DataReceivedFromNetEventHandler d = 
-            //        new TcpReceive.DataReceivedFromNetEventHandler(this.tcpReceive_DataReceived);
-            //    this.Invoke(d, new object[] { text });
-            //}
-            //else
-            //{
-            //    this.textBox1.AppendText(text);
-            //}
+
+            if (this.addCR.Checked)
+            {
+                this.simulator.KeyPress(WindowsInput.Native.VirtualKeyCode.RETURN);
+            }
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)

@@ -33,6 +33,7 @@
             this.button1 = new System.Windows.Forms.Button();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.connectionState = new System.Windows.Forms.ToolStripStatusLabel();
+            this.addCR = new System.Windows.Forms.CheckBox();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -55,7 +56,7 @@
             // button1
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(189, 10);
+            this.button1.Location = new System.Drawing.Point(235, 10);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 3;
@@ -69,7 +70,7 @@
             this.connectionState});
             this.statusStrip1.Location = new System.Drawing.Point(0, 45);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(276, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(323, 22);
             this.statusStrip1.TabIndex = 4;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -79,16 +80,28 @@
             this.connectionState.Size = new System.Drawing.Size(79, 17);
             this.connectionState.Text = "Disconnected";
             // 
+            // addCR
+            // 
+            this.addCR.AutoSize = true;
+            this.addCR.Location = new System.Drawing.Point(182, 14);
+            this.addCR.Name = "addCR";
+            this.addCR.Size = new System.Drawing.Size(47, 17);
+            this.addCR.TabIndex = 5;
+            this.addCR.Text = "+CR";
+            this.addCR.UseVisualStyleBackColor = true;
+            // 
             // MainWindow
             // 
             this.AcceptButton = this.button1;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(276, 67);
+            this.ClientSize = new System.Drawing.Size(323, 67);
+            this.Controls.Add(this.addCR);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.textBox2);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "MainWindow";
             this.Text = "ESRReceiver";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
@@ -106,6 +119,7 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel connectionState;
+        private System.Windows.Forms.CheckBox addCR;
     }
 }
 
