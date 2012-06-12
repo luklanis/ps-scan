@@ -1,0 +1,27 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="MainWindow.cs">
+    <Files>
+      <File FileName="TcpReceive.cs" Line="124" Column="4" />
+      <File FileName="MainWindow.cs" Line="92" Column="32" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="ESRReceiver" expanded="True">
+            <Node name="References" expanded="True" />
+          </Node>
+          <Node name="WindowsInput" selected="True" />
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore>
+      <Breakpoint file="/home/llandis/android/projects/esr-scanner/ESRReceiver/TcpReceive.cs" line="227" />
+      <Breakpoint file="/home/llandis/android/projects/esr-scanner/ESRReceiver/TcpReceive.cs" line="129" />
+      <Breakpoint file="/home/llandis/android/projects/esr-scanner/ESRReceiver/MainWindow.cs" line="92" />
+    </BreakpointStore>
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
