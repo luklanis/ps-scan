@@ -24,9 +24,9 @@
   <string name="button_save">Save</string>
   <string name="button_export_again">Again</string>
   <string name="button_change">Change</string>
-  <string name="history_clear_text">Clear history</string>
-  <string name="history_send_dta">Send history as DTA File</string>
-  <string name="history_send">Send history</string>
+  <string name="history_clear_text">Delete all</string>
+  <string name="history_send_dta">DTA</string>
+  <string name="history_send">CSV</string>
   <string name="history_export">Export history</string>
   <string name="history_email_title">ESR Scanner history</string>
   <string name="history_email_as_dta_title">DTA file from ESR Scanner</string>

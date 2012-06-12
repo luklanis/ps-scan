@@ -24,9 +24,7 @@
   <string name="button_save">Speichern</string>
   <string name="button_export_again">Nochmal</string>
   <string name="button_change">Andere</string>
-  <string name="history_clear_text">Verlauf löschen</string>
-  <string name="history_send_dta">Verlauf als Zahlungsauftrag (DTA) versenden</string>
-  <string name="history_send">Verlauf senden</string>
+  <string name="history_clear_text">Alle löschen</string>
   <string name="history_export">Verlauf exportieren</string>
   <string name="history_email_title">ESR Scanner Verlauf</string>
   <string name="history_email_as_dta_title">Zahlungsauftrag gesendet von ESR Scanner</string>
