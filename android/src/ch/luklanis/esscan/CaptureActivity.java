@@ -433,7 +433,10 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 	void doUnbindService() {
 		if(serviceIsBound) {
-			boundService.stopServer();
+			if(boundService != null) {
+				boundService.stopServer();
+			}
+			
 			unbindService(serviceConnection);
 			stopService(serviceIntent);
 			serviceIsBound = false;
