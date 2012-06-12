@@ -51,10 +51,10 @@ public class ESRSender extends Service {
 		ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo info = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
-		//				if (!info.isConnected()) {
-		//					Log.w(TAG, "Wifi is not connected!");
-		//					return false;
-		//				}
+		if (!info.isConnected()) {
+			Log.w(TAG, "Wifi is not connected!");
+			return false;
+		}
 
 		try {
 			server = new ServerSocket(SERVER_PORT);
