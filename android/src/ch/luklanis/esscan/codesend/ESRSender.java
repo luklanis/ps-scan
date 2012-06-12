@@ -47,7 +47,7 @@ public class ESRSender extends Service {
 		super.onStartCommand(intent, flags, startId);
 
 		this.sockets = new ArrayList<Socket>();
-		
+
 		ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo info = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
@@ -66,7 +66,7 @@ public class ESRSender extends Service {
 			@Override
 			public void run() {
 
-				while(true) {
+				while(!server.isClosed()) {
 					Socket socket;
 					try {
 						socket = server.accept();
@@ -81,22 +81,22 @@ public class ESRSender extends Service {
 
 		return START_STICKY;
 	}
-	
+
 	public String getLocalIpAddress() {
-	    try {
-	        for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
-	            NetworkInterface intf = en.nextElement();
-	            for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
-	                InetAddress inetAddress = enumIpAddr.nextElement();
-	                if (!inetAddress.isLoopbackAddress() && inetAddress.getAddress().length == 4) {
-	                    return inetAddress.getHostAddress();
-	                }
-	            }
-	        }
-	    } catch (SocketException ex) {
-	        Log.e(TAG, ex.toString());
-	    }
-	    return null;
+		try {
+			for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+				NetworkInterface intf = en.nextElement();
+				for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+					InetAddress inetAddress = enumIpAddr.nextElement();
+					if (!inetAddress.isLoopbackAddress() && inetAddress.getAddress().length == 4) {
+						return inetAddress.getHostAddress();
+					}
+				}
+			}
+		} catch (SocketException ex) {
+			Log.e(TAG, ex.toString());
+		}
+		return null;
 	}
 
 	public void sendToListeners(String... messages) {
@@ -116,15 +116,21 @@ public class ESRSender extends Service {
 
 	@Override
 	public void onDestroy() {
+		stopServer();
+
+		super.onDestroy();
+	}
+
+	public void stopServer() {
 		try {
-			this.server.close();
-			
+			if (!this.server.isClosed()) {
+				this.server.close();
+			}
+
 			for (Socket socket : this.sockets){
 				socket.close();
 			}
 		} catch (IOException e) {
 		}
-
-		super.onDestroy();
 	}
 }

@@ -310,6 +310,8 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 	private TextView statusViewBottomRight;
 
+	private Intent serviceIntent;
+
 	@Override
 	public void onCreate(Bundle icicle) {
 		requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
@@ -348,12 +350,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		amountSaveButton.setOnClickListener(saveListener);
 
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-		enableStreamMode = this.prefs.getBoolean(PreferencesActivity.KEY_ENABLE_STREAM_MODE, false);
-
-		if (enableStreamMode) {
-			startService(new Intent(this, ESRSender.class));
-		}
 	}
 
 	@Override
@@ -415,30 +411,31 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		boolean newEnableStreamMode = this.prefs.getBoolean(PreferencesActivity.KEY_ENABLE_STREAM_MODE, false);
 
 		// Start/stop service if resumed from preferences
-		if (!enableStreamMode && newEnableStreamMode) {
-			startService(new Intent(this, ESRSender.class));
+		if (newEnableStreamMode) {
+			doBindService();
 		} else if (enableStreamMode && !newEnableStreamMode) {
 			doUnbindService();
-			stopService(new Intent(this, ESRSender.class));
 		}
 		
 		enableStreamMode = newEnableStreamMode;
-
-		if (enableStreamMode) {
-			doBindService();
-		}
 
 		showHelpOnFirstLaunch();
 	}
 
 	void doBindService() {
-		bindService(new Intent(this, ESRSender.class), serviceConnection, 0);
-		serviceIsBound = true;
+		if(!serviceIsBound) {
+			serviceIntent =  new Intent(this, ESRSender.class);
+			startService(serviceIntent);
+			bindService(serviceIntent, serviceConnection, 0);
+			serviceIsBound = true;
+		}
 	}
 
 	void doUnbindService() {
 		if(serviceIsBound) {
+			boundService.stopServer();
 			unbindService(serviceConnection);
+			stopService(serviceIntent);
 			serviceIsBound = false;
 		}
 	}
@@ -546,8 +543,10 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			SurfaceHolder surfaceHolder = surfaceView.getHolder();
 			surfaceHolder.removeCallback(this);
 		}
-
-		doUnbindService();
+		
+		if (enableStreamMode) {
+			doUnbindService();
+		}
 
 		super.onPause();
 	}
@@ -597,7 +596,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 				}
 				return true;
 			}
-		} 
+		}
 
 		return super.onKeyDown(keyCode, event);
 	}
