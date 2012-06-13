@@ -11,7 +11,8 @@
 
     public partial class MainWindow : Form
     {
-        private const string ConfigTraceIpAddress = "TraceIpAddress";
+        private const string ConfigIpAddress = "IpAddress";
+        private const string ConfigAddCR = "AddCR";
 
         private TcpReceive tcpReceive;
         private TcpReceive.ConnectionState connState;
@@ -27,7 +28,9 @@
             this.tcpReceive.ConnectionStateChanged += new TcpReceive.ConnectionStateChangedEventHandler(this.tcpReceive_ConnectionStateChanged);
 
             //this.textBox2.Text = (string)Registry.LocalMachine.GetValue(ConfigTraceIpAddress, string.Empty);
-            this.textBox2.Text = ConfigurationManager.AppSettings[ConfigTraceIpAddress];
+            this.textBox2.Text = ConfigurationManager.AppSettings[ConfigIpAddress] ?? string.Empty;
+
+            this.addCR.Checked = (ConfigurationManager.AppSettings[ConfigAddCR] ?? string.Empty).ToLower() == "true";
 
             this.simulator = new KeyboardSimulator();
         }
@@ -87,15 +90,15 @@
                 {
                     IPAddress.Parse(this.textBox2.Text);
 
-                    string urlConfiguration = ConfigurationManager.AppSettings[ConfigTraceIpAddress];
+                    string urlConfiguration = ConfigurationManager.AppSettings[ConfigIpAddress];
 
                     if (urlConfiguration != this.textBox2.Text)
                     {
                         Configuration config =
                             ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
-                        config.AppSettings.Settings.Clear();
-                        config.AppSettings.Settings.Add(new KeyValueConfigurationElement(ConfigTraceIpAddress, this.textBox2.Text));
+                        config.AppSettings.Settings.Remove(ConfigIpAddress);
+                        config.AppSettings.Settings.Add(new KeyValueConfigurationElement(ConfigIpAddress, this.textBox2.Text));
                         config.Save(ConfigurationSaveMode.Modified);
                     }
                 }
@@ -111,6 +114,22 @@
             {
                 this.tcpReceive.StopReceiving();
                 this.button1.Text = "Connect";
+            }
+        }
+
+        private void addCR_CheckedChanged(object sender, EventArgs e)
+        {
+
+            string addCRChecked = ConfigurationManager.AppSettings[ConfigAddCR];
+
+            if (addCRChecked != this.addCR.Checked.ToString())
+            {
+                Configuration config =
+                    ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+                config.AppSettings.Settings.Remove(ConfigAddCR);
+                config.AppSettings.Settings.Add(new KeyValueConfigurationElement(ConfigAddCR, this.addCR.Checked.ToString()));
+                config.Save(ConfigurationSaveMode.Modified);
             }
         }
     }
