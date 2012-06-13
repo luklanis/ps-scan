@@ -292,8 +292,14 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			boundService = ((ESRSender.LocalBinder)service).getService();
 
-			statusViewBottomRight.setText(getResources().getString(R.string.status_view_ip_address, boundService.getLocalIpAddress()));
-			statusViewBottomRight.setVisibility(View.VISIBLE);
+			if (boundService.isConnectedWithWifi()) {
+				statusViewBottomRight.setText(getResources().getString(R.string.status_view_ip_address, boundService.getLocalIpAddress()));
+				statusViewBottomRight.setVisibility(View.VISIBLE);
+			} else {
+				statusViewBottomRight.setText("");
+				statusViewBottomRight.setVisibility(View.GONE);
+				setOKAlert(R.string.msg_stream_mode_not_available);
+			}
 		}
 
 		@Override
@@ -408,16 +414,12 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			resumeOCR();
 		}
 
-		boolean newEnableStreamMode = this.prefs.getBoolean(PreferencesActivity.KEY_ENABLE_STREAM_MODE, false);
+		enableStreamMode = this.prefs.getBoolean(PreferencesActivity.KEY_ENABLE_STREAM_MODE, false);
 
 		// Start/stop service if resumed from preferences
-		if (newEnableStreamMode) {
+		if (enableStreamMode) {
 			doBindService();
-		} else if (enableStreamMode && !newEnableStreamMode) {
-			doUnbindService();
-		}
-		
-		enableStreamMode = newEnableStreamMode;
+		} 
 
 		showHelpOnFirstLaunch();
 	}
@@ -432,11 +434,11 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	}
 
 	void doUnbindService() {
-		if(serviceIsBound) {
+		if(serviceIsBound) {			
 			if(boundService != null) {
 				boundService.stopServer();
 			}
-			
+
 			unbindService(serviceConnection);
 			stopService(serviceIntent);
 			serviceIsBound = false;
@@ -546,10 +548,8 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			SurfaceHolder surfaceHolder = surfaceView.getHolder();
 			surfaceHolder.removeCallback(this);
 		}
-		
-		if (enableStreamMode) {
-			doUnbindService();
-		}
+
+		doUnbindService();
 
 		super.onPause();
 	}
@@ -562,10 +562,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 	@Override
 	protected void onDestroy() {
-		if(enableStreamMode) {
-			stopService(new Intent(this, ESRSender.class));
-		}
-
 		if (baseApi != null) {
 			baseApi.end();
 		}
@@ -821,12 +817,22 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 		EsrResult result = historyItem.getResult();
 
-		if(enableStreamMode && this.serviceIsBound) {
+		if(this.serviceIsBound && this.boundService.isConnectedWithWifi()) {
 			this.boundService.sendToListeners(result.getCompleteCode());
 
-			psValidation.gotoBeginning();
-			this.lastValidationStep = psValidation.getCurrentStep();
-			resumeContinuousDecoding();
+			AlertDialog.Builder builder = new AlertDialog.Builder(CaptureActivity.this);
+			builder.setMessage(R.string.msg_coderow_sent);
+			builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					psValidation.gotoBeginning();
+					lastValidationStep = psValidation.getCurrentStep();
+					resumeContinuousDecoding();
+				}
+			});
+			builder.show();
+			
 			return true;
 		}
 
@@ -1032,10 +1038,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		if (showOcrResult) {
 			statusViewBottomLeft.setVisibility(View.VISIBLE);
 		}
-		
-		if (enableStreamMode) {
-			statusViewBottomRight.setVisibility(View.VISIBLE);
-		}
 
 		viewfinderView.setVisibility(View.VISIBLE);
 
@@ -1165,7 +1167,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 	@SuppressWarnings("unused")
 	private void setOKAlert(int id){
-		setOKAlert(this, id);
+		setOKAlert(CaptureActivity.this, id);
 	}
 
 	private void setOKAlert(Context context, int id){

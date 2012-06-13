@@ -16,7 +16,6 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -37,17 +36,44 @@ public class ESRSender extends Service {
 
 	@Override
 	public IBinder onBind(Intent intent) {
-		// TODO Auto-generated method stub
 		return this.binder;
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		// TODO Auto-generated method stub
 		super.onStartCommand(intent, flags, startId);
 
 		this.sockets = new ArrayList<Socket>();
 
+		if(isConnectedWithWifi()) {
+			try {
+				server = new ServerSocket(SERVER_PORT);
+			} catch (IOException e) {
+				Log.e(TAG, "Open a server socket failed!", e);
+			}
+
+			Runnable runnable = new Runnable() {
+				@Override
+				public void run() {
+
+					while(!server.isClosed()) {
+						Socket socket;
+						try {
+							socket = server.accept();
+							sockets.add(socket);
+						} catch (IOException e) {
+						}
+					} 
+				}
+			};
+
+			new Thread(runnable).start();
+		}
+
+		return START_STICKY;
+	}
+
+	public boolean isConnectedWithWifi() {
 		ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo info = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
@@ -56,30 +82,7 @@ public class ESRSender extends Service {
 			return false;
 		}
 
-		try {
-			server = new ServerSocket(SERVER_PORT);
-		} catch (IOException e) {
-			Log.e(TAG, "Open a server socket failed!", e);
-		}
-
-		Runnable runnable = new Runnable() {
-			@Override
-			public void run() {
-
-				while(!server.isClosed()) {
-					Socket socket;
-					try {
-						socket = server.accept();
-						sockets.add(socket);
-					} catch (IOException e) {
-					}
-				} 
-			}
-		};
-
-		new Thread(runnable).start();
-
-		return START_STICKY;
+		return true;
 	}
 
 	public String getLocalIpAddress() {
@@ -123,7 +126,7 @@ public class ESRSender extends Service {
 
 	public void stopServer() {
 		try {
-			if (!this.server.isClosed()) {
+			if (this.server != null && !this.server.isClosed()) {
 				this.server.close();
 			}
 

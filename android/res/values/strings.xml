@@ -53,6 +53,8 @@
   <string name="msg_own_iban_is_not_set">To create DTA files your own IBAN is needed. Please write it down in Settings.</string>
   <string name="msg_own_iban_is_not_valid">IBAN is not valid. It has to be from switzerland.</string>
   <string name="msg_own_address_is_not_set">To create DTA files your own address is needed. Please write it down in Settings.</string>
+  <string name="msg_stream_mode_not_available">Stream mode only available if Wifi is connected.</string>
+  <string name="msg_coderow_sent">Code row sent.</string>
   <string name="esr_result_account">Account</string>
   <string name="esr_result_address">Recipient</string>
   <string name="esr_result_reference_number">Reference Number</string>
