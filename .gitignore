@@ -2,6 +2,7 @@
 .svn
 *.swp
 *~
+*.suo
 ant.properties
 local.properties
 orig-build.xml
