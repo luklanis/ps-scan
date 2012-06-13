@@ -50,7 +50,7 @@
   <string name="msg_own_iban_is_not_set">Um ein Zahlungsauftrag zu erstellen, wird deine eigene IBAN benötigt. Du kannst sie in den Einstellungen angeben.</string>
   <string name="msg_own_iban_is_not_valid">Die IBAN ist ungültig. Sie muss aus der Schweiz sein und die Prüfziffer muss stimmen.</string>
   <string name="msg_own_address_is_not_set">Um ein Zahlungsauftrag zu erstellen, wird deine eigene Adresse benötigt. Du kannst sie in den Einstellungen angeben.</string>
-  <string name="msg_stream_mode_not_available">Stream Modus nur mit verbundenem WLAN möglich.</string>
+  <string name="msg_stream_mode_not_available">Belegleser Modus nur mit verbundenem WLAN möglich.</string>
   <string name="msg_coderow_sent">Kodierzeile wurde gesendet.</string>
   <string name="esr_result_account">Konto</string>
   <string name="esr_result_address">Empfänger</string>
@@ -76,8 +76,8 @@
   <string name="preferences_show_ocr_result_title">OCR Ergebnis zeigen</string>
   <string name="preferences_email_address_title">Standard Email Adresse</string>
   <string name="preferences_email_address_summary"></string>
-  <string name="preferences_enable_stream_mode_title">Stream Modus einschalten</string>
-  <string name="preferences_enable_stream_mode_summary">Sendet die erfasste Zahlung direkt an den Computer</string>
+  <string name="preferences_enable_stream_mode_title">Belegleser Modus einschalten</string>
+  <string name="preferences_enable_stream_mode_summary">Sendet die erfasste Zahlung direkt deinen Computer</string>
   <string name="help_button_done">Schliessen</string>
   <string name="help_button_back">Zurück</string>
 </resources>
