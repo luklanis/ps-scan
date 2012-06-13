@@ -101,14 +101,14 @@
                         config.AppSettings.Settings.Add(new KeyValueConfigurationElement(ConfigIpAddress, this.textBox2.Text));
                         config.Save(ConfigurationSaveMode.Modified);
                     }
+
+                    this.tcpReceive.StartReceiving(this.textBox2.Text);
+                    this.button1.Text = "Disconnect";
                 }
                 catch
                 {
                     MessageBox.Show("\"" + this.textBox2.Text + "\" is not a valid IP Address");
                 }
-
-                this.tcpReceive.StartReceiving(this.textBox2.Text);
-                this.button1.Text = "Disconnect";
             }
             else
             {
