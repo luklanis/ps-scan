@@ -24,9 +24,9 @@
   <string name="button_save">Save</string>
   <string name="button_export_again">Again</string>
   <string name="button_change">Change</string>
-  <string name="history_clear_text">Clear history</string>
-  <string name="history_send_dta">Send history as DTA File</string>
-  <string name="history_send">Send history</string>
+  <string name="history_clear_text">Delete all</string>
+  <string name="history_send_dta">DTA</string>
+  <string name="history_send">CSV</string>
   <string name="history_export">Export history</string>
   <string name="history_email_title">ESR Scanner history</string>
   <string name="history_email_as_dta_title">DTA file from ESR Scanner</string>
@@ -53,6 +53,8 @@
   <string name="msg_own_iban_is_not_set">To create DTA files your own IBAN is needed. Please write it down in Settings.</string>
   <string name="msg_own_iban_is_not_valid">IBAN is not valid. It has to be from switzerland.</string>
   <string name="msg_own_address_is_not_set">To create DTA files your own address is needed. Please write it down in Settings.</string>
+  <string name="msg_stream_mode_not_available">Slip-reader mode only available if Wifi is connected.</string>
+  <string name="msg_coderow_sent">Code row sent.</string>
   <string name="esr_result_account">Account</string>
   <string name="esr_result_address">Recipient</string>
   <string name="esr_result_reference_number">Reference Number</string>
@@ -78,8 +80,8 @@
   <string name="preferences_show_ocr_result_title">Show OCR result</string>
   <string name="preferences_email_address_title">Default email address</string>
   <string name="preferences_email_address_summary"></string>
-  <string name="preferences_enable_stream_mode_title">Enable stream mode</string>
-  <string name="preferences_enable_stream_mode_summary">Sends the recognized code row to the browser plugin (only available on paid version)</string>
+  <string name="preferences_enable_stream_mode_title">Enable slip-reader mode</string>
+  <string name="preferences_enable_stream_mode_summary">Sends the recognized code row to your pc (only available on paid version)</string>
   <string name="help_button_done">Done</string>
   <string name="help_button_back">Back</string>
   <string name="status_view_ip_address">IP Address: %s</string>

@@ -525,7 +525,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 				}
 				return true;
 			}
-		} 
+		}
 
 		return super.onKeyDown(keyCode, event);
 	}
@@ -950,10 +950,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		if (showOcrResult) {
 			statusViewBottomLeft.setVisibility(View.VISIBLE);
 		}
-		
-		if (enableStreamMode) {
-			statusViewBottomRight.setVisibility(View.VISIBLE);
-		}
 
 		viewfinderView.setVisibility(View.VISIBLE);
 
@@ -1083,7 +1079,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 	@SuppressWarnings("unused")
 	private void setOKAlert(int id){
-		setOKAlert(this, id);
+		setOKAlert(CaptureActivity.this, id);
 	}
 
 	private void setOKAlert(Context context, int id){
