@@ -2,6 +2,7 @@
 .svn
 *.swp
 *~
+*.suo
 ant.properties
 local.properties
 orig-build.xml
@@ -17,7 +18,6 @@ PseudoTranslator.java
 TranslatorBing.java
 TranslatorGoogle.java
 actionscript/
-release/
 android-integration/
 androidtest/
 core/
@@ -29,3 +29,4 @@ rim/
 symbian/
 zxing.appspot.com/
 obj/
+dotnet/Setup/Debug/

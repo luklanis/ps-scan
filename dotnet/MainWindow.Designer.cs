@@ -89,6 +89,7 @@
             this.addCR.TabIndex = 5;
             this.addCR.Text = "+CR";
             this.addCR.UseVisualStyleBackColor = true;
+            this.addCR.CheckedChanged += new System.EventHandler(this.addCR_CheckedChanged);
             // 
             // MainWindow
             // 
