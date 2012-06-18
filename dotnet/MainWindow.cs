@@ -2,18 +2,13 @@
 {
     using System;
     using System.Configuration;
-    using System.Threading;
     using System.Windows.Forms;
     using System.Net;
-    using System.IO;
 
     using WindowsInput;
 
     public partial class MainWindow : Form
     {
-        private const string ConfigIpAddress = "IpAddress";
-        private const string ConfigAddCR = "AddCR";
-
         private TcpReceive tcpReceive;
         private TcpReceive.ConnectionState connState;
 
@@ -28,9 +23,9 @@
             this.tcpReceive.ConnectionStateChanged += new TcpReceive.ConnectionStateChangedEventHandler(this.tcpReceive_ConnectionStateChanged);
 
             //this.textBox2.Text = (string)Registry.LocalMachine.GetValue(ConfigTraceIpAddress, string.Empty);
-            this.textBox2.Text = ConfigurationManager.AppSettings[ConfigIpAddress] ?? string.Empty;
+            this.textBox2.Text = Properties.Settings.Default.IpAddress;
 
-            this.addCR.Checked = (ConfigurationManager.AppSettings[ConfigAddCR] ?? string.Empty).ToLower() == "true";
+            this.addCR.Checked = Properties.Settings.Default.AddCR;
 
             this.simulator = new KeyboardSimulator();
         }
@@ -90,16 +85,10 @@
                 {
                     IPAddress.Parse(this.textBox2.Text);
 
-                    string urlConfiguration = ConfigurationManager.AppSettings[ConfigIpAddress];
-
-                    if (urlConfiguration != this.textBox2.Text)
+                    if (Properties.Settings.Default.IpAddress != this.textBox2.Text)
                     {
-                        Configuration config =
-                            ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-
-                        config.AppSettings.Settings.Remove(ConfigIpAddress);
-                        config.AppSettings.Settings.Add(new KeyValueConfigurationElement(ConfigIpAddress, this.textBox2.Text));
-                        config.Save(ConfigurationSaveMode.Modified);
+                        Properties.Settings.Default.IpAddress = this.textBox2.Text;
+                        Properties.Settings.Default.Save();
                     }
 
                     this.tcpReceive.StartReceiving(this.textBox2.Text);
@@ -119,17 +108,10 @@
 
         private void addCR_CheckedChanged(object sender, EventArgs e)
         {
-
-            string addCRChecked = ConfigurationManager.AppSettings[ConfigAddCR];
-
-            if (addCRChecked != this.addCR.Checked.ToString())
+            if (Properties.Settings.Default.AddCR != this.addCR.Checked)
             {
-                Configuration config =
-                    ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-
-                config.AppSettings.Settings.Remove(ConfigAddCR);
-                config.AppSettings.Settings.Add(new KeyValueConfigurationElement(ConfigAddCR, this.addCR.Checked.ToString()));
-                config.Save(ConfigurationSaveMode.Modified);
+                Properties.Settings.Default.AddCR = this.addCR.Checked;
+                Properties.Settings.Default.Save();
             }
         }
     }

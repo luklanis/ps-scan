@@ -62,6 +62,19 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.0,Profile=Client"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4 Client Profile (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.0,Profile=Client"
+                    }
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Windows.Installer.3.1"
+                    {
+                    "Name" = "8:Windows Installer 3.1"
+                    "ProductCode" = "8:Microsoft.Windows.Installer.3.1"
+                    }
+                }
             }
         }
         "Release"
@@ -136,11 +149,6 @@
             "AssemblyAsmDisplayName" = "8:WindowsInput, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_C159CABE46A0F046893CCFDA9FC4B2E1"
-                    {
-                    "Name" = "8:WindowsInput.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:WindowsInput.dll"
             "TargetName" = "8:"
@@ -216,15 +224,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:ESRReceiver"
-        "ProductCode" = "8:{754D7A7A-E769-4AC4-97AF-EF5297A30D28}"
-        "PackageCode" = "8:{E800BD47-4498-4885-A053-53147E08F35A}"
+        "ProductCode" = "8:{7B109646-77C1-423C-A1DB-70C768DC9E3B}"
+        "PackageCode" = "8:{6AF329B7-76AF-4045-B20F-745C090CA05E}"
         "UpgradeCode" = "8:{C6143974-D81F-456A-826E-A62C1EE219BD}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.2"
+        "ProductVersion" = "8:1.0.3"
         "Manufacturer" = "8:luklanis"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
