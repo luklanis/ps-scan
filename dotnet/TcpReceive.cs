@@ -15,6 +15,7 @@ namespace ESRReceiver
     using System.Net.Sockets;
     using System.Text;
     using System.Threading;
+    using System.IO;
 
     /// <summary>
     /// The tcp receive.
@@ -27,14 +28,14 @@ namespace ESRReceiver
         //private const int Timeout = 15;
         // 300 * 50ms = 15000ms
         private const int Timeout = 300;
-        private TcpClient client;
 
         private string ipAddress;
-		private int port;
+        private int port;
 
         private Thread receivingThread;
         private bool stopThread;
-        private NetworkStream stream;
+
+        private TcpClient client = null;
 
         #endregion
 
@@ -106,7 +107,7 @@ namespace ESRReceiver
         {
             get { return this.ipAddress; }
         }
-		
+
         /// <summary>
         /// Gets Port.
         /// </summary>
@@ -145,20 +146,18 @@ namespace ESRReceiver
         {
             this.stopThread = false;
 
-            if (this.receivingThread == null)
+            if (this.receivingThread == null && this.client == null)
             {
                 this.ipAddress = ipAddress;
-				this.port = port;
-
-                this.receivingThread = new Thread(this.ReceiveThread);
-
-                this.receivingThread.Start();
+                this.port = port;
 
                 this.ConnectionStateChanged(ConnectionState.Connecting);
 
+                this.Connect();
+
                 return true;
             }
-            
+
             return false;
         }
 
@@ -168,79 +167,91 @@ namespace ESRReceiver
         /// <returns>
         /// Stops the thread to receiving messages.
         /// </returns>
-        public bool StopReceiving()
+        public void StopReceiving()
         {
             bool stopped = false;
 
             try
             {
-                if (this.receivingThread == null)
+                if (this.receivingThread == null && this.client == null)
                 {
-                    this.ConnectionStateChanged(ConnectionState.Disconnected);
-                    return true;
+                    this.stopThread = true;
+                    return;
                 }
 
-                this.stopThread = true;
-                stopped = this.receivingThread.Join(500);
-
-                if (!stopped)
+                if (this.receivingThread != null)
                 {
-                    this.receivingThread.Abort();
+                    this.stopThread = true;
                     stopped = this.receivingThread.Join(500);
+
+                    if (!stopped)
+                    {
+                        this.receivingThread.Abort();
+                        stopped = this.receivingThread.Join(500);
+                    }
                 }
 
-                this.receivingThread = null;
-
-                if (this.stream != null)
-                {
-                    this.stream.Close();
-                    this.stream = null;
-                }
-
-                if (this.client != null)
+                if (this.client != null && this.client.Connected)
                 {
                     this.client.Close();
-                    this.client = null;
                 }
+
+                this.client = null;
+                this.receivingThread = null;
             }
             finally
             {
-                if (stopped || this.client == null)
-                {
-                    this.ConnectionStateChanged(ConnectionState.Disconnected);
-                }
+                this.ConnectionStateChanged(ConnectionState.Disconnected);
             }
-
-            return stopped;
         }
 
         #endregion
 
         #region private Methods
 
-        private NetworkStream Connect(string server)
+        private void Receiving(IAsyncResult result)
+        {
+            var client = (TcpClient)result.AsyncState;
+
+            if (client.Connected && this.receivingThread == null)
+            {
+                this.client = client;
+
+                this.receivingThread = new Thread(this.ReceiveThread);
+
+                this.receivingThread.Start();
+
+                this.ConnectionStateChanged(ConnectionState.Connected);
+            }
+            else if (this.receivingThread == null && !this.stopThread)
+            {
+                Thread.Sleep(500);
+                this.Connect();
+            }
+        }
+
+        private void Connect()
         {
             try
             {
-                // Create a TcpClient.
-                // Note, for this client to work you need to have a TcpServer 
-                // connected to the same address as specified by the server, port
-                // combination.
-                this.client = new TcpClient(server, Port);
+                var client = new TcpClient();
+                client.LingerState = new LingerOption(true, 0);
+                //client.ReceiveTimeout = 1000;
 
-                this.ConnectionStateChanged(ConnectionState.Connected);
+                client.BeginConnect(this.ipAddress, this.port, Receiving, client);
+                //client.Connect(server, Port);
 
-                return this.client.GetStream();
+                //this.ConnectionStateChanged(ConnectionState.Connected);
+
+                //return client;
             }
             catch (ArgumentNullException e)
             {
                 Trace.WriteLine("ArgumentNullException: " + e);
-                return null;
             }
             catch (SocketException e)
             {
                 Trace.WriteLine("SocketException: " + e);
-                return null;
             }
         }
 
@@ -249,57 +260,72 @@ namespace ESRReceiver
             // NetworkStream stream;
             byte[] data = new byte[256];
             string responseData;
+            NetworkStream stream = null;
+            bool shouldReconnect = false;
 
-            // int lostKa;
-            this.stream = null;
-
-            while (this.stream == null)
+            try
             {
-                if (this.stopThread)
-                {
-                    return;
-                }
-
-                this.stream = this.Connect(this.ipAddress);
-
-                //// lostKa = 0;
-
-                while (this.stream != null)
+                while (this.client != null && this.client.Connected)
                 {
                     if (this.stopThread)
                     {
+                        if (stream != null)
+                        {
+                            stream.Close();
+                        }
+
                         return;
                     }
 
                     // String to store the response ASCII representation.
                     responseData = String.Empty;
 
-                    try
+                    if (stream == null)
                     {
-                        // Read the first batch of the TcpServer response bytes.
-                        int bytes = this.stream.Read(data, 0, data.Length);
-                        responseData = Encoding.UTF8.GetString(data, 2, bytes);
+                        stream = client.GetStream();
                     }
-                    catch (System.IO.IOException)
+
+                    // Read the first batch of the TcpServer response bytes.
+                    int bytes = stream.Read(data, 0, data.Length);
+
+                    if (bytes <= 2)
                     {
                         this.ConnectionStateChanged(ConnectionState.Connecting);
-                        this.stream.Close();
-                        this.stream = null;
-                        this.client.Close();
-                        this.client = null;
-						
+
+                        shouldReconnect = true;
+
                         break;
                     }
 
-                    if (responseData.Length > 0)
-                    {
-                        this.DataReceived(responseData);
-                    }
+                    responseData = Encoding.UTF8.GetString(data, 2, bytes - 2);
+
+                    this.DataReceived(responseData);
 
                     Thread.Sleep(50);
                 }
+            }
+            catch (Exception)
+            {
+            }
+            finally
+            {
+                if (stream != null)
+                {
+                    stream.Close();
+                }
 
-                Thread.Sleep(500);
+                if (this.client != null)
+                {
+                    this.client.Close();
+                    this.client = null;
+                }
+
+                this.receivingThread = null;
+
+                if (shouldReconnect)
+                {
+                    this.Connect();
+                }
             }
         }
 
