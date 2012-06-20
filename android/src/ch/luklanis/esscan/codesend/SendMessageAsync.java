@@ -1,6 +1,7 @@
 package ch.luklanis.esscan.codesend;
 
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import android.os.AsyncTask;
@@ -22,7 +23,12 @@ public class SendMessageAsync extends AsyncTask<String, Integer, Boolean> {
 			try {
 				dataOutputStream.writeUTF(params[0]);
 			} catch (Exception e) {
-				Log.e(TAG, "Send code row failed", e);
+				try {
+					dataOutputStream.close();
+				} catch (Exception ex) {
+				}
+				
+				Log.w(TAG, "Send code row failed. Socket seems to be closed.");
 			}
 		}
 		

@@ -107,9 +107,14 @@ public class ESRSender extends Service {
 
 		for(Socket socket : this.sockets) {
 			try {
-				dataOutputStreams.add(new DataOutputStream(socket.getOutputStream()));
+				if (!socket.isClosed()) {
+					dataOutputStreams.add(new DataOutputStream(socket.getOutputStream()));
+				} 
 			} catch (IOException e) {
-				Log.w(TAG, "Failed to get a output stream");
+				try {
+					socket.close();
+				} catch (IOException ex) {
+				}
 			}
 		}
 
