@@ -333,8 +333,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 		statusViewBottomLeft = (TextView) findViewById(R.id.status_view_bottom_left);
 
-		statusViewBottomRight = (TextView) findViewById(R.id.status_view_bottom_right);
-
 		psValidation = new EsrValidation();
 		this.lastValidationStep = psValidation.getCurrentStep();
 
@@ -750,7 +748,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 		// Turn off capture-related UI elements
 		statusViewBottomLeft.setVisibility(View.GONE);
-		statusViewBottomRight.setVisibility(View.GONE);
 		statusViewTop.setVisibility(View.GONE);
 		viewfinderView.setVisibility(View.GONE); 
 		resultView.setVisibility(View.VISIBLE);
