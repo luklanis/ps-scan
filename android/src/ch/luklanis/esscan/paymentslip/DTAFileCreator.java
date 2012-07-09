@@ -21,6 +21,7 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.util.Log;
 
 public class DTAFileCreator {
@@ -290,18 +291,22 @@ public class DTAFileCreator {
 		int lastModulo = subIban % modulo97;
 		lastEnd = subIbanLength;
 		
-		while(lastEnd < ibanNumber.length()){
-			if((lastEnd + subIbanLength) < ibanNumber.length()){
-				int newEnd = lastEnd + subIbanLength - 2;
-				subIban = Integer.parseInt(String.format("%2d%s", lastModulo, ibanNumber.substring(lastEnd, newEnd)));
-				lastEnd = newEnd;
+		try {
+			while(lastEnd < ibanNumber.length()){
+				if((lastEnd + subIbanLength) < ibanNumber.length()){
+					int newEnd = lastEnd + subIbanLength - 2;
+					subIban = Integer.parseInt(String.format("%2d%s", lastModulo, ibanNumber.substring(lastEnd, newEnd)));
+					lastEnd = newEnd;
+				}
+				else{
+					subIban = Integer.parseInt(String.format("%2d%s", lastModulo, ibanNumber.substring(lastEnd, ibanNumber.length())));
+					lastEnd = ibanNumber.length();
+				}
+
+				lastModulo = subIban % modulo97;
 			}
-			else{
-				subIban = Integer.parseInt(String.format("%2d%s", lastModulo, ibanNumber.substring(lastEnd, ibanNumber.length())));
-				lastEnd = ibanNumber.length();
-			}
-			
-			lastModulo = subIban % modulo97;
+		} catch (NumberFormatException ex) {
+    		return R.string.msg_own_iban_is_not_valid;
 		}
 		
 		if(lastModulo != 1){
@@ -316,7 +321,7 @@ public class DTAFileCreator {
 
 		String iban = prefs.getString(PreferencesActivity.KEY_IBAN, "").replaceAll("\\s", "");
 
-		if(iban == ""){
+		if(TextUtils.isEmpty(iban)){
 			return R.string.msg_own_iban_is_not_set;
 		}
 
