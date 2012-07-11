@@ -91,7 +91,8 @@ public class ESRSender extends Service {
 			}
 		}
 
-		return getLocalIpAddress() != null;
+		return false;
+//		return getLocalIpAddress() != null;
 
 //		if (!info.isConnected()) {
 //			Log.w(TAG, "Wifi is not connected!");
