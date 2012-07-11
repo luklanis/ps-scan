@@ -44,6 +44,7 @@ public class AppFrame extends JFrame {
 	private JTextField ipAddress;
 	private JCheckBox addCRCheckBox;
 	private Properties properties;
+	private static final String propertiesFile = System.getProperty("user.dir") + "/ESRReceiver.properties";
 
 	public AppFrame() {
 		super("ESR Receiver");
@@ -57,7 +58,7 @@ public class AppFrame extends JFrame {
 		properties = new Properties();
 		
 		try {
-			inputStream = new FileInputStream("PropertiesFile.properties");
+			inputStream = new FileInputStream(propertiesFile);
 			properties.load(inputStream);        
 			host = properties.getProperty("host");
 			addCR = properties.getProperty("addCR").equalsIgnoreCase("true");
@@ -189,8 +190,8 @@ public class AppFrame extends JFrame {
 		FileOutputStream outputStream = null;
 		try {  
 			properties.setProperty(property, value);        
-			outputStream = new FileOutputStream("PropertiesFile.properties");        
-			properties.store(outputStream, "update addCR");
+			outputStream = new FileOutputStream(propertiesFile);        
+			properties.store(outputStream, "update " + property);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

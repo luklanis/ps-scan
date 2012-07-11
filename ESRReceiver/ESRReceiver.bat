@@ -1,1 +1,0 @@
-javaw -jar ESRReceiver.jar
