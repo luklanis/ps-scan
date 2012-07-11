@@ -292,7 +292,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			boundService = ((ESRSender.LocalBinder)service).getService();
 
-			if (boundService.isConnectedWithWifi()) {
+			if (boundService.isConnectedLocal()) {
 				statusViewBottomRight.setText(getResources().getString(R.string.status_view_ip_address, boundService.getLocalIpAddress()));
 				statusViewBottomRight.setVisibility(View.VISIBLE);
 			} else {
@@ -817,7 +817,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 		EsrResult result = historyItem.getResult();
 
-		if(this.serviceIsBound && this.boundService.isConnectedWithWifi()) {
+		if(this.serviceIsBound && this.boundService.isConnectedLocal()) {
 			this.boundService.sendToListeners(result.getCompleteCode());
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(CaptureActivity.this);

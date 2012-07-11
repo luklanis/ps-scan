@@ -45,7 +45,7 @@ public class ESRSender extends Service {
 
 		this.sockets = new ArrayList<Socket>();
 
-		if(isConnectedWithWifi()) {
+		if(isConnectedLocal()) {
 			try {
 				server = new ServerSocket(SERVER_PORT);
 			} catch (IOException e) {
@@ -73,16 +73,32 @@ public class ESRSender extends Service {
 		return START_STICKY;
 	}
 
-	public boolean isConnectedWithWifi() {
+	public boolean isConnectedLocal() {
 		ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo info = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+//		NetworkInfo info = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+		NetworkInfo[] allNetworkInfo = connManager.getAllNetworkInfo();
 
-		if (!info.isConnected()) {
-			Log.w(TAG, "Wifi is not connected!");
-			return false;
+		for (int i = 0; i < allNetworkInfo.length; i++) {
+			NetworkInfo info = allNetworkInfo[i];
+			int type = info.getType();
+
+			if (info.isAvailable() && info.isConnected() 
+					&& (type == ConnectivityManager.TYPE_BLUETOOTH
+					|| type == ConnectivityManager.TYPE_DUMMY
+					|| type == ConnectivityManager.TYPE_ETHERNET
+					|| type == ConnectivityManager.TYPE_WIFI)) {
+				return true;
+			}
 		}
 
-		return true;
+		return getLocalIpAddress() != null;
+
+//		if (!info.isConnected()) {
+//			Log.w(TAG, "Wifi is not connected!");
+//			return false;
+//		}
+//
+//		return true;
 	}
 
 	public String getLocalIpAddress() {
