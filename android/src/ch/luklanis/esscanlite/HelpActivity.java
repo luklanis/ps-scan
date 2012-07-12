@@ -176,7 +176,11 @@ public final class HelpActivity extends SherlockActivity {
 		@Override
 		public boolean shouldOverrideUrlLoading(WebView view, String url) {
 			if (url.startsWith("file")) {
-				// Keep local assets in this WebView.
+				if (url.contains("{html-lang}")) {
+					String page = url.substring(url.lastIndexOf('/') + 1);
+					view.loadUrl(BASE_HELP_URL + page);
+					return true;
+				}
 				return false;
 			} else if (url.startsWith("mailto:")) {
 				try {
@@ -192,7 +196,7 @@ public final class HelpActivity extends SherlockActivity {
 					Log.w(TAG, "Problem with Intent.ACTION_SEND", e);
 					new AlertDialog.Builder(context)
 					.setTitle("Contact Info")
-					.setMessage( "Please send your feedback to: app.ocr@gmail.com" )
+					.setMessage( "Please send your feedback to: cinusdev@gmail.com" )
 					.setPositiveButton( "Done", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int which) {
 							Log.d("AlertDialog", "Positive");
