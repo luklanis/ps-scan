@@ -126,6 +126,11 @@ public final class ViewfinderView extends View {
 			// Only draw text/bounding boxes on viewfinder if it hasn't been resized since the OCR was requested.
 			Point bitmapSize = resultText.getBitmapDimensions();
 			previewFrame = cameraManager.getFramingRectInPreview();
+			
+			if (previewFrame == null) {
+				return;
+			}
+			
 			if (bitmapSize.x == previewFrame.width() && bitmapSize.y == previewFrame.height()) {
 
 
