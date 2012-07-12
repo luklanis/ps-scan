@@ -1,7 +1,6 @@
 package ch.luklanis.esscan.codesend;
 
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import android.os.AsyncTask;

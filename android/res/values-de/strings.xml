@@ -25,7 +25,8 @@
   <string name="button_export_again">Nochmal</string>
   <string name="button_change">Andere</string>
   <string name="history_clear_text">Alle löschen</string>
-  <string name="history_export">Verlauf exportieren</string>
+  <string name="history_send_dta">DTA</string>
+  <string name="history_send">CSV</string>
   <string name="history_email_title">ESR Scanner Verlauf</string>
   <string name="history_email_as_dta_title">Zahlungsauftrag gesendet von ESR Scanner</string>
   <string name="history_title">Verlauf</string>
@@ -36,7 +37,7 @@
   <string name="menu_help">Hilfe</string>
   <string name="menu_history">Verlauf</string>
   <string name="menu_settings">Einstellungen</string>
-  <string name="menu_share">Teilen</string>
+  <string name="alert_title_information">Information</string>
   <string name="alert_dont_show_again">Nicht nochmal zeigen</string>
   <string name="msg_sure">Bist du sicher?</string>
   <string name="msg_unmount_usb">Entschuldige, die SD Karte ist nicht erreichbar</string>
@@ -55,11 +56,10 @@
   <string name="esr_result_account">Konto</string>
   <string name="esr_result_address">Empfänger</string>
   <string name="esr_result_reference_number">Referenznummer</string>
+  <string name="esr_result_amount_not_set">0.00</string>
+  <string name="esr_picture">Ein kleines Bild von einem Orangen Einzahlungsschein</string>
   <string name="button_copy_code_row">Kodierzeile kopieren</string>
-  <string name="button_share_code_row">Kodierzeile teilen</string>
-  <string name="preferences_general_title">Allgemeine Einstellungen</string>
   <string name="preferences_only_macro_focus_title">Makrofokus</string>
-  <string name="preferences_only_macro_focus_summary">Versuche Makrofokus. Wenn er vom Gerät nicht unterstützt wird, dann wird automatisch Autofokus genommen.</string>
   <string name="preferences_enable_torch_title">Frontleuchte</string>
   <string name="preferences_dta_format_title">DTA Einstellungen</string>
   <string name="preferences_advanced_title">Erweiterte Einstellungen</string>
@@ -80,4 +80,5 @@
   <string name="preferences_enable_stream_mode_summary">Sendet die erfasste Zahlung direkt an deinen Computer</string>
   <string name="help_button_done">Schliessen</string>
   <string name="help_button_back">Zurück</string>
+  <string name="status_view_ip_address">IP Adresse(n): %s</string>
 </resources>

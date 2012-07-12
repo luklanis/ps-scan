@@ -66,22 +66,12 @@
         <activity
             android:name=".HelpActivity"
             android:screenOrientation="user" >
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
         </activity>
         <activity android:name=".PreferencesActivity" />
         <activity
             android:name=".history.HistoryActivity"
             android:label="@string/history_title"
             android:stateNotNeeded="true" >
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
         </activity>
         
         <service android:name=".codesend.ESRSender" android:label="Code row send service"></service>

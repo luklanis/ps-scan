@@ -83,10 +83,16 @@ public class ESRSender extends Service {
 			int type = info.getType();
 
 			if (info.isAvailable() && info.isConnected() 
-					&& (type == ConnectivityManager.TYPE_BLUETOOTH
-					|| type == ConnectivityManager.TYPE_DUMMY
-					|| type == ConnectivityManager.TYPE_ETHERNET
-					|| type == ConnectivityManager.TYPE_WIFI)) {
+//					&& (type == ConnectivityManager.TYPE_BLUETOOTH
+//					|| type == ConnectivityManager.TYPE_DUMMY
+//					|| type == ConnectivityManager.TYPE_ETHERNET
+//					|| type == ConnectivityManager.TYPE_WIFI)) {
+					&& type != ConnectivityManager.TYPE_MOBILE
+					&& type != ConnectivityManager.TYPE_MOBILE_DUN
+					&& type != ConnectivityManager.TYPE_MOBILE_HIPRI
+					&& type != ConnectivityManager.TYPE_MOBILE_MMS
+					&& type != ConnectivityManager.TYPE_MOBILE_SUPL
+					&& type != ConnectivityManager.TYPE_WIMAX) {
 				return true;
 			}
 		}

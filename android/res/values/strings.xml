@@ -27,7 +27,6 @@
   <string name="history_clear_text">Delete all</string>
   <string name="history_send_dta">DTA</string>
   <string name="history_send">CSV</string>
-  <string name="history_export">Export history</string>
   <string name="history_email_title">ESR Scanner history</string>
   <string name="history_email_as_dta_title">DTA file from ESR Scanner</string>
   <string name="history_title">History</string>
@@ -38,7 +37,6 @@
   <string name="menu_help">Help</string>
   <string name="menu_history">History</string>
   <string name="menu_settings">Settings</string>
-  <string name="menu_share">Share</string>
   <string name="alert_title_information">Information</string>
   <string name="alert_dont_show_again">Don\'t show again!</string>
   <string name="msg_sure">Are you sure?</string>
@@ -59,11 +57,9 @@
   <string name="esr_result_address">Recipient</string>
   <string name="esr_result_reference_number">Reference Number</string>
   <string name="esr_result_amount_not_set">0.00</string>
+  <string name="esr_picture">A little picture of a orange payment slip</string>
   <string name="button_copy_code_row">Copy code row</string>
-  <string name="button_share_code_row">Share code row</string>
-  <string name="preferences_general_title">General settings</string>
   <string name="preferences_only_macro_focus_title">Macro focus</string>
-  <string name="preferences_only_macro_focus_summary">Try macro focus if supported from device. Otherwise auto focus will be set.</string>
   <string name="preferences_enable_torch_title">Enable front light</string>
   <string name="preferences_dta_format_title">DTA format settings</string>
   <string name="preferences_advanced_title">Advanced settings</string>
@@ -84,5 +80,5 @@
   <string name="preferences_enable_stream_mode_summary">Sends the recognized code row to your pc</string>
   <string name="help_button_done">Done</string>
   <string name="help_button_back">Back</string>
-  <string name="status_view_ip_address">IP Address: %s</string>
+  <string name="status_view_ip_address">IP Address(es): %s</string>
 </resources>

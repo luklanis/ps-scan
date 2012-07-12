@@ -33,7 +33,6 @@ import android.view.WindowManager;
 
 import ch.luklanis.esscan.R;
 import ch.luklanis.esscan.PreferencesActivity;
-import ch.luklanis.esscan.ViewfinderView;
 
 import java.util.Collection;
 
