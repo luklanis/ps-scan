@@ -132,7 +132,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	private TextView statusViewBottomLeft;
 	//private TextView statusViewTop;
 	private View statusViewTop;
-	private TextView ocrResultView;
 	private View resultView;
 	private HistoryItem lastItem;
 	private boolean hasSurface;
@@ -150,7 +149,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	private ProgressDialog indeterminateDialog; // also for initOcr - init OCR engine
 	private boolean isEngineReady;
 	private boolean isPaused;
-	private static boolean isFirstLaunch; // True if this is the first time the app is being run
 	private HistoryManager historyManager;
 
 	private PsValidation psValidation;
@@ -281,7 +279,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 	@Override
 	public void onCreate(Bundle icicle) {
-		requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
+		requestWindowFeature(com.actionbarsherlock.view.Window.FEATURE_ACTION_BAR_OVERLAY);
 		super.onCreate(icicle);
 
 		Window window = getWindow();
@@ -329,6 +327,8 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		viewfinderView.setCameraManager(cameraManager);
 
 		resultView = findViewById(R.id.result_view);
+		resultView.setVisibility(View.GONE);
+		
 		statusViewTop = findViewById(R.id.status_view_top);
 
 		statusViewBottomLeft = (TextView) findViewById(R.id.status_view_bottom_left);
@@ -354,7 +354,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		surfaceHolder = surfaceView.getHolder();
 		if (!hasSurface) {
 			surfaceHolder.addCallback(this);
-			surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		}
 
 		// Comment out the following block to test non-OCR functions without an SD card
@@ -1073,8 +1072,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		.setPositiveButton( "Done", new FinishListener(this))
 		.show();
 	}
-
-	@SuppressWarnings("unused")
+	
 	private void setOKAlert(int id){
 		setOKAlert(CaptureActivity.this, id);
 	}
