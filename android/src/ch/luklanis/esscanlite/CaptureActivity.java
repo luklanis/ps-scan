@@ -354,6 +354,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		surfaceHolder = surfaceView.getHolder();
 		if (!hasSurface) {
 			surfaceHolder.addCallback(this);
+			surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		}
 
 		// Comment out the following block to test non-OCR functions without an SD card
