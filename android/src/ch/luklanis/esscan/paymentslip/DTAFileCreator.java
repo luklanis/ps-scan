@@ -265,14 +265,10 @@ public class DTAFileCreator {
 		for(int i=0; i<iban.length();i++){
 			char ibanChar = iban.charAt(i);
 			
-			if(ibanChar < '0' || ibanChar > '9') {
-				if (i != 17 && i != 18) {
-		    		return R.string.msg_own_iban_is_not_valid;
-				}
-				
+			if(ibanChar < '0' || ibanChar > '9') {				
 				int ibanLetter = 10 + (ibanChar - 'A');
 
-				if(ibanLetter < 10 || ibanLetter > ('Z' - 'A')) {
+				if(ibanLetter < 10 || ibanLetter > (('Z' - 'A') + 10)) {
 		    		return R.string.msg_own_iban_is_not_valid;
 				}
 				
@@ -285,6 +281,7 @@ public class DTAFileCreator {
 		
 		int lastEnd = 0;
 		int subIbanLength = 9;
+		int subIbanLengthWithModulo = subIbanLength - 2;
 		int modulo97 = 97;
 		
 		int subIban = Integer.parseInt(ibanNumber.substring(lastEnd, subIbanLength));
@@ -293,13 +290,13 @@ public class DTAFileCreator {
 		
 		try {
 			while(lastEnd < ibanNumber.length()){
-				if((lastEnd + subIbanLength) < ibanNumber.length()){
-					int newEnd = lastEnd + subIbanLength - 2;
-					subIban = Integer.parseInt(String.format("%2d%s", lastModulo, ibanNumber.substring(lastEnd, newEnd)));
+				if((lastEnd + subIbanLengthWithModulo) < ibanNumber.length()){
+					int newEnd = lastEnd + subIbanLengthWithModulo;
+					subIban = Integer.parseInt(String.format("%s%s", lastModulo, ibanNumber.substring(lastEnd, newEnd)));
 					lastEnd = newEnd;
 				}
 				else{
-					subIban = Integer.parseInt(String.format("%2d%s", lastModulo, ibanNumber.substring(lastEnd, ibanNumber.length())));
+					subIban = Integer.parseInt(String.format("%s%s", lastModulo, ibanNumber.substring(lastEnd)));
 					lastEnd = ibanNumber.length();
 				}
 
