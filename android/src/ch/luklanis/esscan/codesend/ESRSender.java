@@ -17,6 +17,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Binder;
 import android.os.IBinder;
+import android.text.TextUtils;
 import android.util.Log;
 
 public class ESRSender extends Service {
@@ -109,20 +110,24 @@ public class ESRSender extends Service {
 	}
 
 	public String getLocalIpAddress() {
+		
+		String adresses = "";
+		
 		try {
 			for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
 				NetworkInterface intf = en.nextElement();
 				for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
 					InetAddress inetAddress = enumIpAddr.nextElement();
 					if (!inetAddress.isLoopbackAddress() && inetAddress.getAddress().length == 4) {
-						return inetAddress.getHostAddress();
+						adresses += String.format("\n %s: %s", intf.getDisplayName(), inetAddress.getHostAddress());
 					}
 				}
 			}
 		} catch (SocketException ex) {
 			Log.e(TAG, ex.toString());
 		}
-		return null;
+		
+		return adresses;
 	}
 
 	public void sendToListeners(String... messages) {
