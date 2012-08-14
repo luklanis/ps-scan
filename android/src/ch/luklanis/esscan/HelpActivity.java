@@ -76,13 +76,6 @@ public final class HelpActivity extends SherlockActivity {
 
 	private WebView webView;
 
-	private final Button.OnClickListener backListener = new Button.OnClickListener() {
-		@Override
-		public void onClick(View view) {
-			webView.goBack();
-		}
-	};
-
 	private final Button.OnClickListener doneListener = new Button.OnClickListener() {
 		@Override
 		public void onClick(View view) {
@@ -107,10 +100,6 @@ public final class HelpActivity extends SherlockActivity {
 		View doneButton = findViewById(R.id.done_button);
 		doneButton.setOnClickListener(doneListener);
 
-		// Show an BACK button.
-		View backButton = findViewById(R.id.back_button);
-		backButton.setOnClickListener(backListener);
-
 		// Froyo has a bug with calling onCreate() twice in a row, which causes the What's New page
 		// that's auto-loaded on first run to appear blank. As a workaround we only call restoreState()
 		// if a valid URL was loaded at the time the previous activity was torn down.
@@ -125,11 +114,6 @@ public final class HelpActivity extends SherlockActivity {
 					webView.loadUrl(BASE_HELP_URL + page);
 				} else {
 					webView.loadUrl(BASE_URL + "/" + page);
-				}
-				
-				if(page.equals(WHATS_NEW_PAGE) || page.equals(ABOUT_PAGE) || page.equals(DEFAULT_PAGE)) {
-//					backButton.setEnabled(false);
-					backButton.setVisibility(View.GONE);
 				}
 				
 			}else {
