@@ -119,7 +119,7 @@ public class ESRSender extends Service {
 				for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
 					InetAddress inetAddress = enumIpAddr.nextElement();
 					if (!inetAddress.isLoopbackAddress() && inetAddress.getAddress().length == 4) {
-						adresses += String.format("\n %s: %s", intf.getDisplayName(), inetAddress.getHostAddress());
+						adresses += String.format("\n%s: %s", intf.getDisplayName(), inetAddress.getHostAddress());
 					}
 				}
 			}
