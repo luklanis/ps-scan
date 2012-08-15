@@ -24,10 +24,10 @@ import android.content.Context;
 /**
  * @author Sean Owen
  */
-final class DBHelper extends SQLiteOpenHelper {
+public final class DBHelper extends SQLiteOpenHelper {
 
+  public static final String DB_NAME = "esrscan.db";
   private static final int DB_VERSION = 6;
-  private static final String DB_NAME = "esrscan.db";
   static final String ID_COL = "id";
   
   static final String HISTORY_TABLE_NAME = "history";

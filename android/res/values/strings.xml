@@ -44,6 +44,8 @@
   <string name="msg_address_line_to_long">The DTA file only allows 20 signs per line and 4 lines. It will cut on export.</string>
   <string name="msg_saved">Successfully saved</string>
   <string name="msg_dta_saved">DTA file saved in %s</string>
+  <string name="msg_database_saved">Database successfully copied</string>
+  <string name="msg_database_restored">Database successfully restored</string>
   <string name="msg_copied">Successfully copied</string>
   <string name="msg_nothing_to_export">No payment to export.</string>
   <string name="msg_amount_not_valid">Amount is not valid.</string>
@@ -78,7 +80,12 @@
   <string name="preferences_email_address_summary"></string>
   <string name="preferences_enable_stream_mode_title">Enable slip-reader mode</string>
   <string name="preferences_enable_stream_mode_summary">Sends the recognized code row to your pc</string>
+  <string name="preferences_backup_restore_title">Backup/Restore</string>
+  <string name="preferences_backup_title">Backup</string>
+  <string name="preferences_backup_summary">Tab to create backup of database and preferences on external storage.</string>
+  <string name="preferences_restore_title">Restore</string>
+  <string name="preferences_restore_summary">Tab to restore a previous backup. Existing data will be overwritten.</string>
   <string name="help_button_done">Done</string>
   <string name="help_button_back">Back</string>
-  <string name="status_view_ip_address">IP Address(es): %s</string>
+  <string name="status_view_ip_address">IP Address(es):%s</string>
 </resources>

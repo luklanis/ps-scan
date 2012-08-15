@@ -16,18 +16,35 @@
  */
 package ch.luklanis.esscan;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.nio.channels.FileChannel;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 
+import ch.luklanis.esscan.history.DBHelper;
 import ch.luklanis.esscan.paymentslip.DTAFileCreator;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.EditTextPreference;
+import android.preference.Preference;
 import android.preference.PreferenceManager;
+import android.util.Log;
+import android.view.Gravity;
+import android.widget.Toast;
 
 /**
  * Class to handle preferences that are saved across sessions of the app. Shows
@@ -59,6 +76,12 @@ OnSharedPreferenceChangeListener {
 	public static final String KEY_SHOW_OCR_RESULT_PREFERENCE = "preferences_show_ocr_result";
 	public static final String KEY_NOT_SHOW_ALERT = "preferences_not_show_alertid_";
 	public static final String KEY_ENABLE_STREAM_MODE = "preferences_enable_stream_mode";
+	
+	public static final String KEY_BUTTON_BACKUP = "preferences_button_backup";
+	public static final String KEY_BUTTON_RESTORE = "preferences_button_restore";
+	
+	
+	private static final String TAG = PreferencesActivity.class.getName();
 
 	//  private ListPreference listPreferenceSourceLanguage;
 	private EditTextPreference editTextPreferenceCharacterWhitelist;
@@ -85,6 +108,24 @@ OnSharedPreferenceChangeListener {
 
 		//    listPreferenceSourceLanguage = (ListPreference) getPreferenceScreen().findPreference(KEY_SOURCE_LANGUAGE_PREFERENCE);
 		editTextPreferenceCharacterWhitelist = (EditTextPreference) getPreferenceScreen().findPreference(KEY_CHARACTER_WHITELIST);
+		
+		Preference backupButton = (Preference)findPreference(KEY_BUTTON_BACKUP);
+		backupButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+		                @Override
+		                public boolean onPreferenceClick(Preference arg0) { 
+		                    backupData();  
+		                    return true;
+		                }
+		            });
+		
+		Preference restoreButton = (Preference)findPreference(KEY_BUTTON_RESTORE);
+		restoreButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+		                @Override
+		                public boolean onPreferenceClick(Preference arg0) { 
+		                    restoreData();  
+		                    return true;
+		                }
+		            });
 	}
 
 	/**
@@ -176,6 +217,155 @@ OnSharedPreferenceChangeListener {
 	protected void onPause() {
 		super.onPause();
 		PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
+	}
+
+	private void backupData() {
+		FileChannel src = null;
+		FileChannel dst = null;
+		ObjectOutputStream prefBackup = null;
+
+		try {
+			File sd = Environment.getExternalStorageDirectory();
+			File data = Environment.getDataDirectory();
+
+			if (sd.canWrite()) {
+				File bsRoot = new File(Environment.getExternalStorageDirectory(), CaptureActivity.EXTERNAL_STORAGE_DIRECTORY);
+				if (!bsRoot.exists() && !bsRoot.mkdirs()) {
+					Log.w(TAG, "Couldn't make dir " + bsRoot);
+					return;
+				}
+
+				String currentDBPath = "data/" + this.getPackageName() + "/databases/" + DBHelper.DB_NAME;
+				String backupDBPath = CaptureActivity.EXTERNAL_STORAGE_DIRECTORY + "/" + DBHelper.DB_NAME;
+				String backupPrefsPath = CaptureActivity.EXTERNAL_STORAGE_DIRECTORY + "/preferences.xml";
+				File currentDB = new File(data, currentDBPath);
+				File backupDB = new File(sd, backupDBPath);
+				File backupPrefs = new File(sd, backupPrefsPath);
+
+				if (currentDB.exists()) {
+					src = new FileInputStream(currentDB).getChannel();
+					dst = new FileOutputStream(backupDB).getChannel();
+					dst.transferFrom(src, 0, src.size());
+
+					prefBackup = new ObjectOutputStream(new FileOutputStream(backupPrefs));
+					SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+					prefBackup.writeObject(pref.getAll());
+
+					Toast toast = Toast.makeText(getApplicationContext(), 
+							getResources().getString(R.string.msg_database_saved), 
+							Toast.LENGTH_SHORT);
+					toast.setGravity(Gravity.BOTTOM, 0, 0);
+					toast.show();
+				}
+			}
+		} catch (Exception e) {
+			Log.w(TAG, "restore failed", e);
+		} finally {
+			try {
+				if (prefBackup != null) {
+					prefBackup.close();
+				}
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+
+			try {
+				if (src != null) {
+					src.close();
+				}
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+
+			try {
+				if (dst != null) {
+					dst.close();
+				}
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+
+	private void restoreData() {
+		ObjectInputStream input = null;
+		FileChannel src = null;
+		FileChannel dst = null;
+
+		try {
+			File sd = Environment.getExternalStorageDirectory();
+			File data = Environment.getDataDirectory();
+
+			String currentDBPath = "data/" + this.getPackageName() + "/databases/" + DBHelper.DB_NAME;
+			String backupDBPath = CaptureActivity.EXTERNAL_STORAGE_DIRECTORY + "/" + DBHelper.DB_NAME;
+			String backupPrefsPath = CaptureActivity.EXTERNAL_STORAGE_DIRECTORY + "/preferences.xml";
+			File currentDB = new File(data, currentDBPath);
+			File backupDB = new File(sd, backupDBPath);
+			File backupPrefs = new File(sd, backupPrefsPath);
+
+			if (currentDB.canWrite() && backupDB.exists()) {
+				src = new FileInputStream(backupDB).getChannel();
+				dst = new FileOutputStream(currentDB).getChannel();
+				dst.transferFrom(src, 0, src.size());
+
+				input = new ObjectInputStream(new FileInputStream(backupPrefs));
+				Editor prefEdit = PreferenceManager.getDefaultSharedPreferences(this).edit();
+				prefEdit.clear();
+
+				@SuppressWarnings("unchecked")
+				Map<String, ?> entries = (Map<String, ?>) input.readObject();
+				for (Entry<String, ?> entry : entries.entrySet()) {
+					Object v = entry.getValue();
+					String key = entry.getKey();
+
+					if (v instanceof Boolean)
+						prefEdit.putBoolean(key, ((Boolean) v).booleanValue());
+					else if (v instanceof Float)
+						prefEdit.putFloat(key, ((Float) v).floatValue());
+					else if (v instanceof Integer)
+						prefEdit.putInt(key, ((Integer) v).intValue());
+					else if (v instanceof Long)
+						prefEdit.putLong(key, ((Long) v).longValue());
+					else if (v instanceof String)
+						prefEdit.putString(key, ((String) v));
+				}
+				prefEdit.commit();
+
+				Toast toast = Toast.makeText(getApplicationContext(), 
+						getResources().getString(R.string.msg_database_restored), 
+						Toast.LENGTH_SHORT);
+				toast.setGravity(Gravity.BOTTOM, 0, 0);
+				toast.show();
+
+				this.finish();
+			}
+		} catch (Exception e) {
+			Log.w(TAG, "restore failed", e);
+		} finally {
+			try {
+				if (input != null) {
+					input.close();
+				}
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+
+			try {
+				if (src != null) {
+					src.close();
+				}
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+
+			try {
+				if (dst != null) {
+					dst.close();
+				}
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
 	}
 
 	private void setOKAlert(int id){

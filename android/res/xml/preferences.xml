@@ -103,4 +103,16 @@
             android:summary="@string/preferences_enable_stream_mode_summary" />
     </PreferenceCategory>
 
+    <!-- ADVANCED SETTINGS -->
+    <PreferenceCategory android:title="@string/preferences_backup_restore_title" >
+        <Preference
+            android:title="@string/preferences_backup_title"
+            android:key="preferences_button_backup"
+            android:summary="@string/preferences_backup_summary" />
+        <Preference
+            android:title="@string/preferences_restore_title"
+            android:key="preferences_button_restore"
+            android:summary="@string/preferences_restore_summary" />
+    </PreferenceCategory>
+
 </PreferenceScreen>

@@ -11,6 +11,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import ch.luklanis.esscan.CaptureActivity;
 import ch.luklanis.esscan.PreferencesActivity;
 import ch.luklanis.esscan.R;
 import ch.luklanis.esscan.history.HistoryItem;
@@ -37,7 +38,7 @@ public class DTAFileCreator {
 	public DTAFileCreator(Context context){
 		this.context = context;
 
-		File bsRoot = new File(Environment.getExternalStorageDirectory(), "ESRScan");
+		File bsRoot = new File(Environment.getExternalStorageDirectory(), CaptureActivity.EXTERNAL_STORAGE_DIRECTORY);
 		
 		historyRoot = new File(bsRoot, "DTA");
 		fileName = "DTA-" + System.currentTimeMillis() + ".001";

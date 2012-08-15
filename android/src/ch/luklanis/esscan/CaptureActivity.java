@@ -95,6 +95,8 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 	/** The default OCR engine to use. */
 	public static final String DEFAULT_OCR_ENGINE_MODE = "Tesseract";
+	
+	public static final String EXTERNAL_STORAGE_DIRECTORY = "ESRScan";
 
 	/** Languages for which Cube data is available. */
 	static final String[] CUBE_SUPPORTED_LANGUAGES = { 
