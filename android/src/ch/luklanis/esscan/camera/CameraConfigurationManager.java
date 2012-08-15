@@ -108,10 +108,6 @@ final class CameraConfigurationManager {
 		if (cameraHeight > cameraResolution.x) {
 			cameraHeight = cameraResolution.x;
 		}
-		
-		if (screenHeight != cameraHeight) {
-			this.heightDiff += (cameraResolution.y - screenHeight) / 2;
-		}
 
 		previewResolution = new Point(previewWidth, previewHeight);
 		Log.i(TAG, "Preview resolution: " + previewResolution);

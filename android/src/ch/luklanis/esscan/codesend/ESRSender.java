@@ -17,7 +17,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Binder;
 import android.os.IBinder;
-import android.text.TextUtils;
 import android.util.Log;
 
 public class ESRSender extends Service {

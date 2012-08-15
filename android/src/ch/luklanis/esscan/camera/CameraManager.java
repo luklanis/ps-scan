@@ -39,10 +39,10 @@ import java.io.IOException;
  */
 public final class CameraManager {
 
-	private static final int MIN_FRAME_WIDTH = 50; // originally 240
-	private static final int MIN_FRAME_HEIGHT = 20; // originally 240
-	private static final int MAX_FRAME_WIDTH = 800; // originally 480
-	private static final int MAX_FRAME_HEIGHT = 64; // originally 360
+	public static final int MIN_FRAME_WIDTH = 50; // originally 240
+	public static final int MIN_FRAME_HEIGHT = 20; // originally 240
+	public static final int MAX_FRAME_WIDTH = 800; // originally 480
+	public static final int MAX_FRAME_HEIGHT = 64; // originally 360
 
 	private final Activity activity;
 	private final CameraConfigurationManager configManager;
@@ -220,7 +220,10 @@ public final class CameraManager {
 				return null;
 			}
 			
-			Rect rect = new Rect(getFramingRect());
+			Rect rect = new Rect(framingRect);
+			
+			rect.offset(0, getFramingTopOffset());
+			
 			Point cameraResolution = configManager.getCameraResolution();
 			Point screenResolution = configManager.getPreviewResolution();
 			
@@ -251,9 +254,12 @@ public final class CameraManager {
 			return null;
 		}
 		// Go ahead and assume it's YUV rather than die.
-		return new PlanarYUVLuminanceSource(data, width, height, rect.left, 
-				(rect.top + (configManager.getHeightDiff() / 2)),
+		return new PlanarYUVLuminanceSource(data, width, height, rect.left, rect.top,
 				rect.width(), rect.height(), reverseImage);
+	}
+
+	public int getFramingTopOffset() {
+		return configManager.getHeightDiff() / 2;
 	}
 
 }
