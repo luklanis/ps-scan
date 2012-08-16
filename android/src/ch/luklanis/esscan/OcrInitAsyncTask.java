@@ -141,10 +141,10 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
     }
 
     // Check for, and create if necessary, folder to hold model data
-    String destinationDirBase = params[0]; // The storage directory, minus the
-                                           // "tessdata" subdirectory
+    String destinationDirBase = params[0] + 
+    		File.separator + CaptureActivity.EXTERNAL_STORAGE_DIRECTORY; 	// The storage directory, minus the
+                                           									// "tessdata" subdirectory
     File tessdataDir = new File(destinationDirBase + 
-    		File.separator + CaptureActivity.EXTERNAL_STORAGE_DIRECTORY + 
     		File.separator + "tessdata");
     
     if (!tessdataDir.exists() && !tessdataDir.mkdirs()) {
