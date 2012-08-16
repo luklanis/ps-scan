@@ -44,8 +44,8 @@
   <string name="msg_address_line_to_long">The DTA file only allows 20 signs per line and 4 lines. It will cut on export.</string>
   <string name="msg_saved">Successfully saved</string>
   <string name="msg_dta_saved">DTA file saved in %s</string>
-  <string name="msg_database_saved">Database successfully copied</string>
-  <string name="msg_database_restored">Database successfully restored</string>
+  <string name="msg_database_saved">Backup successfully saved!</string>
+  <string name="msg_database_restored">Data successfully restored!</string>
   <string name="msg_copied">Successfully copied</string>
   <string name="msg_nothing_to_export">No payment to export.</string>
   <string name="msg_amount_not_valid">Amount is not valid.</string>
