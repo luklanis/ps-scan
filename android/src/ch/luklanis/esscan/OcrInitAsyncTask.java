@@ -35,6 +35,8 @@ import java.util.zip.ZipInputStream;
 import org.xeustechnologies.jtar.TarEntry;
 import org.xeustechnologies.jtar.TarInputStream;
 
+import ch.luklanis.esscan.history.DBHelper;
+
 import com.googlecode.tesseract.android.TessBaseAPI;
 
 import android.app.ProgressDialog;
@@ -141,7 +143,10 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
     // Check for, and create if necessary, folder to hold model data
     String destinationDirBase = params[0]; // The storage directory, minus the
                                            // "tessdata" subdirectory
-    File tessdataDir = new File(destinationDirBase + File.separator + "tessdata");
+    File tessdataDir = new File(destinationDirBase + 
+    		File.separator + CaptureActivity.EXTERNAL_STORAGE_DIRECTORY + 
+    		File.separator + "tessdata");
+    
     if (!tessdataDir.exists() && !tessdataDir.mkdirs()) {
       Log.e(TAG, "Couldn't make directory " + tessdataDir);
       return false;

@@ -236,7 +236,7 @@ OnSharedPreferenceChangeListener {
 				}
 
 				String currentDBPath = "data/" + this.getPackageName() + "/databases/" + DBHelper.DB_NAME;
-				String backupDBPath = CaptureActivity.EXTERNAL_STORAGE_DIRECTORY + "/" + DBHelper.DB_NAME;
+				String backupDBPath = CaptureActivity.EXTERNAL_STORAGE_DIRECTORY + File.separator + DBHelper.DB_NAME;
 				String backupPrefsPath = CaptureActivity.EXTERNAL_STORAGE_DIRECTORY + "/preferences.xml";
 				File currentDB = new File(data, currentDBPath);
 				File backupDB = new File(sd, backupDBPath);

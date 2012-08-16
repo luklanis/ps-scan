@@ -24,6 +24,7 @@ import android.graphics.Rect;
 import android.hardware.Camera;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.util.DisplayMetrics;
 import android.view.SurfaceHolder;
 import ch.luklanis.esscan.PlanarYUVLuminanceSource;
 import ch.luklanis.esscan.PreferencesActivity;
@@ -41,8 +42,9 @@ public final class CameraManager {
 
 	public static final int MIN_FRAME_WIDTH = 50; // originally 240
 	public static final int MIN_FRAME_HEIGHT = 20; // originally 240
-	public static final int MAX_FRAME_WIDTH = 800; // originally 480
-	public static final int MAX_FRAME_HEIGHT = 64; // originally 360
+	
+	public static final double FRAME_WIDTH_INCHES = 3.74;
+	public static final double FRAME_HEIGHT_INCHES = 0.23;
 
 	private final Activity activity;
 	private final CameraConfigurationManager configManager;
@@ -186,19 +188,23 @@ public final class CameraManager {
 			if (camera == null) {
 				return null;
 			}
+			
 			Point previewResolution = configManager.getPreviewResolution();
-			int width = previewResolution.x;
+			
+			DisplayMetrics metrics = new DisplayMetrics();
+			activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+			
+			int width = (int) (metrics.xdpi * FRAME_WIDTH_INCHES);
 			if (width < MIN_FRAME_WIDTH) {
 				width = MIN_FRAME_WIDTH;
-			} else if (width > MAX_FRAME_WIDTH) {
-				width = MAX_FRAME_WIDTH;
+			} else if (width > previewResolution.x) {
+				width = previewResolution.x;
 			}
-			int height = previewResolution.y * 1/7;
+			
+			int height = (int) (metrics.ydpi * FRAME_HEIGHT_INCHES);
 			if (height < MIN_FRAME_HEIGHT) {
 				height = MIN_FRAME_HEIGHT;
-			} else if (height > MAX_FRAME_HEIGHT) {
-				height = MAX_FRAME_HEIGHT;
-			}
+			} 
 			
 			int leftOffset = (previewResolution.x - width) / 2;
 			int topOffset = ((previewResolution.y - height) / 2);
