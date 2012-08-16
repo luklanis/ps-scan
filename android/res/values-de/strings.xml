@@ -44,8 +44,8 @@
   <string name="msg_address_line_to_long">Das DTA Format erlaubt nur 20 Zeichen pro Zeile und instgesamt 4 Zeilen. Beim Export wird abgeschnitten.</string>
   <string name="msg_saved">Erfolgreich gespeichert!</string>
   <string name="msg_dta_saved">DTA Datei gespeichert unter %s</string>
-  <string name="msg_database_saved">Datenbank erfolgreich gesichert</string>
-  <string name="msg_database_restored">Datenbank erfolgreich wiederhergestellt</string>
+  <string name="msg_database_saved">Daten erfolgreich gesichert!</string>
+  <string name="msg_database_restored">Daten erfolgreich wiederhergestellt!</string>
   <string name="msg_copied">Erfolgreich kopiert!</string>
   <string name="msg_nothing_to_export">Alle Zahlungen wurden schon mal exportiert.</string>
   <string name="msg_amount_not_valid">Betrag ist ungültig.</string>
