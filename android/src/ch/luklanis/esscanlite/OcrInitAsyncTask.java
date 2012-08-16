@@ -35,8 +35,6 @@ import java.util.zip.ZipInputStream;
 import org.xeustechnologies.jtar.TarEntry;
 import org.xeustechnologies.jtar.TarInputStream;
 
-import ch.luklanis.esscan.history.DBHelper;
-
 import com.googlecode.tesseract.android.TessBaseAPI;
 
 import android.app.ProgressDialog;

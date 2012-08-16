@@ -17,7 +17,7 @@
 
 package ch.luklanis.esscanlite.history;
 
-import ch.luklanis.esscan.CaptureActivity;
+import ch.luklanis.esscanlite.CaptureActivity;
 import ch.luklanis.esscan.paymentslip.EsrResult;
 
 import android.app.Activity;

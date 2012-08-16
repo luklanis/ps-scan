@@ -28,7 +28,7 @@ import java.util.Map.Entry;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 
-import ch.luklanis.esscan.history.DBHelper;
+import ch.luklanis.esscanlite.history.DBHelper;
 import ch.luklanis.esscan.paymentslip.DTAFileCreator;
 
 import android.app.AlertDialog;
