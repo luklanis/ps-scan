@@ -88,5 +88,5 @@
   <string name="preferences_restore_summary">Klicken um die Datenbank und Einstellungen von einer zuvor erstellten Kopie wieder herzustellen. Alle Daten werden überschrieben.</string>
   <string name="help_button_done">Schliessen</string>
   <string name="help_button_back">Zurück</string>
-  <string name="status_view_ip_address">IP Adresse(n): %s</string>
+  <string name="status_view_ip_address">IP Adresse(n):%s</string>
 </resources>
