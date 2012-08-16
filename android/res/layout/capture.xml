@@ -280,7 +280,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:orientation="horizontal"
-                android:paddingTop="48dip" >
+                android:paddingTop="72dip" >
 
                 <TextView
                     android:id="@+id/status_view_1"

@@ -24,6 +24,7 @@ import android.graphics.Rect;
 import android.hardware.Camera;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.util.DisplayMetrics;
 import android.view.SurfaceHolder;
 import ch.luklanis.esscanlite.PlanarYUVLuminanceSource;
 import ch.luklanis.esscanlite.PreferencesActivity;
@@ -39,10 +40,11 @@ import java.io.IOException;
  */
 public final class CameraManager {
 
-	private static final int MIN_FRAME_WIDTH = 50; // originally 240
-	private static final int MIN_FRAME_HEIGHT = 20; // originally 240
-	private static final int MAX_FRAME_WIDTH = 800; // originally 480
-	private static final int MAX_FRAME_HEIGHT = 600; // originally 360
+	public static final int MIN_FRAME_WIDTH = 50; // originally 240
+	public static final int MIN_FRAME_HEIGHT = 20; // originally 240
+	
+	public static final double FRAME_WIDTH_INCHES = 3.74;
+	public static final double FRAME_HEIGHT_INCHES = 0.23;
 
 	private final Activity activity;
 	private final CameraConfigurationManager configManager;
@@ -186,19 +188,23 @@ public final class CameraManager {
 			if (camera == null) {
 				return null;
 			}
+			
 			Point previewResolution = configManager.getPreviewResolution();
-			int width = previewResolution.x;
+			
+			DisplayMetrics metrics = new DisplayMetrics();
+			activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+			
+			int width = (int) (metrics.xdpi * FRAME_WIDTH_INCHES);
 			if (width < MIN_FRAME_WIDTH) {
 				width = MIN_FRAME_WIDTH;
-			} else if (width > MAX_FRAME_WIDTH) {
-				width = MAX_FRAME_WIDTH;
+			} else if (width > previewResolution.x) {
+				width = previewResolution.x;
 			}
-			int height = previewResolution.y * 1/7;
+			
+			int height = (int) (metrics.ydpi * FRAME_HEIGHT_INCHES);
 			if (height < MIN_FRAME_HEIGHT) {
 				height = MIN_FRAME_HEIGHT;
-			} else if (height > MAX_FRAME_HEIGHT) {
-				height = MAX_FRAME_HEIGHT;
-			}
+			} 
 			
 			int leftOffset = (previewResolution.x - width) / 2;
 			int topOffset = ((previewResolution.y - height) / 2);
@@ -220,7 +226,10 @@ public final class CameraManager {
 				return null;
 			}
 			
-			Rect rect = new Rect(getFramingRect());
+			Rect rect = new Rect(framingRect);
+			
+			rect.offset(0, getFramingTopOffset());
+			
 			Point cameraResolution = configManager.getCameraResolution();
 			Point screenResolution = configManager.getPreviewResolution();
 			
@@ -251,9 +260,12 @@ public final class CameraManager {
 			return null;
 		}
 		// Go ahead and assume it's YUV rather than die.
-		return new PlanarYUVLuminanceSource(data, width, height, rect.left, 
-				(rect.top + (configManager.getHeightDiff() / 2)),
+		return new PlanarYUVLuminanceSource(data, width, height, rect.left, rect.top,
 				rect.width(), rect.height(), reverseImage);
+	}
+
+	public int getFramingTopOffset() {
+		return configManager.getHeightDiff() / 2;
 	}
 
 }

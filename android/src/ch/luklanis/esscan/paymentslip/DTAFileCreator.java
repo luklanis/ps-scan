@@ -26,8 +26,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import ch.luklanis.esscanlite.R;
+import ch.luklanis.esscanlite.CaptureActivity;
 import ch.luklanis.esscanlite.PreferencesActivity;
+import ch.luklanis.esscanlite.R;
 import ch.luklanis.esscanlite.history.HistoryItem;
 
 import android.content.Context;
@@ -52,7 +53,7 @@ public class DTAFileCreator {
 	public DTAFileCreator(Context context){
 		this.context = context;
 
-		File bsRoot = new File(Environment.getExternalStorageDirectory(), "ESRScan");
+		File bsRoot = new File(Environment.getExternalStorageDirectory(), CaptureActivity.EXTERNAL_STORAGE_DIRECTORY);
 		
 		historyRoot = new File(bsRoot, "DTA");
 		fileName = "DTA-" + System.currentTimeMillis() + ".001";

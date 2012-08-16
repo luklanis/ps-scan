@@ -17,6 +17,7 @@
 
 package ch.luklanis.esscanlite.history;
 
+import ch.luklanis.esscan.CaptureActivity;
 import ch.luklanis.esscan.paymentslip.EsrResult;
 
 import android.app.Activity;
@@ -421,7 +422,7 @@ public final class HistoryManager {
 	}
 
 	static Uri saveHistory(String history) {
-		File bsRoot = new File(Environment.getExternalStorageDirectory(), "ESRScan");
+		File bsRoot = new File(Environment.getExternalStorageDirectory(), CaptureActivity.EXTERNAL_STORAGE_DIRECTORY);
 		File historyRoot = new File(bsRoot, "History");
 		if (!historyRoot.exists() && !historyRoot.mkdirs()) {
 			Log.w(TAG, "Couldn't make dir " + historyRoot);

@@ -106,12 +106,12 @@ public final class ViewfinderView extends View {
 		int width = canvas.getWidth();
 		int height = canvas.getHeight(); 
 		
+		
 		if (cameraManager == null || cameraManager.getFramingRect() == null) {
-			bounds.set(0, (height / 2), width, ((height / 2) - (height / 7)));
-			frame = bounds;
-		} else {
-			frame = cameraManager.getFramingRect();
+			return;
 		}
+		
+		frame = cameraManager.getFramingRect();
 
 		// Draw the exterior (i.e. outside the framing rect) darkened
 		paint.setColor(maskColor);

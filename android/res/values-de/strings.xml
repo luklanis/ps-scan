@@ -44,6 +44,8 @@
   <string name="msg_address_line_to_long">Das DTA Format erlaubt nur 20 Zeichen pro Zeile und instgesamt 4 Zeilen. Beim Export wird abgeschnitten.</string>
   <string name="msg_saved">Erfolgreich gespeichert!</string>
   <string name="msg_dta_saved">DTA Datei gespeichert unter %s</string>
+  <string name="msg_database_saved">Datenbank erfolgreich gesichert</string>
+  <string name="msg_database_restored">Datenbank erfolgreich wiederhergestellt</string>
   <string name="msg_copied">Erfolgreich kopiert!</string>
   <string name="msg_nothing_to_export">Alle Zahlungen wurden schon mal exportiert.</string>
   <string name="msg_amount_not_valid">Betrag ist ungültig.</string>
@@ -61,6 +63,7 @@
   <string name="preferences_enable_torch_title">Frontleuchte</string>
   <string name="preferences_dta_format_title">DTA Einstellungen</string>
   <string name="preferences_advanced_title">Erweiterte Einstellungen</string>
+  <string name="preferences_database_title">Sichern/Wiederherstellen der Datenbank</string>
   <string name="preferences_play_beep_title">Beepton abspielen</string>
   <string name="preferences_character_whitelist_title">Zeichen Whitelist</string>
   <string name="preferences_reverse_image_title">Kamerabild umdrehen</string>
@@ -76,6 +79,11 @@
   <string name="preferences_email_address_summary"></string>
   <string name="preferences_enable_stream_mode_title">Beleglesermodus einschalten</string>
   <string name="preferences_enable_stream_mode_summary">Sendet die erfasste Zahlung direkt an deinen Computer (nur möglich in der Vollversion)</string>
+  <string name="preferences_backup_restore_title">Sichern/Wiederherstellen</string>
+  <string name="preferences_backup_title">Sichern</string>
+  <string name="preferences_backup_summary">Klicken um eine Kopie der Datenbank und den Einstellungen auf dem externen Speicher zu erstellen.</string>
+  <string name="preferences_restore_title">Wiederherstellen</string>
+  <string name="preferences_restore_summary">Klicken um die Datenbank und Einstellungen von einer zuvor erstellten Kopie wieder herzustellen. Alle Daten werden überschrieben.</string>
   <string name="help_button_done">Schliessen</string>
   <string name="help_button_back">Zurück</string>
 </resources>

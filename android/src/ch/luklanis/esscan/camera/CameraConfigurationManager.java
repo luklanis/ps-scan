@@ -49,8 +49,6 @@ final class CameraConfigurationManager {
 	private static final int MIN_PREVIEW_PIXELS = 320 * 240; // small screen
 	//  private static final int MAX_PREVIEW_PIXELS = 800 * 480; // large/HD screen
 
-	private static final boolean SCALE_PREVIEW_VIEW = false;
-
 	private final Activity activity;
 	private Point previewResolution;
 	private Point cameraResolution;
@@ -110,10 +108,6 @@ final class CameraConfigurationManager {
 		
 		if (cameraHeight > cameraResolution.x) {
 			cameraHeight = cameraResolution.x;
-		}
-		
-		if (screenHeight != cameraHeight) {
-			this.heightDiff += (cameraResolution.y - screenHeight) / 2;
 		}
 
 		previewResolution = new Point(previewWidth, previewHeight);
