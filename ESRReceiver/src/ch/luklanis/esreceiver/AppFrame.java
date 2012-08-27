@@ -3,7 +3,11 @@ package ch.luklanis.esreceiver;
 import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Label;
+import java.awt.LayoutManager;
 import java.awt.Robot;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -119,16 +123,16 @@ public class AppFrame extends JFrame {
 		body.add(saveButton);
 
 
-		JPanel footer = new JPanel();
+		JPanel footer = new JPanel(new SWTGridLayout(2, false));
 		getContentPane().add(footer, BorderLayout.SOUTH);
 		footer.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.BLACK));
 
-		data = new SWTGridData();
-		data.horizontalSpan = 4;
-		data.horizontalAlignment = SWTGridData.HORIZONTAL_ALIGN_BEGINNING;
-		//		body.add(address, data);
 		connectionState = new JLabel(ConnectionState.Disconnected.name());
 		footer.add(connectionState, data);
+
+		JLabel version = new JLabel("Version: 0.5.1");
+		version.setAlignmentX(JLabel.RIGHT_ALIGNMENT);
+		footer.add(version);
 
 		this.tcpReceive = new TcpReceive();
 		this.tcpReceive.setOnConnectionStateChangeListener(new OnConnectionStateChangeListener() {

@@ -1,10 +1,10 @@
 Windows
 -------
-Double-click ESRReceiver.jar to start the server application.
+Double-click ESRReceiver-x.x.x.jar to start the server application.
 
 OSX, Linux
 ----------
-Double-click ESRReceiver.jar to start the server application.
+Double-click ESRReceiver-x.x.x.jar to start the server application.
 
 The Java SE runtime environment is needed to use this program.
 Mac and Windows users can go to
