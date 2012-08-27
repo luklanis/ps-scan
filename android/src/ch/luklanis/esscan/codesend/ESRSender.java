@@ -17,6 +17,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Binder;
 import android.os.IBinder;
+import android.text.TextUtils;
 import android.util.Log;
 
 public class ESRSender extends Service {
@@ -28,7 +29,7 @@ public class ESRSender extends Service {
 	}
 
 	private static final int SERVER_PORT = 8765;
-	private static final String TAG = ESRSender.class.getPackage().getName() + "." + ESRSender.class.getName();
+	private static final String TAG = ESRSender.class.getName();
 	private final IBinder binder = new LocalBinder();
 
 	private ServerSocket server;
@@ -98,7 +99,7 @@ public class ESRSender extends Service {
 		}
 
 		return false;
-//		return getLocalIpAddress() != null;
+//		return !TextUtils.isEmpty(getLocalIpAddress());
 
 //		if (!info.isConnected()) {
 //			Log.w(TAG, "Wifi is not connected!");

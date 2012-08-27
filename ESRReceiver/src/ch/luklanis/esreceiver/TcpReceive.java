@@ -80,10 +80,19 @@ public class TcpReceive  implements Runnable{
 				is = new DataInputStream(clientSocket.getInputStream());
 				changeConnectionState(ConnectionState.Connected);
 			} catch (Exception e) {
-				System.err.println("Don't know about host "+host);
+				System.err.println("Don't know about host " + host);
+				changeConnectionState(ConnectionState.Connecting);
+				
 				try {
-					changeConnectionState(ConnectionState.Connecting);
-					Thread.sleep(3000);
+
+					if (clientSocket.isConnected()) {
+						clientSocket.close();
+					}
+				} catch (Exception e1) {
+				}
+
+				try {
+					Thread.sleep(1000);
 				} catch (Exception e1) {
 				}
 				continue;
@@ -105,7 +114,15 @@ public class TcpReceive  implements Runnable{
 				// close the socket
 				try {
 					is.close();
-					clientSocket.close(); 
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} 
+
+				try {
+					if (clientSocket.isConnected()) {
+						clientSocket.close(); 
+					}
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
