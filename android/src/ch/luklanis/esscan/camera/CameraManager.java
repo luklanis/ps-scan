@@ -40,8 +40,8 @@ import java.io.IOException;
  */
 public final class CameraManager {
 
-	public static final int MIN_FRAME_WIDTH = 50; // originally 240
-	public static final int MIN_FRAME_HEIGHT = 20; // originally 240
+	public static final int MIN_FRAME_WIDTH = 240; // originally 240
+	public static final int MIN_FRAME_HEIGHT = 48; // originally 240
 	
 	public static final double FRAME_WIDTH_INCHES = 3.74;
 	public static final double FRAME_HEIGHT_INCHES = 0.23;
