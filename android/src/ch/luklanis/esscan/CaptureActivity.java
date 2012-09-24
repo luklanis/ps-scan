@@ -417,7 +417,13 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			resumeOCR();
 		}
 
+
 		enableStreamMode = this.prefs.getBoolean(PreferencesActivity.KEY_ENABLE_STREAM_MODE, false);
+		
+		if (enableStreamMode && serviceIntent == null) {
+			serviceIntent =  new Intent(this, ESRSender.class);
+			startService(serviceIntent);
+		}
 
 		// Start/stop service if resumed from preferences
 		if (enableStreamMode) {
@@ -429,21 +435,14 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 	void doBindService() {
 		if(!serviceIsBound) {
-			serviceIntent =  new Intent(this, ESRSender.class);
-			startService(serviceIntent);
 			bindService(serviceIntent, serviceConnection, 0);
 			serviceIsBound = true;
 		}
 	}
 
 	void doUnbindService() {
-		if(serviceIsBound) {			
-			if(boundService != null) {
-				boundService.stopServer();
-			}
-
+		if(serviceIsBound) {		
 			unbindService(serviceConnection);
-			stopService(serviceIntent);
 			serviceIsBound = false;
 		}
 	}

@@ -33,7 +33,7 @@ public class ESRSender extends Service {
 	private final IBinder binder = new LocalBinder();
 
 	private ServerSocket server;
-	private ArrayList<Socket> sockets;
+	private Socket socket;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -44,7 +44,7 @@ public class ESRSender extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		super.onStartCommand(intent, flags, startId);
 
-		this.sockets = new ArrayList<Socket>();
+		this.socket = null;
 
 		if(isConnectedLocal()) {
 			try {
@@ -58,10 +58,8 @@ public class ESRSender extends Service {
 				public void run() {
 
 					while(!server.isClosed()) {
-						Socket socket;
 						try {
 							socket = server.accept();
-							sockets.add(socket);
 						} catch (IOException e) {
 						}
 					} 
@@ -76,7 +74,7 @@ public class ESRSender extends Service {
 
 	public boolean isConnectedLocal() {
 		ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-//		NetworkInfo info = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+		//		NetworkInfo info = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 		NetworkInfo[] allNetworkInfo = connManager.getAllNetworkInfo();
 
 		for (int i = 0; i < allNetworkInfo.length; i++) {
@@ -84,10 +82,10 @@ public class ESRSender extends Service {
 			int type = info.getType();
 
 			if (info.isAvailable() && info.isConnected() 
-//					&& (type == ConnectivityManager.TYPE_BLUETOOTH
-//					|| type == ConnectivityManager.TYPE_DUMMY
-//					|| type == ConnectivityManager.TYPE_ETHERNET
-//					|| type == ConnectivityManager.TYPE_WIFI)) {
+					//					&& (type == ConnectivityManager.TYPE_BLUETOOTH
+					//					|| type == ConnectivityManager.TYPE_DUMMY
+					//					|| type == ConnectivityManager.TYPE_ETHERNET
+					//					|| type == ConnectivityManager.TYPE_WIFI)) {
 					&& type != ConnectivityManager.TYPE_MOBILE
 					&& type != ConnectivityManager.TYPE_MOBILE_DUN
 					&& type != ConnectivityManager.TYPE_MOBILE_HIPRI
@@ -99,20 +97,20 @@ public class ESRSender extends Service {
 		}
 
 		return false;
-//		return !TextUtils.isEmpty(getLocalIpAddress());
+		//		return !TextUtils.isEmpty(getLocalIpAddress());
 
-//		if (!info.isConnected()) {
-//			Log.w(TAG, "Wifi is not connected!");
-//			return false;
-//		}
-//
-//		return true;
+		//		if (!info.isConnected()) {
+		//			Log.w(TAG, "Wifi is not connected!");
+		//			return false;
+		//		}
+		//
+		//		return true;
 	}
 
 	public String getLocalIpAddress() {
-		
+
 		String adresses = "";
-		
+
 		try {
 			for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
 				NetworkInterface intf = en.nextElement();
@@ -126,23 +124,21 @@ public class ESRSender extends Service {
 		} catch (SocketException ex) {
 			Log.e(TAG, ex.toString());
 		}
-		
+
 		return adresses;
 	}
 
 	public void sendToListeners(String... messages) {
 		ArrayList<DataOutputStream> dataOutputStreams = new ArrayList<DataOutputStream>();
 
-		for(Socket socket : this.sockets) {
+		try {
+			if (!this.socket.isClosed()) {
+				dataOutputStreams.add(new DataOutputStream(this.socket.getOutputStream()));
+			} 
+		} catch (IOException e) {
 			try {
-				if (!socket.isClosed()) {
-					dataOutputStreams.add(new DataOutputStream(socket.getOutputStream()));
-				} 
-			} catch (IOException e) {
-				try {
-					socket.close();
-				} catch (IOException ex) {
-				}
+				this.socket.close();
+			} catch (IOException ex) {
 			}
 		}
 
@@ -163,9 +159,7 @@ public class ESRSender extends Service {
 				this.server.close();
 			}
 
-			for (Socket socket : this.sockets){
-				socket.close();
-			}
+			socket.close();
 		} catch (IOException e) {
 		}
 	}
