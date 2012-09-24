@@ -17,7 +17,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Binder;
 import android.os.IBinder;
-import android.text.TextUtils;
 import android.util.Log;
 
 public class ESRSender extends Service {
@@ -46,28 +45,7 @@ public class ESRSender extends Service {
 
 		this.socket = null;
 
-		if(isConnectedLocal()) {
-			try {
-				server = new ServerSocket(SERVER_PORT);
-			} catch (IOException e) {
-				Log.e(TAG, "Open a server socket failed!", e);
-			}
-
-			Runnable runnable = new Runnable() {
-				@Override
-				public void run() {
-
-					while(!server.isClosed()) {
-						try {
-							socket = server.accept();
-						} catch (IOException e) {
-						}
-					} 
-				}
-			};
-
-			new Thread(runnable).start();
-		}
+		this.startServer();
 
 		return START_STICKY;
 	}
@@ -128,27 +106,39 @@ public class ESRSender extends Service {
 		return adresses;
 	}
 
-	public void sendToListeners(String... messages) {
+	public boolean sendToListeners(String... messages) {
 		ArrayList<DataOutputStream> dataOutputStreams = new ArrayList<DataOutputStream>();
 
 		try {
-			if (!this.socket.isClosed()) {
+			if (this.socket != null && !this.socket.isClosed()) {
 				dataOutputStreams.add(new DataOutputStream(this.socket.getOutputStream()));
-			} 
+			} else {
+				return false;
+			}
 		} catch (IOException e) {
 			try {
 				this.socket.close();
 			} catch (IOException ex) {
 			}
+
+			return false;
 		}
 
 		SendMessageAsync sendMessageAsync = new SendMessageAsync(dataOutputStreams);
 		sendMessageAsync.execute(messages);
+		return true;
 	}
 
 	@Override
 	public void onDestroy() {
 		stopServer();
+
+		if (this.socket != null) {
+			try {
+				this.socket.close();
+			} catch (IOException e) {
+			}
+		}
 
 		super.onDestroy();
 	}
@@ -157,10 +147,43 @@ public class ESRSender extends Service {
 		try {
 			if (this.server != null && !this.server.isClosed()) {
 				this.server.close();
+				this.server = null;
 			}
 
-			socket.close();
+			if (this.socket != null) {
+				this.socket.close();
+			}
 		} catch (IOException e) {
+		}
+	}
+
+	public void startServer() {
+
+		if(isConnectedLocal()) {
+			if (this.server != null) {
+				return;
+			}
+
+			try {
+				server = new ServerSocket(SERVER_PORT);
+			} catch (IOException e) {
+				Log.e(TAG, "Open a server socket failed!", e);
+			}
+
+			Runnable runnable = new Runnable() {
+				@Override
+				public void run() {
+
+					while(server != null && !server.isClosed()) {
+						try {
+							socket = server.accept();
+						} catch (IOException e) {
+						}
+					} 
+				}
+			};
+
+			new Thread(runnable).start();
 		}
 	}
 }

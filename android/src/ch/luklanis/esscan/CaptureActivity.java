@@ -43,16 +43,20 @@ import ch.luklanis.esscan.paymentslip.PsValidation;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 //import android.content.ClipData;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -62,6 +66,7 @@ import android.preference.PreferenceManager;
 //import android.content.ClipboardManager;
 import android.text.ClipboardManager;
 import android.text.SpannableStringBuilder;
+import android.text.TextUtils;
 import android.text.style.CharacterStyle;
 import android.util.Log;
 import android.view.Gravity;
@@ -293,8 +298,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			boundService = ((ESRSender.LocalBinder)service).getService();
 
 			if (boundService.isConnectedLocal()) {
-				statusViewBottomRight.setText(getResources().getString(R.string.status_view_ip_address, boundService.getLocalIpAddress()));
-				statusViewBottomRight.setVisibility(View.VISIBLE);
+				showIPAddresses();
 			} else {
 				statusViewBottomRight.setText("");
 				statusViewBottomRight.setVisibility(View.GONE);
@@ -309,6 +313,10 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			// Because it is running in our same process, we should never
 			// see this happen.
 			boundService = null;
+			
+			statusViewBottomRight.setText("");
+			statusViewBottomRight.setVisibility(View.GONE);
+			setOKAlert(R.string.msg_stream_mode_not_available);
 		}
 	};
 
@@ -317,6 +325,8 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	private TextView statusViewBottomRight;
 
 	private Intent serviceIntent;
+
+	private NetworkReceiver receiver;
 
 	@Override
 	public void onCreate(Bundle icicle) {
@@ -356,6 +366,11 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		amountSaveButton.setOnClickListener(saveListener);
 
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		
+        // Registers BroadcastReceiver to track network connection changes.
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        receiver = new NetworkReceiver();
+        this.registerReceiver(receiver, filter);
 	}
 
 	@Override
@@ -417,18 +432,16 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			resumeOCR();
 		}
 
-
 		enableStreamMode = this.prefs.getBoolean(PreferencesActivity.KEY_ENABLE_STREAM_MODE, false);
 		
-		if (enableStreamMode && serviceIntent == null) {
-			serviceIntent =  new Intent(this, ESRSender.class);
-			startService(serviceIntent);
-		}
-
-		// Start/stop service if resumed from preferences
 		if (enableStreamMode) {
-			doBindService();
-		} 
+			if (serviceIntent == null) {
+				serviceIntent =  new Intent(this, ESRSender.class);
+				startService(serviceIntent);
+			}
+
+			doBindService(); 
+		}
 
 		showHelpOnFirstLaunch();
 	}
@@ -536,6 +549,11 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		}   
 	}
 
+	private void showIPAddresses() {
+		statusViewBottomRight.setText(getResources().getString(R.string.status_view_ip_address, boundService.getLocalIpAddress()));
+		statusViewBottomRight.setVisibility(View.VISIBLE);
+	}
+
 	@Override
 	protected void onPause() {
 		if (handler != null) {
@@ -564,11 +582,16 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 	@Override
 	protected void onDestroy() {
+		super.onDestroy();
+		
 		if (baseApi != null) {
 			baseApi.end();
 		}
-
-		super.onDestroy();
+		
+        // Unregisters BroadcastReceiver when app is destroyed.
+        if (receiver != null) {
+            this.unregisterReceiver(receiver);
+        }
 	}
 
 	@Override
@@ -1176,5 +1199,35 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		builder.setMessage(id);
 		builder.setPositiveButton(R.string.button_ok, null);
 		builder.show();
+	}
+	
+	// From http://developer.android.com/training/basics/network-ops/managing.html#detect-changes
+	private class NetworkReceiver extends BroadcastReceiver {   
+	      
+		@Override
+		public void onReceive(Context context, Intent intent) {
+		    ConnectivityManager conn =  (ConnectivityManager)
+		        context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		    NetworkInfo networkInfo = conn.getActiveNetworkInfo();
+
+		    if (networkInfo != null && networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+		    	if (enableStreamMode) {
+			        if (boundService != null) {
+			        	boundService.startServer();
+			        	showIPAddresses();
+			        }
+				}
+		    } else {
+		    	if (boundService != null) {
+		    		boundService.stopServer();
+
+		    		if (!TextUtils.isEmpty(statusViewBottomRight.getText())) {
+		    			statusViewBottomRight.setText("");
+		    			statusViewBottomRight.setVisibility(View.GONE);
+		    			setOKAlert(R.string.msg_stream_mode_not_available);
+		    		}
+		        }
+		    }
+		}
 	}
 }
