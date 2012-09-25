@@ -47,6 +47,6 @@ public final class EsResult extends PsResult{
 
 	@Override
 	public String toString() {
-		return getAccount();
+		return PS_TYPE_NAME + " payment slip," + (completeCode.indexOf("+") > 0 ? " first" : " second") + " code row";
 	}
 }

@@ -16,6 +16,7 @@
 
 package ch.luklanis.esscan.history;
 
+import android.text.TextUtils;
 import ch.luklanis.esscan.paymentslip.EsrResult;
 import ch.luklanis.esscan.paymentslip.PsResult;
 
@@ -31,7 +32,7 @@ public final class HistoryItem {
 	public HistoryItem(PsResult result) {
 		this.result = result;
 		this.addressNumber = -1;
-		this.amount = null;
+		this.amount = "";
 		this.dtaFile = null;
 		this.exported = false;
 		this.address = "";
@@ -76,12 +77,12 @@ public final class HistoryItem {
 
 			EsrResult esrResult = (EsrResult)result;
 
-			if(esrResult.getAmount() != ""){
+			if(!TextUtils.isEmpty(esrResult.getAmount())){
 				return esrResult.getAmount();
 			}
 		}
 
-		return amount;
+		return amount == null ? "" : amount;
 	}
 
 	public boolean getExported() {

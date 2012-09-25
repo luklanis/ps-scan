@@ -26,7 +26,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import ch.luklanis.esscan.R;
-import ch.luklanis.esscan.paymentslip.EsrResult;
 import ch.luklanis.esscan.paymentslip.PsResult;
 
 import java.util.ArrayList;
@@ -57,7 +56,6 @@ final class HistoryItemAdapter extends ArrayAdapter<HistoryItem> {
     String address;
     if (result != null) {
       title = result.toString() + " " + item.getAmount();
-      // TODO get address
       address = item.getAddress().replaceAll("[\\r\\n]+", ", ");      
     } else {
       Resources resources = getContext().getResources();

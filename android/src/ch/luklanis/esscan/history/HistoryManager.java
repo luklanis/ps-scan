@@ -139,7 +139,13 @@ public final class HistoryManager {
 				String amount = cursor.getString(3);
 				String dtaFile = cursor.getString(4);
 
-				EsrResult result = new EsrResult(code_row, timestamp);
+				PsResult result;
+				if (PsResult.getCoderowType(code_row).equals(EsrResult.PS_TYPE_NAME)) {
+					result = new EsrResult(code_row, timestamp);
+				} else {
+					result = new EsResult(code_row, timestamp);
+				}
+				
 				HistoryItem item = new HistoryItem(result, amount, addressNumber, dtaFile); 
 
 				if(addressNumber != -1)
@@ -399,10 +405,16 @@ public final class HistoryManager {
 
 			while (cursor.moveToNext()) {
 
-				EsrResult result = new EsrResult(cursor.getString(0));
+				PsResult result;
+				String code_row = cursor.getString(0);
+				long timestamp = cursor.getLong(1);
+				if (PsResult.getCoderowType(code_row).equals(EsrResult.PS_TYPE_NAME)) {
+					result = new EsrResult(code_row, timestamp);
+				} else {
+					result = new EsResult(code_row, timestamp);
+				}
 
 				// Add timestamp, formatted
-				long timestamp = cursor.getLong(1);
 				historyText.append('"').append(messageHistoryField(
 						EXPORT_DATE_TIME_FORMAT.format(new Date(timestamp)))).append("\",");
 
