@@ -20,6 +20,8 @@ package ch.luklanis.esscan.paymentslip;
  */
 public final class EsResult extends PsResult{
 
+	public static final String PS_TYPE_NAME = "red";
+
 	public EsResult(String completeCode) {
 		super(completeCode);
 	}

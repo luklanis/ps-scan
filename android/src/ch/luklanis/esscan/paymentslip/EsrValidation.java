@@ -138,6 +138,6 @@ public class EsrValidation extends PsValidation {
 
 	@Override
 	public String getSpokenType() {
-		return "orange";
+		return EsrResult.PS_TYPE_NAME;
 	}
 }

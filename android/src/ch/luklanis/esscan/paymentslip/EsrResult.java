@@ -19,6 +19,8 @@ package ch.luklanis.esscan.paymentslip;
  * Encapsulates the result of OCR.
  */
 public final class EsrResult extends PsResult{
+	
+	public static final String PS_TYPE_NAME = "orange";
 
 	public EsrResult(String completeCode) {
 		super(completeCode);

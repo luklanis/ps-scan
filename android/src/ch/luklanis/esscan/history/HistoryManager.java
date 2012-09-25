@@ -176,7 +176,7 @@ public final class HistoryManager {
 				String dtaFile = cursor.getString(4);
 
 				PsResult result;
-				if (PsResult.getCoderowType(text).equals("orange")) {
+				if (PsResult.getCoderowType(text).equals(EsrResult.PS_TYPE_NAME)) {
 					result = new EsrResult(text, timestamp);
 				} else {
 					result = new EsResult(text, timestamp);

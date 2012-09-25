@@ -72,7 +72,7 @@ public final class HistoryItem {
 
 	public String getAmount() {
 
-		if(result instanceof EsrResult) {
+		if(result.getType().equals(EsrResult.PS_TYPE_NAME)) {
 
 			EsrResult esrResult = (EsrResult)result;
 

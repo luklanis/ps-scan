@@ -45,7 +45,7 @@ public abstract class PsResult {
 		int plusLocation = completeCodeRow.indexOf("+");
 		int greaterThanLocation = completeCodeRow.indexOf(">");
 		
-		return (plusLocation > greaterThanLocation) ? "orange" : "red";
+		return (plusLocation > greaterThanLocation) ? EsrResult.PS_TYPE_NAME : EsResult.PS_TYPE_NAME;
 	}
 	
 	public String getType() {

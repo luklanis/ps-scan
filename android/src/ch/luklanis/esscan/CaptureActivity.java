@@ -37,6 +37,7 @@ import ch.luklanis.esscan.history.HistoryManager;
 import ch.luklanis.esscan.language.LanguageCodeHelper;
 import ch.luklanis.esscan.paymentslip.DTAFileCreator;
 import ch.luklanis.esscan.paymentslip.EsIbanValidation;
+import ch.luklanis.esscan.paymentslip.EsResult;
 import ch.luklanis.esscan.paymentslip.EsrResult;
 import ch.luklanis.esscan.paymentslip.EsrValidation;
 import ch.luklanis.esscan.paymentslip.PsResult;
@@ -663,7 +664,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		Intent intent;
 		switch (item.getItemId()) {
 		case R.id.menu_switch_ps: {
-			if (this.psValidation.getSpokenType().equals("orange")) {
+			if (this.psValidation.getSpokenType().equals(EsrResult.PS_TYPE_NAME)) {
 				this.psValidation = new EsIbanValidation();
 			} else {
 				this.psValidation = new EsrValidation();
@@ -892,7 +893,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			return;
 		}
 		
-		if (psResult.getType().equals("red")) {
+		if (psResult.getType().equals(EsResult.PS_TYPE_NAME)) {
 			return;
 		}
 		
@@ -1095,7 +1096,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		View orangeStatusView = findViewById(R.id.status_view_top_orange);
 		View redStatusView = findViewById(R.id.status_view_top_red);
 		
-		if (this.psValidation.getSpokenType().equals("orange")) {
+		if (this.psValidation.getSpokenType().equals(EsrResult.PS_TYPE_NAME)) {
 			redStatusView.setVisibility(View.GONE);
 			orangeStatusView.setVisibility(View.VISIBLE);
 			statusViewTop = orangeStatusView;
@@ -1125,7 +1126,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		TextView statusView2;
 		TextView statusView3;
 		
-		if (this.psValidation.getSpokenType().equals("orange")) {
+		if (this.psValidation.getSpokenType().equals(EsrResult.PS_TYPE_NAME)) {
 			statusView1 = (TextView) findViewById(R.id.status_view_1_orange);
 			statusView2 = (TextView) findViewById(R.id.status_view_2_orange);
 			statusView3 = (TextView) findViewById(R.id.status_view_3_orange);
@@ -1284,7 +1285,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		    		if (!TextUtils.isEmpty(statusViewBottomRight.getText())) {
 		    			clearIPAddresses();
 			        	invalidateOptionsMenu();
-						if (psValidation.getSpokenType().equals("red")) {
+						if (psValidation.getSpokenType().equals(EsResult.PS_TYPE_NAME)) {
 							psValidation = new EsrValidation();
 						} 
 						resetStatusView();

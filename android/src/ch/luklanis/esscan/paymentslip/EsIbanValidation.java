@@ -166,6 +166,6 @@ public class EsIbanValidation extends PsValidation {
 
 	@Override
 	public String getSpokenType() {
-		return "red";
+		return EsResult.PS_TYPE_NAME;
 	}
 }

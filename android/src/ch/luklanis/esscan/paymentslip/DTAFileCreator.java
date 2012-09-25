@@ -84,7 +84,7 @@ public class DTAFileCreator {
 
 		for (HistoryItem historyItem : historyItems) {
 			
-			if (!historyItem.getResult().getType().equals("orange")) {
+			if (!historyItem.getResult().getType().equals(EsrResult.PS_TYPE_NAME)) {
 				continue;
 			}
 			
@@ -359,7 +359,7 @@ public class DTAFileCreator {
 	
 			for (HistoryItem historyItem : historyItems) {
 				
-				if (!historyItem.getResult().getType().equals("orange")) {
+				if (!historyItem.getResult().getType().equals(EsrResult.PS_TYPE_NAME)) {
 					continue;
 				}
 				
