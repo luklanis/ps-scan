@@ -57,6 +57,7 @@
   <string name="msg_stream_mode_not_available">Slip-reader mode only available if Wifi is connected.</string>
   <string name="msg_coderow_sent">Code row sent.</string>
   <string name="msg_coderow_not_sent">Unable to send code row. ESR Receiver is not connected!</string>
+  <string name="msg_red_result_view_not_available">No details for red payment slips!</string>
   <string name="esr_result_account">Account</string>
   <string name="esr_result_address">Recipient</string>
   <string name="esr_result_reference_number">Reference Number</string>

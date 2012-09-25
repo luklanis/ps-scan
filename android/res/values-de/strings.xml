@@ -57,6 +57,7 @@
   <string name="msg_stream_mode_not_available">Beleglesermodus nur mit verbundenem WLAN möglich.</string>
   <string name="msg_coderow_sent">Kodierzeile wurde gesendet.</string>
   <string name="msg_coderow_not_sent">Kodierzeile senden nicht möglich. ESR Receiver ist nicht verbunden!</string>
+  <string name="msg_red_result_view_not_available">Für rote Einzahlungsscheine können keine Details angezeigt werden!</string>
   <string name="esr_result_account">Konto</string>
   <string name="esr_result_address">Empfänger</string>
   <string name="esr_result_reference_number">Referenznummer</string>

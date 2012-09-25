@@ -646,7 +646,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		
 		MenuItem ps_switch = menu.findItem(R.id.menu_switch_ps);
 		
-		if (boundService != null && boundService.isConnectedLocal()) {
+		if (enableStreamMode && boundService != null && boundService.isConnectedLocal()) {
 			ps_switch.setVisible(true);
 		} else {
 			ps_switch.setVisible(false);
@@ -893,6 +893,20 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		}
 		
 		if (psResult.getType().equals(EsResult.PS_TYPE_NAME)) {
+
+			AlertDialog.Builder builder = new AlertDialog.Builder(CaptureActivity.this);
+			builder.setMessage(R.string.msg_red_result_view_not_available);
+			builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					psValidation.gotoBeginning(false);
+					lastValidationStep = psValidation.getCurrentStep();
+					resumeContinuousDecoding();
+				}
+			});
+			builder.show();
+			
 			return;
 		}
 		
