@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import ch.luklanis.esscan.R;
 import ch.luklanis.esscan.paymentslip.EsrResult;
+import ch.luklanis.esscan.paymentslip.PsResult;
 
 import java.util.ArrayList;
 
@@ -50,7 +51,7 @@ final class HistoryItemAdapter extends ArrayAdapter<HistoryItem> {
     }
 
     HistoryItem item = getItem(position);
-    EsrResult result = item.getResult();
+    PsResult result = item.getResult();
 
     String title;
     String address;

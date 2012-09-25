@@ -18,7 +18,9 @@
 package ch.luklanis.esscan.history;
 
 import ch.luklanis.esscan.CaptureActivity;
+import ch.luklanis.esscan.paymentslip.EsResult;
 import ch.luklanis.esscan.paymentslip.EsrResult;
+import ch.luklanis.esscan.paymentslip.PsResult;
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -173,7 +175,13 @@ public final class HistoryManager {
 				String amount = cursor.getString(3);
 				String dtaFile = cursor.getString(4);
 
-				EsrResult result = new EsrResult(text, timestamp);
+				PsResult result;
+				if (PsResult.getCoderowType(text).equals("orange")) {
+					result = new EsrResult(text, timestamp);
+				} else {
+					result = new EsResult(text, timestamp);
+				}
+				
 				HistoryItem item = new HistoryItem(result, amount, addressNumber, dtaFile); 
 
 				if(addressNumber != -1)
@@ -210,7 +218,7 @@ public final class HistoryManager {
 		}
 	}
 
-	public HistoryItem addHistoryItem(EsrResult result) {
+	public HistoryItem addHistoryItem(PsResult result) {
 		// Do not save this item to the history if the preference is turned off, or the contents are
 		// considered secure.
 		//    if (!activity.getIntent().getBooleanExtra(Intents.Scan.SAVE_HISTORY, true)) {

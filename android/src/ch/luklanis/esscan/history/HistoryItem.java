@@ -17,17 +17,18 @@
 package ch.luklanis.esscan.history;
 
 import ch.luklanis.esscan.paymentslip.EsrResult;
+import ch.luklanis.esscan.paymentslip.PsResult;
 
 public final class HistoryItem {
 
-	private final EsrResult result;
+	private final PsResult result;
 	private int addressNumber;
 	private String amount;
 	private final String dtaFile;
 	private boolean exported;
 	private String address;
 
-	public HistoryItem(EsrResult result) {
+	public HistoryItem(PsResult result) {
 		this.result = result;
 		this.addressNumber = -1;
 		this.amount = null;
@@ -52,7 +53,7 @@ public final class HistoryItem {
 //		this.exported = false;
 //	}
 
-	HistoryItem(EsrResult result, String amount, int addressNumber, String dtaFile) {
+	HistoryItem(PsResult result, String amount, int addressNumber, String dtaFile) {
 		this.result = result;
 		this.addressNumber = addressNumber;
 		this.amount = amount;
@@ -61,7 +62,7 @@ public final class HistoryItem {
 		this.address = "";
 	}
 
-	public EsrResult getResult() {
+	public PsResult getResult() {
 		return result;
 	}
 
@@ -70,10 +71,16 @@ public final class HistoryItem {
 //	}
 
 	public String getAmount() {
-		if(result.getAmount() != ""){
-			return result.getAmount();
+
+		if(result instanceof EsrResult) {
+
+			EsrResult esrResult = (EsrResult)result;
+
+			if(esrResult.getAmount() != ""){
+				return esrResult.getAmount();
+			}
 		}
-		
+
 		return amount;
 	}
 

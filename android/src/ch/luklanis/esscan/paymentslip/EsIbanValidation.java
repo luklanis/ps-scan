@@ -17,30 +17,30 @@ package ch.luklanis.esscan.paymentslip;
 
 import android.util.Log;
 
-public class EsrValidation extends PsValidation {
-	private static final String TAG = "ESR Validation";
+public class EsIbanValidation extends PsValidation {
+	private static final String TAG = "ES Validation";
 	private static final int STEP_COUNT = 3; 
-    
-    private static final char[] CONTROL_CHARS_IN_STEP = {
-    	'>', '+', '>'
-    };
-    
-    private static final int[][] VALID_LENGTHS_IN_STEP = {
-    	{ 4, 14 },
-    	{ 28, 17 },  // TODO check length
-    	{ 10, -1 }  // TODO check length
-    };
-    
-    private static final String[] STEP_FORMAT = {
-    	"%s", "%s", " %s"
-    };
-    
-    private String[] completeCode;
-    
-    public EsrValidation() {
+
+	private static final char[] CONTROL_CHARS_IN_STEP = {
+		'+', '>', '>'
+	};
+
+	private static final int[][] VALID_LENGTHS_IN_STEP = {
+		{ 28, -1 },  // TODO check length
+		{ 10, -1 },  // TODO check length
+		{ 10, -1 }  // TODO check length
+	};
+
+	private static final String[] STEP_FORMAT = {
+		"%s", " %s", "%s"
+	};
+
+	private String[] completeCode;
+
+	public EsIbanValidation() {
 		completeCode = new String[STEP_COUNT];
 	}
-	
+
 	@Override
 	public int getStepCount(){
 		return STEP_COUNT;
@@ -78,7 +78,7 @@ public class EsrValidation extends PsValidation {
 			Log.e(TAG, exc.toString());
 			return false;
 		}
-		
+
 		return false;
 	}
 
@@ -92,36 +92,38 @@ public class EsrValidation extends PsValidation {
 		if(text == null || text == ""){
 			return null;
 		}
-		
+
 		relatedText = text.replaceAll("\\s", "");
-		
-		if(currentStep > 0){
+
+		if(currentStep == 1){
 			int indexOfControlCharBefore = relatedText.indexOf(String.valueOf(CONTROL_CHARS_IN_STEP[currentStep-1]));
-			
+
 			if(indexOfControlCharBefore != -1 && indexOfControlCharBefore < (relatedText.length() - 1)){
 				relatedText = relatedText.substring(indexOfControlCharBefore + 1);
 			}
 		}
-		
+
 		int indexOfCurrentControlChar = relatedText.indexOf(String.valueOf(CONTROL_CHARS_IN_STEP[currentStep]));
-		
+
 		if(indexOfCurrentControlChar != -1 && indexOfCurrentControlChar != (relatedText.length() - 1)){
 			relatedText = relatedText.substring(0, indexOfCurrentControlChar + 1);
 		}
-		
+
 		return relatedText;
 	}
 
 	@Override
 	public String getCompleteCode() {
 		String result = "";
-		
-		for(int i = 0; i < completeCode.length; i++){
+		int start = (completeCode[completeCode.length - 1]) != null ? 2 : 0;
+		int end = (start == 2) ? completeCode.length : 2;
+
+		for(int i = start; i < end; i++){
 			if(completeCode[i] != null){
 				result += completeCode[i];
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -130,14 +132,40 @@ public class EsrValidation extends PsValidation {
 		if(completeCode == null){
 			return;
 		}
-		
+
 		for(int i = 0; i < completeCode.length; i++){
 			completeCode[i] = null;
 		}
 	}
 
 	@Override
+	public boolean nextStep() {
+
+		if ((currentStep == 1) || (currentStep == (getStepCount() - 1))) {
+			finished = true;
+			return false;
+		}
+
+		currentStep++;
+		relatedText = null;
+		return true;
+	}
+
+	@Override
+	public void gotoBeginning(boolean reset) {
+		if ((currentStep == (getStepCount() - 1)) || reset) {
+			currentStep = 0;
+			resetCompleteCode();
+		} else {
+			currentStep = 2;
+		}
+
+		finished = false;
+		relatedText = null;
+	}
+
+	@Override
 	public String getSpokenType() {
-		return "orange";
+		return "red";
 	}
 }

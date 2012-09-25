@@ -23,6 +23,7 @@ import ch.luklanis.esscan.R;
 import ch.luklanis.esscan.camera.CameraManager;
 import ch.luklanis.esscan.history.HistoryItem;
 import ch.luklanis.esscan.paymentslip.EsrResult;
+import ch.luklanis.esscan.paymentslip.PsResult;
 import ch.luklanis.esscan.OcrResult;
 
 import android.os.Handler;
@@ -123,7 +124,7 @@ final class CaptureActivityHandler extends Handler {
         }
         break;
       case R.id.esr_decode_succeeded:
-    	  EsrResult result = (EsrResult) message.obj;
+    	  PsResult result = (PsResult) message.obj;
 
     	  activity.showResult(result);
     	  DecodeHandler.resetDecodeState();

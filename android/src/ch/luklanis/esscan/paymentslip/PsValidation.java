@@ -17,14 +17,42 @@ package ch.luklanis.esscan.paymentslip;
 
 public abstract class PsValidation {
     private static final int STEP_COUNT = 1;  
+    
+    protected static final int[][] MODULO10 = {
+    	{ 0, 9, 4, 6, 8, 2, 7, 1, 3, 5 },
+    	{ 9, 4, 6, 8, 2, 7, 1, 3, 5, 0 },
+    	{ 4, 6, 8, 2, 7, 1, 3, 5, 0, 9 },
+    	{ 6, 8, 2, 7, 1, 3, 5, 0, 9, 4 },
+    	{ 8, 2, 7, 1, 3, 5, 0, 9, 4, 6 },
+    	{ 2, 7, 1, 3, 5, 0, 9, 4, 6, 8 },
+    	{ 7, 1, 3, 5, 0, 9, 4, 6, 8, 2 },
+    	{ 1, 3, 5, 0, 9, 4, 6, 8, 2, 7 },
+    	{ 3, 5, 0, 9, 4, 6, 8, 2, 7, 1 },
+    	{ 5, 0, 9, 4, 6, 8, 2, 7, 1, 3 }
+    };
+    
+    protected static final int[] CHECK_DIGIT = {
+    	0, 9, 8, 7, 6, 5, 4, 3, 2, 1
+    };
+    
 	protected int currentStep;
 	
 	protected String relatedText;
-	private boolean finished;
+	protected boolean finished;
 	
 	public PsValidation() {
-		gotoBeginning();
+		gotoBeginning(true);
 	}
+    
+	protected int getCheckDigit(int[] digits){
+		int lastValue = 0;
+		
+		for(int i = 0; i < digits.length; i++){
+				lastValue = MODULO10[lastValue][digits[i]];
+		}
+		
+		return CHECK_DIGIT[lastValue];
+    }
 	
 	public int getStepCount(){
 		return STEP_COUNT;
@@ -45,7 +73,7 @@ public abstract class PsValidation {
 		return false;
 	}
 	
-	public void gotoBeginning(){
+	public void gotoBeginning(boolean reset){
 		currentStep = 0;
 		finished = false;
 		relatedText = null;
@@ -79,4 +107,6 @@ public abstract class PsValidation {
 	public abstract String getCompleteCode();
 	
 	public abstract void resetCompleteCode();	
+	
+	public abstract String getSpokenType();	
 }
