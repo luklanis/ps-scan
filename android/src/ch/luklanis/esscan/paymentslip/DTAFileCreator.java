@@ -98,13 +98,20 @@ public class DTAFileCreator {
 		List<HistoryItem> filteredHistoryItem = new ArrayList<HistoryItem>();
 
 		for (HistoryItem historyItem : historyItems) {
-			if(historyItem.getResult().getCurrency() == "CHF"){
+			
+			if (!historyItem.getResult().getType().equals(EsrResult.PS_TYPE_NAME)) {
+				continue;
+			}
+			
+			EsrResult result = new EsrResult(historyItem.getResult().getCompleteCode());
+			
+			if(result.getCurrency() == "CHF"){
 				filteredHistoryItem.add(historyItem);
 			}
 		}
 
-		for (int i = 0; i < filteredHistoryItem.size(); i++) {
-			EsrResult esrResult = filteredHistoryItem.get(i).getResult();
+		for (int i = 0; i < filteredHistoryItem.size(); i++) {			
+			EsrResult esrResult = new EsrResult(filteredHistoryItem.get(i).getResult().getCompleteCode());
 
 			String currency = esrResult.getCurrency();
 
@@ -366,7 +373,14 @@ public class DTAFileCreator {
 			boolean nothingToExport = true;
 	
 			for (HistoryItem historyItem : historyItems) {
-				if(historyItem.getResult().getCurrency() == "CHF"){
+				
+				if (!historyItem.getResult().getType().equals(EsrResult.PS_TYPE_NAME)) {
+					continue;
+				}
+				
+				EsrResult result = new EsrResult(historyItem.getResult().getCompleteCode());
+				
+				if(result.getCurrency() == "CHF"){
 					items.add(historyItem);
 				}
 				

@@ -28,8 +28,11 @@ import com.googlecode.tesseract.android.TessBaseAPI;
 import ch.luklanis.esscan.camera.CameraManager;
 import ch.luklanis.esscan.language.LanguageCodeHelper;
 import ch.luklanis.esscan.paymentslip.DTAFileCreator;
+import ch.luklanis.esscan.paymentslip.EsIbanValidation;
+import ch.luklanis.esscan.paymentslip.EsResult;
 import ch.luklanis.esscan.paymentslip.EsrResult;
 import ch.luklanis.esscan.paymentslip.EsrValidation;
+import ch.luklanis.esscan.paymentslip.PsResult;
 import ch.luklanis.esscan.paymentslip.PsValidation;
 import ch.luklanis.esscanlite.BeepManager;
 import ch.luklanis.esscanlite.HelpActivity;
@@ -58,6 +61,7 @@ import android.preference.PreferenceManager;
 //import android.content.ClipboardManager;
 import android.text.ClipboardManager;
 import android.text.SpannableStringBuilder;
+import android.text.TextUtils;
 import android.text.style.CharacterStyle;
 import android.util.Log;
 import android.view.Gravity;
@@ -212,8 +216,10 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	private final Button.OnClickListener saveListener = new Button.OnClickListener() {
 		public void onClick(View v) {
 			boolean somethingSaved = false;
+			
+			EsrResult result = new EsrResult(lastItem.getResult().getAccount());
 
-			if(lastItem.getResult().getAmount() == ""){
+			if(result.getAmount() == ""){
 				EditText amountEditText = (EditText) findViewById(R.id.esr_result_amount);
 				String newAmount = amountEditText.getText().toString().replace(',', '.');
 				try {
@@ -330,8 +336,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 		resultView = findViewById(R.id.result_view);
 		resultView.setVisibility(View.GONE);
-		
-		statusViewTop = findViewById(R.id.status_view_top);
 
 		statusViewBottomLeft = (TextView) findViewById(R.id.status_view_bottom_left);
 
@@ -348,7 +352,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		retrievePreferences();
 
 		resetStatusView();
-		psValidation.gotoBeginning();
+		psValidation.gotoBeginning(true);
 		this.lastValidationStep = psValidation.getCurrentStep();
 
 		// Set up the camera preview surface.
@@ -492,11 +496,11 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 	@Override
 	protected void onDestroy() {
+		super.onDestroy();
+		
 		if (baseApi != null) {
 			baseApi.end();
 		}
-
-		super.onDestroy();
 	}
 
 	@Override
@@ -506,7 +510,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			// First check if we're paused in continuous mode, and if so, just unpause.
 			if (isPaused) {
 				Log.d(TAG, "only resuming continuous recognition, not quitting...");
-				psValidation.gotoBeginning();
+				psValidation.gotoBeginning(true);
 				this.lastValidationStep = psValidation.getCurrentStep();
 				resumeContinuousDecoding();
 				return true;
@@ -545,9 +549,13 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	public boolean onOptionsItemSelected(MenuItem item) {
 		Intent intent;
 		switch (item.getItemId()) {
-		case R.id.menu_settings: {
-			intent = new Intent().setClass(this, PreferencesActivity.class);
-			startActivity(intent);
+		case R.id.menu_switch_ps: {
+			if (this.psValidation.getSpokenType().equals(EsrResult.PS_TYPE_NAME)) {
+				this.psValidation = new EsIbanValidation();
+			} else {
+				this.psValidation = new EsrValidation();
+			}
+			resetStatusView();
 			break;
 		}
 		case R.id.menu_history: {
@@ -555,6 +563,11 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
 			intent.setClassName(this, HistoryActivity.class.getName());
 			startActivityForResult(intent, HISTORY_REQUEST_CODE);
+			break;
+		}
+		case R.id.menu_settings: {
+			intent = new Intent().setClass(this, PreferencesActivity.class);
+			startActivity(intent);
 			break;
 		}
 		case R.id.menu_help: {
@@ -711,11 +724,11 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	 * @param ocrResult Object representing successful OCR results
 	 * @return True if a non-null result was received for OCR
 	 */
-	boolean showResult(EsrResult esrResult) {
+	void showResult(PsResult psResult) {
 		beepManager.playBeepSoundAndVibrate();
 
-		HistoryItem historyItem = historyManager.addHistoryItem(esrResult);
-		return showResult(historyItem);
+		HistoryItem historyItem = historyManager.addHistoryItem(psResult);
+		showResult(historyItem);
 	}
 
 	/**
@@ -725,7 +738,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	 * @param ocrResult Object representing successful OCR results
 	 * @return True if a non-null result was received for OCR
 	 */
-	boolean showResult(HistoryItem historyItem) {
+	void showResult(HistoryItem historyItem) {
 		lastItem = historyItem;
 
 		if(handler != null)
@@ -742,11 +755,29 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			toast.setGravity(Gravity.TOP, 0, 0);
 			toast.show();
 			resumeContinuousDecoding();
-			return false;
+			return;
 		}
 
-		EsrResult result = historyItem.getResult();
+		PsResult psResult = historyItem.getResult();
 
+		if (psResult.getType().equals(EsResult.PS_TYPE_NAME)) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(CaptureActivity.this);
+			builder.setMessage(R.string.msg_red_result_view_not_available);
+			builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					psValidation.gotoBeginning(false);
+					lastValidationStep = psValidation.getCurrentStep();
+					resumeContinuousDecoding();
+				}
+			});
+			builder.show();
+			
+			return;
+		}
+		
+		EsrResult result = new EsrResult(psResult.getCompleteCode());
 
 		// Turn off capture-related UI elements
 		statusViewBottomLeft.setVisibility(View.GONE);
@@ -821,11 +852,11 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			showAddressDialog(this);
 		}
 
-		return true;
+		return;
 	}
 
 	private void showAddressDialog(Context context) {
-		EsrResult result = lastItem.getResult();
+		PsResult result = lastItem.getResult();
 		List<String> addresses = new ArrayList<String>();
 		addresses.addAll(historyManager.getAddresses(result.getAccount()));
 		addresses.add(getResources().getString(R.string.address_new));
@@ -940,9 +971,21 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	 */
 	private void resetStatusView() {
 		resultView.setVisibility(View.GONE);
+		
+		View orangeStatusView = findViewById(R.id.status_view_top_orange);
+		View redStatusView = findViewById(R.id.status_view_top_red);
+		
+		if (this.psValidation.getSpokenType().equals(EsrResult.PS_TYPE_NAME)) {
+			redStatusView.setVisibility(View.GONE);
+			orangeStatusView.setVisibility(View.VISIBLE);
+			statusViewTop = orangeStatusView;
+		} else {
+			orangeStatusView.setVisibility(View.GONE);
+			redStatusView.setVisibility(View.VISIBLE);
+			statusViewTop = redStatusView;
+		}
 
 		refreshStatusView();
-		statusViewTop.setVisibility(View.VISIBLE);
 
 		statusViewBottomLeft.setText("");
 
@@ -958,9 +1001,19 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	}
 
 	private void refreshStatusView() {
-		TextView statusView1 = (TextView) findViewById(R.id.status_view_1);
-		TextView statusView2 = (TextView) findViewById(R.id.status_view_2);
-		TextView statusView3 = (TextView) findViewById(R.id.status_view_3);
+		TextView statusView1;
+		TextView statusView2;
+		TextView statusView3;
+		
+		if (this.psValidation.getSpokenType().equals(EsrResult.PS_TYPE_NAME)) {
+			statusView1 = (TextView) findViewById(R.id.status_view_1_orange);
+			statusView2 = (TextView) findViewById(R.id.status_view_2_orange);
+			statusView3 = (TextView) findViewById(R.id.status_view_3_orange);
+		} else {
+			statusView1 = (TextView) findViewById(R.id.status_view_1_red);
+			statusView2 = (TextView) findViewById(R.id.status_view_2_red);
+			statusView3 = (TextView) findViewById(R.id.status_view_3_red);
+		}
 
 		statusView1.setBackgroundResource(0);
 		statusView2.setBackgroundResource(0);

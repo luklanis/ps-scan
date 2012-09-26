@@ -17,8 +17,10 @@
 
 package ch.luklanis.esscanlite.history;
 
-import ch.luklanis.esscanlite.CaptureActivity;
+import ch.luklanis.esscan.CaptureActivity;
+import ch.luklanis.esscan.paymentslip.EsResult;
 import ch.luklanis.esscan.paymentslip.EsrResult;
+import ch.luklanis.esscan.paymentslip.PsResult;
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -137,7 +139,13 @@ public final class HistoryManager {
 				String amount = cursor.getString(3);
 				String dtaFile = cursor.getString(4);
 
-				EsrResult result = new EsrResult(code_row, timestamp);
+				PsResult result;
+				if (PsResult.getCoderowType(code_row).equals(EsrResult.PS_TYPE_NAME)) {
+					result = new EsrResult(code_row, timestamp);
+				} else {
+					result = new EsResult(code_row, timestamp);
+				}
+				
 				HistoryItem item = new HistoryItem(result, amount, addressNumber, dtaFile); 
 
 				if(addressNumber != -1)
@@ -173,7 +181,13 @@ public final class HistoryManager {
 				String amount = cursor.getString(3);
 				String dtaFile = cursor.getString(4);
 
-				EsrResult result = new EsrResult(text, timestamp);
+				PsResult result;
+				if (PsResult.getCoderowType(text).equals(EsrResult.PS_TYPE_NAME)) {
+					result = new EsrResult(text, timestamp);
+				} else {
+					result = new EsResult(text, timestamp);
+				}
+				
 				HistoryItem item = new HistoryItem(result, amount, addressNumber, dtaFile); 
 
 				if(addressNumber != -1)
@@ -210,7 +224,7 @@ public final class HistoryManager {
 		}
 	}
 
-	public HistoryItem addHistoryItem(EsrResult result) {
+	public HistoryItem addHistoryItem(PsResult result) {
 		// Do not save this item to the history if the preference is turned off, or the contents are
 		// considered secure.
 		//    if (!activity.getIntent().getBooleanExtra(Intents.Scan.SAVE_HISTORY, true)) {
@@ -391,10 +405,16 @@ public final class HistoryManager {
 
 			while (cursor.moveToNext()) {
 
-				EsrResult result = new EsrResult(cursor.getString(0));
+				PsResult result;
+				String code_row = cursor.getString(0);
+				long timestamp = cursor.getLong(1);
+				if (PsResult.getCoderowType(code_row).equals(EsrResult.PS_TYPE_NAME)) {
+					result = new EsrResult(code_row, timestamp);
+				} else {
+					result = new EsResult(code_row, timestamp);
+				}
 
 				// Add timestamp, formatted
-				long timestamp = cursor.getLong(1);
 				historyText.append('"').append(messageHistoryField(
 						EXPORT_DATE_TIME_FORMAT.format(new Date(timestamp)))).append("\",");
 

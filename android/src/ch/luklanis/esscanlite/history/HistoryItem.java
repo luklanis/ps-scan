@@ -16,21 +16,23 @@
 
 package ch.luklanis.esscanlite.history;
 
+import android.text.TextUtils;
 import ch.luklanis.esscan.paymentslip.EsrResult;
+import ch.luklanis.esscan.paymentslip.PsResult;
 
 public final class HistoryItem {
 
-	private final EsrResult result;
+	private final PsResult result;
 	private int addressNumber;
 	private String amount;
 	private final String dtaFile;
 	private boolean exported;
 	private String address;
 
-	public HistoryItem(EsrResult result) {
+	public HistoryItem(PsResult result) {
 		this.result = result;
 		this.addressNumber = -1;
-		this.amount = null;
+		this.amount = "";
 		this.dtaFile = null;
 		this.exported = false;
 		this.address = "";
@@ -52,7 +54,7 @@ public final class HistoryItem {
 //		this.exported = false;
 //	}
 
-	HistoryItem(EsrResult result, String amount, int addressNumber, String dtaFile) {
+	HistoryItem(PsResult result, String amount, int addressNumber, String dtaFile) {
 		this.result = result;
 		this.addressNumber = addressNumber;
 		this.amount = amount;
@@ -61,7 +63,7 @@ public final class HistoryItem {
 		this.address = "";
 	}
 
-	public EsrResult getResult() {
+	public PsResult getResult() {
 		return result;
 	}
 
@@ -70,11 +72,17 @@ public final class HistoryItem {
 //	}
 
 	public String getAmount() {
-		if(result.getAmount() != ""){
-			return result.getAmount();
+
+		if(result.getType().equals(EsrResult.PS_TYPE_NAME)) {
+
+			EsrResult esrResult = (EsrResult)result;
+
+			if(!TextUtils.isEmpty(esrResult.getAmount())){
+				return esrResult.getAmount();
+			}
 		}
-		
-		return amount;
+
+		return amount == null ? "" : amount;
 	}
 
 	public boolean getExported() {

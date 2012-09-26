@@ -20,7 +20,7 @@ import com.googlecode.tesseract.android.TessBaseAPI;
 
 import ch.luklanis.esscanlite.R;
 import ch.luklanis.esscan.camera.CameraManager;
-import ch.luklanis.esscan.paymentslip.EsrResult;
+import ch.luklanis.esscan.paymentslip.PsResult;
 import ch.luklanis.esscanlite.CaptureActivity;
 import ch.luklanis.esscanlite.OcrResult;
 import ch.luklanis.esscanlite.history.HistoryItem;
@@ -123,7 +123,7 @@ final class CaptureActivityHandler extends Handler {
         }
         break;
       case R.id.esr_decode_succeeded:
-    	  EsrResult result = (EsrResult) message.obj;
+    	  PsResult result = (PsResult) message.obj;
 
     	  activity.showResult(result);
     	  DecodeHandler.resetDecodeState();

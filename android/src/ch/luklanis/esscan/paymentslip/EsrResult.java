@@ -18,27 +18,16 @@ package ch.luklanis.esscan.paymentslip;
 /**
  * Encapsulates the result of OCR.
  */
-public final class EsrResult {
-	private final String completeCode;
-
-	private final long timestamp;
+public final class EsrResult extends PsResult{
+	
+	public static final String PS_TYPE_NAME = "orange";
 
 	public EsrResult(String completeCode) {
-		this.completeCode = completeCode;
-		this.timestamp = System.currentTimeMillis();
+		super(completeCode);
 	}
-
+	
 	public EsrResult(String completeCode, long timestamp) {
-		this.completeCode = completeCode;
-		this.timestamp = timestamp;
-	}
-
-	public String getCompleteCode() {
-		return completeCode;
-	}
-
-	public long getTimestamp() {
-		return timestamp;
+		super(completeCode, timestamp);
 	}
 
 	public String getAmount(){
@@ -73,6 +62,7 @@ public final class EsrResult {
 		}
 	}
 
+	@Override
 	public String getAccount(){
 		String code = completeCode;
 		int indexOfSpace = code.indexOf(' ');
