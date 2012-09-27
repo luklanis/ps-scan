@@ -185,13 +185,16 @@ OnSharedPreferenceChangeListener {
 			if (warning != 0){
 				setOKAlert(warning);
 			}
-		}else if (key.equals(KEY_ADDRESS)){
+		} else if (key.equals(KEY_ADDRESS)){
 			String address = sharedPreferences.getString(key, "");
 
 			int warning = DTAFileCreator.validateAddress(address);
 			if (warning != 0){
 				setOKAlert(warning);
 			}
+		} else if (key.equals(KEY_ONLY_MACRO_FOCUS)) {
+			Preference continuesFocusPref = findPreference(KEY_NO_CONTINUES_AUTO_FOCUS);
+			continuesFocusPref.setEnabled(!sharedPreferences.getBoolean(KEY_ONLY_MACRO_FOCUS, false));
 		}
 	}
 
