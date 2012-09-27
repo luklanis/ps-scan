@@ -125,7 +125,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	static final long AUTOFOCUS_FAILURE_INTERVAL_MS = 1000L;
 
 	public static final int HISTORY_REQUEST_CODE = 0x0000bacc;
-	
+
 	private static final int ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
 
 	private CameraManager cameraManager;
@@ -484,7 +484,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		if (handler != null) {
 			handler.sendEmptyMessageDelayed(R.id.restart_decode, delayMS);
 		}
-		
+
 		resumeOcrEngine();
 		resetStatusView();
 	}
@@ -502,7 +502,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			Log.d(TAG, "surfaceCreated(): calling initCamera()...");
 			initCamera(holder);
 		}
-		
+
 		hasSurface = true;
 	}
 
@@ -541,6 +541,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	protected void onPause() {
 		if (handler != null) {
 			handler.quitSynchronously();
+			handler = null;
 		}
 
 		// Stop using the camera, to avoid conflicting with other camera-based apps
