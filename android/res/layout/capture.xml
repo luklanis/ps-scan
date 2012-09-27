@@ -282,6 +282,7 @@
                 android:gravity="right"
                 android:orientation="vertical"
                 android:paddingTop="72dip"
+                android:paddingLeft="4dip"
                 android:visibility="gone" >
 
             <LinearLayout
@@ -324,7 +325,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:orientation="horizontal"
-                android:paddingTop="72dip" >
+                android:paddingTop="72dip"
+                android:paddingLeft="4dip" >
 
                 <TextView
                     android:id="@+id/status_view_1_orange"
