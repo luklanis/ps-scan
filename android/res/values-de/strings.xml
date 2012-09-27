@@ -65,6 +65,8 @@
   <string name="esr_picture">Ein kleines Bild von einem Orangen Einzahlungsschein</string>
   <string name="button_copy_code_row">Kodierzeile kopieren</string>
   <string name="preferences_only_macro_focus_title">Makrofokus</string>
+  <string name="preferences_no_continous_auto_focus_title">Kein fortlaufender Autofokus</string>
+  <string name="preferences_no_continous_auto_focus_summary">Benutze nur den Standard Autofokus</string>
   <string name="preferences_enable_torch_title">Frontleuchte</string>
   <string name="preferences_dta_format_title">DTA Einstellungen</string>
   <string name="preferences_advanced_title">Erweiterte Einstellungen</string>

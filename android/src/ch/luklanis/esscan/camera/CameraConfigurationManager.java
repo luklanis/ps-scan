@@ -33,6 +33,8 @@ import android.view.WindowManager;
 
 import ch.luklanis.esscan.R;
 import ch.luklanis.esscan.PreferencesActivity;
+import ch.luklanis.esscan.camera.exposure.ExposureInterface;
+import ch.luklanis.esscan.camera.exposure.ExposureManager;
 
 import java.util.Collection;
 
@@ -52,9 +54,11 @@ final class CameraConfigurationManager {
 	private Point previewResolution;
 	private Point cameraResolution;
 	private int heightDiff;
+	private final ExposureInterface exposure;
 
 	CameraConfigurationManager(Activity activity) {
 		this.activity = activity;
+		exposure = new ExposureManager().build();
 	}
 
 	/**
@@ -88,7 +92,7 @@ final class CameraConfigurationManager {
 		if (previewWidth < previewHeight) {
 			Log.i(TAG, "Display reports portrait orientation; assuming this is incorrect");
 			previewWidth = screenWidth;
-			
+
 			this.heightDiff = screenWidth - previewHeight;
 			previewHeight = (screenHeight - (screenWidth - previewHeight));
 		}
@@ -100,11 +104,11 @@ final class CameraConfigurationManager {
 		LayoutParams params = previewView.getLayoutParams();
 		params.height = screenHeight;
 		previewView.setLayoutParams(params);
-		
+
 		previewHeight = screenHeight;
-		
+
 		int cameraHeight = cameraResolution.y;
-		
+
 		if (cameraHeight > cameraResolution.x) {
 			cameraHeight = cameraResolution.x;
 		}
@@ -125,17 +129,26 @@ final class CameraConfigurationManager {
 
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 
-		String focusMode;
+		initializeTorch(parameters, prefs);
 
-		if(prefs.getBoolean(PreferencesActivity.KEY_ONLY_MACRO_FOCUS, false)){
+		String focusMode = null;
+		if (!prefs.getBoolean(PreferencesActivity.KEY_ONLY_MACRO_FOCUS, false)) {
+			if (prefs.getBoolean(PreferencesActivity.KEY_NO_CONTINUES_AUTO_FOCUS, false)) {
+				focusMode = findSettableValue(parameters.getSupportedFocusModes(),
+						Camera.Parameters.FOCUS_MODE_AUTO);
+			} else {
+				focusMode = findSettableValue(parameters.getSupportedFocusModes(),
+						"continuous-picture", // Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE in 4.0+
+						"continuous-video",   // Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO in 4.0+
+						Camera.Parameters.FOCUS_MODE_AUTO);
+			}
+		}
+
+		// Maybe selected auto-focus but not available, so fall through here:
+		if (focusMode == null) {
 			focusMode = findSettableValue(parameters.getSupportedFocusModes(),
 					Camera.Parameters.FOCUS_MODE_MACRO,
-					Camera.Parameters.FOCUS_MODE_AUTO);
-		}
-		else{
-			focusMode = findSettableValue(parameters.getSupportedFocusModes(),
-					Camera.Parameters.FOCUS_MODE_AUTO,
-					Camera.Parameters.FOCUS_MODE_MACRO);
+					"edof"); // Camera.Parameters.FOCUS_MODE_EDOF in 2.2+
 		}
 
 		if (focusMode != null) {
@@ -158,13 +171,25 @@ final class CameraConfigurationManager {
 		Camera.Parameters parameters = camera.getParameters();
 		doSetTorch(parameters, newSetting);
 		camera.setParameters(parameters);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
+		boolean currentSetting = prefs.getBoolean(PreferencesActivity.KEY_ENABLE_TORCH, false);
+		if (currentSetting != newSetting) {
+			SharedPreferences.Editor editor = prefs.edit();
+			editor.putBoolean(PreferencesActivity.KEY_ENABLE_TORCH, newSetting);
+			editor.commit();
+		}
 	}
-	
+
 	int getHeightDiff() {
 		return this.heightDiff;
 	}
 
-	private static void doSetTorch(Camera.Parameters parameters, boolean newSetting) {
+	public void initializeTorch(Camera.Parameters parameters, SharedPreferences prefs) {
+		boolean currentSetting = prefs.getBoolean(PreferencesActivity.KEY_ENABLE_TORCH, false);
+		doSetTorch(parameters, currentSetting);
+	}
+
+	private void doSetTorch(Camera.Parameters parameters, boolean newSetting) {
 		String flashMode;
 		if (newSetting) {
 			flashMode = findSettableValue(parameters.getSupportedFlashModes(),
@@ -177,6 +202,8 @@ final class CameraConfigurationManager {
 		if (flashMode != null) {
 			parameters.setFlashMode(flashMode);
 		}
+
+		exposure.setExposure(parameters, newSetting);
 	}
 
 	private static Point findBestPreviewSizeValue(Camera.Parameters parameters,

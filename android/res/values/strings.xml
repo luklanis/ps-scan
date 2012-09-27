@@ -65,6 +65,8 @@
   <string name="esr_picture">A little picture of a orange payment slip</string>
   <string name="button_copy_code_row">Copy code row</string>
   <string name="preferences_only_macro_focus_title">Macro focus</string>
+  <string name="preferences_no_continous_auto_focus_title">No continues auto focus</string>
+  <string name="preferences_no_continous_auto_focus_summary">Use standard auto focus only</string>
   <string name="preferences_enable_torch_title">Enable front light</string>
   <string name="preferences_dta_format_title">DTA format settings</string>
   <string name="preferences_advanced_title">Advanced settings</string>

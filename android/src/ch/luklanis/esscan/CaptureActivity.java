@@ -103,20 +103,8 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 	/** The default OCR engine to use. */
 	public static final String DEFAULT_OCR_ENGINE_MODE = "Tesseract";
-	
+
 	public static final String EXTERNAL_STORAGE_DIRECTORY = "ESRScan";
-
-	/** Languages for which Cube data is available. */
-	static final String[] CUBE_SUPPORTED_LANGUAGES = { 
-		"ara", // Arabic
-		"eng", // English
-		"hin" // Hindi
-	};
-
-	/** Languages that require Cube, and cannot run using Tesseract. */
-	private static final String[] CUBE_REQUIRED_LANGUAGES = { 
-		"ara" // Arabic
-	};
 
 	/** Resource to use for data file downloads. */
 	static final String DOWNLOAD_BASE = "http://tesseract-ocr.googlecode.com/files/";
@@ -137,6 +125,8 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	static final long AUTOFOCUS_FAILURE_INTERVAL_MS = 1000L;
 
 	public static final int HISTORY_REQUEST_CODE = 0x0000bacc;
+	
+	private static final int ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
 
 	private CameraManager cameraManager;
 	private CaptureActivityHandler handler;
@@ -154,7 +144,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	private String sourceLanguageCodeOcr; // ISO 639-3 language code
 	private String sourceLanguageReadable; // Language name, for example, "English"
 	private int pageSegmentationMode = TessBaseAPI.PSM_SINGLE_LINE;
-	private int ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
 	private String characterWhitelist;
 
 	private SharedPreferences prefs;
@@ -162,7 +151,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	private ProgressDialog dialog; // for initOcr - language download & unzip
 	private ProgressDialog indeterminateDialog; // also for initOcr - init OCR engine
 	private boolean isEngineReady;
-	private boolean isPaused;
 	private HistoryManager historyManager;
 
 	private PsValidation psValidation;
@@ -225,7 +213,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	private final Button.OnClickListener saveListener = new Button.OnClickListener() {
 		public void onClick(View v) {
 			boolean somethingSaved = false;
-			
+
 			EsrResult result = new EsrResult(lastItem.getResult().getAccount());
 
 			if(result.getAmount() == ""){
@@ -307,7 +295,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			} else {
 				clearIPAddresses();
 			}
-			
+
 			invalidateOptionsMenu();
 		}
 
@@ -318,9 +306,9 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			// Because it is running in our same process, we should never
 			// see this happen.
 			boundService = null;
-			
+
 			clearIPAddresses();
-			
+
 			invalidateOptionsMenu();
 		}
 	};
@@ -371,11 +359,11 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		amountSaveButton.setOnClickListener(saveListener);
 
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		
-        // Registers BroadcastReceiver to track network connection changes.
-        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        receiver = new NetworkReceiver();
-        this.registerReceiver(receiver, filter);
+
+		// Registers BroadcastReceiver to track network connection changes.
+		IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+		receiver = new NetworkReceiver();
+		this.registerReceiver(receiver, filter);
 	}
 
 	@Override
@@ -401,7 +389,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		isEngineReady = false;
 
 		String previousSourceLanguageCodeOcr = sourceLanguageCodeOcr;
-		int previousOcrEngineMode = ocrEngineMode;
 
 		handler = null;
 
@@ -422,8 +409,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		// Comment out the following block to test non-OCR functions without an SD card
 
 		// Do OCR engine initialization, if necessary
-		boolean doNewInit = (baseApi == null) || !sourceLanguageCodeOcr.equals(previousSourceLanguageCodeOcr) || 
-				ocrEngineMode != previousOcrEngineMode;
+		boolean doNewInit = (baseApi == null) || !sourceLanguageCodeOcr.equals(previousSourceLanguageCodeOcr);
 		if (doNewInit) {      
 			// Initialize the OCR engine
 			File storageDirectory = getStorageDirectory();
@@ -432,16 +418,16 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			}
 		} else {
 			// We already have the engine initialized, so just start the camera.
-			resumeOCR();
+			resumeOcrEngine();
 		}
 
 		boolean enabledBefore = enableStreamMode;
 		enableStreamMode = this.prefs.getBoolean(PreferencesActivity.KEY_ENABLE_STREAM_MODE, false);
-		
+
 		if (enabledBefore != enableStreamMode) {
 			invalidateOptionsMenu();
 		}
-		
+
 		if (enableStreamMode) {
 			if (serviceIntent == null) {
 				serviceIntent =  new Intent(this, ESRSender.class);
@@ -473,18 +459,13 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	 * or after the app regains focus. Sets state related settings and OCR engine parameters,
 	 * and requests camera initialization.
 	 */
-	void resumeOCR() {
-		Log.d(TAG, "resumeOCR()");
+	void resumeOcrEngine() {
+		Log.d(TAG, "resumeOcrEngine()");
 
 		// This method is called when Tesseract has already been successfully initialized, so set 
 		// isEngineReady = true here.
 		isEngineReady = true;
 
-		isPaused = false;
-
-		if (handler != null) {
-			handler.resetState();
-		}
 		if (baseApi != null) {
 			baseApi.setPageSegMode(pageSegmentationMode);
 			baseApi.setVariable(TessBaseAPI.VAR_CHAR_BLACKLIST, "");
@@ -498,27 +479,14 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		}
 	}
 
-	/** Called when the shutter button is pressed in continuous mode. */
-	void onShutterButtonPressContinuous() {
-		isPaused = true;
-		handler.stop();  
-		beepManager.playBeepSoundAndVibrate();
-		if (lastItem != null) {
-			showResult(lastItem);
-		} else {
-			Toast toast = Toast.makeText(this, "OCR failed. Please try again.", Toast.LENGTH_SHORT);
-			toast.setGravity(Gravity.TOP, 0, 0);
-			toast.show();
-			resumeContinuousDecoding();
-		}
-	}
-
 	/** Called to resume recognition after translation in continuous mode. */
-	void resumeContinuousDecoding() {
-		isPaused = false;
+	void restartPreviewAfterDelay(long delayMS) {
+		if (handler != null) {
+			handler.sendEmptyMessageDelayed(R.id.restart_decode, delayMS);
+		}
+		
+		resumeOcrEngine();
 		resetStatusView();
-		setStatusViewForContinuous();
-		handler.resetState();
 	}
 
 	@Override
@@ -534,6 +502,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			Log.d(TAG, "surfaceCreated(): calling initCamera()...");
 			initCamera(holder);
 		}
+		
 		hasSurface = true;
 	}
 
@@ -588,52 +557,39 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		super.onPause();
 	}
 
-	void stopHandler() {
-		if (handler != null) {
-			handler.stop();
-		}
-	}
-
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		
+
 		if (baseApi != null) {
 			baseApi.end();
 		}
-		
-        // Unregisters BroadcastReceiver when app is destroyed.
-        if (receiver != null) {
-            this.unregisterReceiver(receiver);
-        }
+
+		// Unregisters BroadcastReceiver when app is destroyed.
+		if (receiver != null) {
+			this.unregisterReceiver(receiver);
+		}
 	}
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_BACK) {
-
-			// First check if we're paused in continuous mode, and if so, just unpause.
-			if (isPaused) {
-				Log.d(TAG, "only resuming continuous recognition, not quitting...");
-				psValidation.gotoBeginning(true);
-				this.lastValidationStep = psValidation.getCurrentStep();
-				resumeContinuousDecoding();
-				return true;
-			}
-
+		switch (keyCode) { 
+		case KeyEvent.KEYCODE_BACK:
 			// Exit the app if we're not viewing a result.
 			if (lastItem == null) {
 				setResult(RESULT_CANCELED);
 				finish();
-				return true;
 			} else {
-				// Go back to previewing in regular OCR mode.
-				resetStatusView();
-				if (handler != null) {
-					handler.sendEmptyMessage(R.id.restart_preview);
-				}
-				return true;
+				restartPreviewAfterDelay(0L);
 			}
+			return true;
+			// Use volume up/down to turn on light
+		case KeyEvent.KEYCODE_VOLUME_DOWN:
+			cameraManager.setTorch(false);
+			return true;
+		case KeyEvent.KEYCODE_VOLUME_UP:
+			cameraManager.setTorch(true);
+			return true;
 		}
 
 		return super.onKeyDown(keyCode, event);
@@ -643,9 +599,9 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getSupportMenuInflater();
 		inflater.inflate(R.menu.capture_menu, menu);
-		
+
 		MenuItem ps_switch = menu.findItem(R.id.menu_switch_ps);
-		
+
 		if (enableStreamMode && boundService != null && boundService.isConnectedLocal()) {
 			ps_switch.setVisible(true);
 		} else {
@@ -788,28 +744,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		}
 		dialog = new ProgressDialog(this);
 
-		// If we have a language that only runs using Cube, then set the ocrEngineMode to Cube
-		if (ocrEngineMode != TessBaseAPI.OEM_CUBE_ONLY) {
-			for (String s : CUBE_REQUIRED_LANGUAGES) {
-				if (s.equals(languageCode)) {
-					ocrEngineMode = TessBaseAPI.OEM_CUBE_ONLY;
-				}
-			}
-		}
-
-		// If our language doesn't support Cube, then set the ocrEngineMode to Tesseract
-		if (ocrEngineMode != TessBaseAPI.OEM_TESSERACT_ONLY) {
-			boolean cubeOk = false;
-			for (String s : CUBE_SUPPORTED_LANGUAGES) {
-				if (s.equals(languageCode)) {
-					cubeOk = true;
-				}
-			}
-			if (!cubeOk) {
-				ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
-			}
-		}
-
 		// Display the name of the OCR engine we're initializing in the indeterminate progress dialog box
 		indeterminateDialog = new ProgressDialog(this);
 		indeterminateDialog.setTitle("Please wait");
@@ -854,23 +788,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	void showResult(HistoryItem historyItem) {
 		lastItem = historyItem;
 
-		if(handler != null)
-		{
-			handler.stop();
-			isPaused = true;
-		}
-
-		try {
-			// Test whether the result is null
-			lastItem.getResult().getCompleteCode();
-		} catch (NullPointerException e) {
-			Toast toast = Toast.makeText(this, "OCR failed. Please try again.", Toast.LENGTH_SHORT);
-			toast.setGravity(Gravity.TOP, 0, 0);
-			toast.show();
-			resumeContinuousDecoding();
-			return;
-		}
-
 		PsResult psResult = historyItem.getResult();
 
 		if(this.serviceIsBound && this.boundService.isConnectedLocal()) {
@@ -879,37 +796,37 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			AlertDialog.Builder builder = new AlertDialog.Builder(CaptureActivity.this);
 			builder.setMessage(sent ? R.string.msg_coderow_sent : R.string.msg_coderow_not_sent);
 			builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
-				
+
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					psValidation.gotoBeginning(false);
 					lastValidationStep = psValidation.getCurrentStep();
-					resumeContinuousDecoding();
+					restartPreviewAfterDelay(0L);
 				}
 			});
 			builder.show();
-			
+
 			return;
 		}
-		
+
 		if (psResult.getType().equals(EsResult.PS_TYPE_NAME)) {
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(CaptureActivity.this);
 			builder.setMessage(R.string.msg_red_result_view_not_available);
 			builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
-				
+
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					psValidation.gotoBeginning(false);
 					lastValidationStep = psValidation.getCurrentStep();
-					resumeContinuousDecoding();
+					restartPreviewAfterDelay(0L);
 				}
 			});
 			builder.show();
-			
+
 			return;
 		}
-		
+
 		EsrResult result = new EsrResult(psResult.getCompleteCode());
 
 		// Turn off capture-related UI elements
@@ -1105,10 +1022,10 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	 */
 	private void resetStatusView() {
 		resultView.setVisibility(View.GONE);
-		
+
 		View orangeStatusView = findViewById(R.id.status_view_top_orange);
 		View redStatusView = findViewById(R.id.status_view_top_red);
-		
+
 		if (this.psValidation.getSpokenType().equals(EsrResult.PS_TYPE_NAME)) {
 			redStatusView.setVisibility(View.GONE);
 			orangeStatusView.setVisibility(View.VISIBLE);
@@ -1119,6 +1036,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			statusViewTop = redStatusView;
 		}
 
+		psValidation.gotoBeginning(true);
 		refreshStatusView();
 
 		statusViewBottomLeft.setText("");
@@ -1127,6 +1045,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			statusViewBottomLeft.setVisibility(View.VISIBLE);
 		}
 
+		viewfinderView.removeResultText();
 		viewfinderView.setVisibility(View.VISIBLE);
 
 		lastItem = null;
@@ -1138,7 +1057,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		TextView statusView1;
 		TextView statusView2;
 		TextView statusView3;
-		
+
 		if (this.psValidation.getSpokenType().equals(EsrResult.PS_TYPE_NAME)) {
 			statusView1 = (TextView) findViewById(R.id.status_view_1_orange);
 			statusView2 = (TextView) findViewById(R.id.status_view_2_orange);
@@ -1174,14 +1093,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		Toast toast = Toast.makeText(this, "OCR: " + sourceLanguageReadable, Toast.LENGTH_LONG);
 		toast.setGravity(Gravity.TOP, 0, 0);
 		toast.show();
-	}
-
-	/**
-	 * Displays an initial message to the user while waiting for the first OCR request to be
-	 * completed after starting realtime OCR.
-	 */
-	void setStatusViewForContinuous() {
-		viewfinderView.removeResultText();
 	}
 
 	/** Request the viewfinder to be invalidated. */
@@ -1237,8 +1148,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		setSourceLanguage(prefs.getString(PreferencesActivity.KEY_SOURCE_LANGUAGE_PREFERENCE, "deu"));
 
-		ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
-
 		characterWhitelist = OcrCharacterHelper.getWhitelist(prefs, sourceLanguageCodeOcr);
 
 		prefs.registerOnSharedPreferenceChangeListener(listener);
@@ -1262,7 +1171,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		.setPositiveButton( "Done", new FinishListener(this))
 		.show();
 	}
-	
+
 	private void setOKAlert(int id){
 		setOKAlert(CaptureActivity.this, id);
 	}
@@ -1273,38 +1182,38 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		builder.setPositiveButton(R.string.button_ok, null);
 		builder.show();
 	}
-	
+
 	// From http://developer.android.com/training/basics/network-ops/managing.html#detect-changes
 	private class NetworkReceiver extends BroadcastReceiver {   
-	      
+
 		@Override
 		public void onReceive(Context context, Intent intent) {
-		    ConnectivityManager conn =  (ConnectivityManager)
-		        context.getSystemService(Context.CONNECTIVITY_SERVICE);
-		    NetworkInfo networkInfo = conn.getActiveNetworkInfo();
+			ConnectivityManager conn =  (ConnectivityManager)
+					context.getSystemService(Context.CONNECTIVITY_SERVICE);
+			NetworkInfo networkInfo = conn.getActiveNetworkInfo();
 
-		    if (networkInfo != null && networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
-		    	if (enableStreamMode) {
-			        if (boundService != null) {
-			        	boundService.startServer();
-			        	showIPAddresses();
-			        	invalidateOptionsMenu();
-			        }
+			if (networkInfo != null && networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+				if (enableStreamMode) {
+					if (boundService != null) {
+						boundService.startServer();
+						showIPAddresses();
+						invalidateOptionsMenu();
+					}
 				}
-		    } else {
-		    	if (boundService != null) {
-		    		boundService.stopServer();
+			} else {
+				if (boundService != null) {
+					boundService.stopServer();
 
-		    		if (!TextUtils.isEmpty(statusViewBottomRight.getText())) {
-		    			clearIPAddresses();
-			        	invalidateOptionsMenu();
+					if (!TextUtils.isEmpty(statusViewBottomRight.getText())) {
+						clearIPAddresses();
+						invalidateOptionsMenu();
 						if (psValidation.getSpokenType().equals(EsResult.PS_TYPE_NAME)) {
 							psValidation = new EsrValidation();
 						} 
 						resetStatusView();
-		    		}
-		        }
-		    }
+					}
+				}
+			}
 		}
 	}
 }

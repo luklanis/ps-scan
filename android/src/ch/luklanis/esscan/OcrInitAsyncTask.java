@@ -49,19 +49,6 @@ import android.util.Log;
 final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
   private static final String TAG = OcrInitAsyncTask.class.getSimpleName();
 
-  /** Suffixes of required data files for Cube. */
-  private static final String[] CUBE_DATA_FILES = {
-    ".cube.bigrams",
-    ".cube.fold", 
-    ".cube.lm", 
-    ".cube.nn", 
-    ".cube.params", 
-    //".cube.size", // This file is not available for Hindi
-    ".cube.word-freq", 
-    ".tesseract_cube.nn", 
-    ".traineddata"
-  };
-
   private CaptureActivity activity;
   private Context context;
   private TessBaseAPI baseApi;
@@ -125,18 +112,6 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
     // Example Cube data filename: "tesseract-ocr-3.01.eng.tar"
     // Example Tesseract data filename: "eng.traineddata"
     String destinationFilenameBase = languageCode + ".traineddata";
-    boolean isCubeSupported = false;
-    for (String s : CaptureActivity.CUBE_SUPPORTED_LANGUAGES) {
-      if (s.equals(languageCode)) {
-        isCubeSupported = true;
-        destinationFilenameBase = "tesseract-ocr-3.01." + languageCode + ".tar";
-      }
-    }
-    
-    // Hack for Thai, which is a Tesseract-only language but packaged as a tar.
-    if (languageCode.equals("tha")) {
-      destinationFilenameBase = "tesseract-ocr-3.01.tha.tar";
-    }
 
     // Check for, and create if necessary, folder to hold model data
     String destinationDirBase = params[0] + 
@@ -162,29 +137,12 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
       if (tesseractTestFile.exists()) {
         tesseractTestFile.delete();
       }
-      deleteCubeDataFiles(tessdataDir);
-    }
-
-    // Check whether all Cube data files have already been installed
-    boolean isAllCubeDataInstalled = false;
-    if (isCubeSupported) {
-      boolean isAFileMissing = false;
-      File dataFile;
-      for (String s : CUBE_DATA_FILES) {
-        dataFile = new File(tessdataDir.toString() + File.separator + languageCode + s);
-        if (!dataFile.exists()) {
-          isAFileMissing = true;
-        }
-      }
-      isAllCubeDataInstalled = !isAFileMissing;
     }
 
     // If language data files are not present, install them
     boolean installSuccess = false;
-    if (!tesseractTestFile.exists()
-        || (isCubeSupported && !isAllCubeDataInstalled)) {
+    if (!tesseractTestFile.exists()) {
       Log.d(TAG, "Language data for " + languageCode + " not found in " + tessdataDir.toString());
-      deleteCubeDataFiles(tessdataDir);
 
       // Check assets for language data to install. If not present, download from Internet
       try {
@@ -300,30 +258,6 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
       return installSuccess && osdInstallSuccess;
     }
     return false;
-  }
-
-  /**
-   * Delete any existing data files for Cube that are present in the given directory. Files may be 
-   * partially uncompressed files left over from a failed install, or pre-v3.01 traineddata files.
-   * 
-   * @param tessdataDir
-   *          Directory to delete the files from
-   */
-  private void deleteCubeDataFiles(File tessdataDir) {
-    File badFile;
-    for (String s : CUBE_DATA_FILES) {
-      badFile = new File(tessdataDir.toString() + File.separator + languageCode + s);
-      if (badFile.exists()) {
-        Log.d(TAG, "Deleting existing file " + badFile.toString());
-        badFile.delete();
-      }
-      badFile = new File(tessdataDir.toString() + File.separator + "tesseract-ocr-3.01." 
-          + languageCode + ".tar");
-      if (badFile.exists()) {
-        Log.d(TAG, "Deleting existing file " + badFile.toString());
-        badFile.delete();
-      }
-    }
   }
 
   /**
@@ -697,7 +631,7 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
 
     if (result) {
       // Restart recognition
-      activity.resumeOCR();
+      activity.resumeOcrEngine();
       // activity.showLanguageName();
     } else {
       activity.showErrorMessage("Error", "Network is unreachable - cannot download language data. "

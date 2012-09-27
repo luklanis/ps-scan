@@ -28,6 +28,7 @@ import android.util.DisplayMetrics;
 import android.view.SurfaceHolder;
 import ch.luklanis.esscan.PlanarYUVLuminanceSource;
 import ch.luklanis.esscan.PreferencesActivity;
+import ch.luklanis.esscan.camera.open.OpenCameraManager;
 
 import java.io.IOException;
 
@@ -42,33 +43,30 @@ public final class CameraManager {
 
 	public static final int MIN_FRAME_WIDTH = 240; // originally 240
 	public static final int MIN_FRAME_HEIGHT = 48; // originally 240
-	
+
 	public static final double FRAME_WIDTH_INCHES = 3.74;
 	public static final double FRAME_HEIGHT_INCHES = 0.23;
 
 	private final Activity activity;
 	private final CameraConfigurationManager configManager;
 	private Camera camera;
+	private AutoFocusManager autoFocusManager;
 	private Rect framingRect;
 	private Rect framingRectInPreview;
 	private boolean initialized;
 	private boolean previewing;
 	private boolean reverseImage;
-	
+
 	/**
 	 * Preview frames are delivered here, which we pass on to the registered handler. Make sure to
 	 * clear the handler so it will only receive one message.
 	 */
 	private final PreviewCallback previewCallback;
 
-	/** Autofocus callbacks arrive here, and are dispatched to the Handler which requested them. */
-	private final AutoFocusCallback autoFocusCallback;
-
 	public CameraManager(Activity activity) {
 		this.activity = activity;
 		this.configManager = new CameraConfigurationManager(activity);
 		previewCallback = new PreviewCallback(configManager);
-		autoFocusCallback = new AutoFocusCallback();
 	}
 
 	/**
@@ -80,25 +78,22 @@ public final class CameraManager {
 	public void openDriver(SurfaceHolder holder) throws IOException {
 		Camera theCamera = camera;
 		if (theCamera == null) {
-			theCamera = Camera.open();
+			theCamera = new OpenCameraManager().build().open();
 			if (theCamera == null) {
 				throw new IOException();
 			}
 			camera = theCamera;
 		}
 		camera.setPreviewDisplay(holder);
+
 		if (!initialized) {
 			initialized = true;
 			configManager.initFromCameraParameters(theCamera);
 		}
-		
-		configManager.setDesiredCameraParameters(theCamera);
-		
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 
-			if(prefs.getBoolean(PreferencesActivity.KEY_ENABLE_TORCH, false)){
-				this.configManager.setTorch(theCamera, true);
-			}
+		configManager.setDesiredCameraParameters(theCamera);
+
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 
 		reverseImage = prefs.getBoolean(PreferencesActivity.KEY_REVERSE_IMAGE, false);
 	}
@@ -126,6 +121,7 @@ public final class CameraManager {
 		if (theCamera != null && !previewing) {
 			theCamera.startPreview();
 			previewing = true;
+			autoFocusManager = new AutoFocusManager(activity, camera);
 		}
 	}
 
@@ -133,14 +129,32 @@ public final class CameraManager {
 	 * Tells the camera to stop drawing preview frames.
 	 */
 	public void stopPreview() {
+		if (autoFocusManager != null) {
+			autoFocusManager.stop();
+			autoFocusManager = null;
+		}
 		if (camera != null && previewing) {
 			camera.stopPreview();
 			previewCallback.setHandler(null, 0);
-			autoFocusCallback.setHandler(null, 0);
-			
+
 			this.configManager.setTorch(camera, false);
-			
+
 			previewing = false;
+		}
+	}
+
+	/**
+	 * Convenience method for {@link com.google.zxing.client.android.CaptureActivity}
+	 */
+	public synchronized void setTorch(boolean newSetting) {
+		if (camera != null) {
+			if (autoFocusManager != null) {
+				autoFocusManager.stop();
+			}
+			configManager.setTorch(camera, newSetting);
+			if (autoFocusManager != null) {
+				autoFocusManager.start();
+			}
 		}
 	}
 
@@ -161,22 +175,6 @@ public final class CameraManager {
 	}
 
 	/**
-	 * Asks the camera hardware to perform an autofocus.
-	 *
-	 * @param handler The Handler to notify Use macro focus only when the autofocus completes.
-	 * @param message The message to deliver.
-	 */
-	public void requestAutoFocus(Handler handler, int message) {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
-
-		if (camera != null && previewing 
-				&& !prefs.getBoolean(PreferencesActivity.KEY_ONLY_MACRO_FOCUS, false)) {
-			autoFocusCallback.setHandler(handler, message);
-			camera.autoFocus(autoFocusCallback);
-		}
-	}
-
-	/**
 	 * Calculates the framing rect which the UI should draw to show the user where to place the
 	 * barcode. This target helps with alignment as well as forces the user to hold the device
 	 * far enough away to ensure the image will be in focus.
@@ -188,27 +186,27 @@ public final class CameraManager {
 			if (camera == null) {
 				return null;
 			}
-			
+
 			Point previewResolution = configManager.getPreviewResolution();
-			
+
 			DisplayMetrics metrics = new DisplayMetrics();
 			activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
-			
+
 			int width = (int) (metrics.xdpi * FRAME_WIDTH_INCHES);
 			if (width < MIN_FRAME_WIDTH) {
 				width = MIN_FRAME_WIDTH;
 			} else if (width > previewResolution.x) {
 				width = previewResolution.x;
 			}
-			
+
 			int height = (int) (metrics.ydpi * FRAME_HEIGHT_INCHES);
 			if (height < MIN_FRAME_HEIGHT) {
 				height = MIN_FRAME_HEIGHT;
 			} 
-			
+
 			int leftOffset = (previewResolution.x - width) / 2;
 			int topOffset = ((previewResolution.y - height) / 2);
-			
+
 			framingRect = new Rect(leftOffset, topOffset, leftOffset + width, topOffset + height);
 		}
 		return framingRect;
@@ -221,21 +219,21 @@ public final class CameraManager {
 	public Rect getFramingRectInPreview() {
 		if (framingRectInPreview == null) {
 			Rect framingRect = getFramingRect();
-			
+
 			if (framingRect == null) {
 				return null;
 			}
-			
+
 			Rect rect = new Rect(framingRect);
-			
+
 			rect.offset(0, getFramingTopOffset());
-			
+
 			Point cameraResolution = configManager.getCameraResolution();
 			Point screenResolution = configManager.getPreviewResolution();
-			
+
 			float scaleX = (float)cameraResolution.x / (float)screenResolution.x;
 			float scaleY = (float)cameraResolution.y / (float)screenResolution.y;
-			
+
 			rect.left = (int)(rect.left * scaleX);
 			rect.right = (int)(rect.right * scaleX);
 			rect.top = (int)(rect.top * scaleY);
