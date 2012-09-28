@@ -118,15 +118,10 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	/** Minimum mean confidence score necessary to not reject single-shot OCR result. Currently unused. */
 	static final int MINIMUM_MEAN_CONFIDENCE = 0; // 0 means don't reject any scored results
 
-	/** Length of time before the next autofocus request, if the last one was successful. Used in CaptureActivityHandler. */
-	static final long AUTOFOCUS_SUCCESS_INTERVAL_MS = 3000L;
-
-	/** Length of time before the next autofocus request, if the last request failed. Used in CaptureActivityHandler. */
-	static final long AUTOFOCUS_FAILURE_INTERVAL_MS = 1000L;
-
 	public static final int HISTORY_REQUEST_CODE = 0x0000bacc;
 
 	private static final int ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
+	private static final String sourceLanguageCodeOcr = "deu"; // ISO 639-3 language code
 
 	private CameraManager cameraManager;
 	private CaptureActivityHandler handler;
@@ -141,7 +136,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	private boolean hasSurface;
 	private BeepManager beepManager;
 	private TessBaseAPI baseApi; // Java interface for the Tesseract OCR engine
-	private String sourceLanguageCodeOcr; // ISO 639-3 language code
 	private String sourceLanguageReadable; // Language name, for example, "English"
 	private int pageSegmentationMode = TessBaseAPI.PSM_SINGLE_LINE;
 	private String characterWhitelist;
@@ -150,7 +144,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	private OnSharedPreferenceChangeListener listener;
 	private ProgressDialog dialog; // for initOcr - language download & unzip
 	private ProgressDialog indeterminateDialog; // also for initOcr - init OCR engine
-	private boolean isEngineReady;
 	private HistoryManager historyManager;
 
 	private PsValidation psValidation;
@@ -321,6 +314,8 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 	private NetworkReceiver receiver;
 
+	private HistoryItem savedResultToShow;
+
 	@Override
 	public void onCreate(Bundle icicle) {
 		requestWindowFeature(com.actionbarsherlock.view.Window.FEATURE_ACTION_BAR_OVERLAY);
@@ -337,6 +332,8 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 		// Hide Icon in ActionBar
 		getSupportActionBar().setDisplayShowHomeEnabled(false);
+
+		savedResultToShow = null;
 
 		showOcrResult = false;
 
@@ -386,10 +383,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		psValidation = new EsrValidation();
 		this.lastValidationStep = psValidation.getCurrentStep();
 
-		isEngineReady = false;
-
-		String previousSourceLanguageCodeOcr = sourceLanguageCodeOcr;
-
 		handler = null;
 
 		retrievePreferences();
@@ -398,27 +391,29 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		psValidation.gotoBeginning(true);
 		this.lastValidationStep = psValidation.getCurrentStep();
 
-		// Set up the camera preview surface.
-		surfaceView = (SurfaceView) findViewById(R.id.preview_view);
-		surfaceHolder = surfaceView.getHolder();
-		if (!hasSurface) {
-			surfaceHolder.addCallback(this);
-			surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-		}
-
-		// Comment out the following block to test non-OCR functions without an SD card
-
 		// Do OCR engine initialization, if necessary
-		boolean doNewInit = (baseApi == null) || !sourceLanguageCodeOcr.equals(previousSourceLanguageCodeOcr);
-		if (doNewInit) {      
+		if (baseApi == null) {      
 			// Initialize the OCR engine
 			File storageDirectory = getStorageDirectory();
 			if (storageDirectory != null) {
 				initOcrEngine(storageDirectory, sourceLanguageCodeOcr, sourceLanguageReadable);
 			}
 		} else {
-			// We already have the engine initialized, so just start the camera.
 			resumeOcrEngine();
+		}
+
+		// Set up the camera preview surface.
+		surfaceView = (SurfaceView) findViewById(R.id.preview_view);
+		surfaceHolder = surfaceView.getHolder();
+
+		if (hasSurface) {
+			// The activity was paused but not stopped, so the surface still exists. Therefore
+			// surfaceCreated() won't be called, so init the camera here.
+			initCamera(surfaceHolder);
+		} else {
+			// Install the callback and wait for surfaceCreated() to init the camera.
+			surfaceHolder.addCallback(this);
+			surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		}
 
 		boolean enabledBefore = enableStreamMode;
@@ -464,18 +459,15 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 		// This method is called when Tesseract has already been successfully initialized, so set 
 		// isEngineReady = true here.
-		isEngineReady = true;
 
 		if (baseApi != null) {
+			if(handler != null) {
+				handler.startDecode(baseApi);
+			}
+
 			baseApi.setPageSegMode(pageSegmentationMode);
 			baseApi.setVariable(TessBaseAPI.VAR_CHAR_BLACKLIST, "");
 			baseApi.setVariable(TessBaseAPI.VAR_CHAR_WHITELIST, characterWhitelist);
-		}
-
-		if (hasSurface) {
-			// The activity was paused but not stopped, so the surface still exists. Therefore
-			// surfaceCreated() won't be called, so init the camera here.
-			initCamera(surfaceHolder);
 		}
 	}
 
@@ -498,7 +490,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		}
 
 		// Only initialize the camera if the OCR engine is ready to go.
-		if (!hasSurface && isEngineReady) {
+		if (!hasSurface) {
 			Log.d(TAG, "surfaceCreated(): calling initCamera()...");
 			initCamera(holder);
 		}
@@ -514,9 +506,16 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			// Open and initialize the camera
 			cameraManager.openDriver(surfaceHolder);
 
-			// Creating the handler starts the preview, which can also throw a RuntimeException.
-			handler = new CaptureActivityHandler(this, cameraManager, baseApi);
+			if (handler == null) {
+				// Creating the handler starts the preview, which can also throw a RuntimeException.
+				handler = new CaptureActivityHandler(this, cameraManager);
 
+				if (baseApi != null) {
+					handler.startDecode(baseApi);
+				}
+			}
+
+			showOrStoreSavedItem(null);
 		} catch (IOException ioe) {
 			showErrorMessage("Error", "Could not initialize camera. Please try restarting device.");
 		} catch (RuntimeException e) {
@@ -564,6 +563,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 		if (baseApi != null) {
 			baseApi.end();
+			baseApi = null;
 		}
 
 		// Unregisters BroadcastReceiver when app is destroyed.
@@ -663,8 +663,25 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 			HistoryItem item = historyManager.buildHistoryItem(position);
 
-			Message message = Message.obtain(handler, R.id.esr_show_history_item, item);
-			message.sendToTarget();
+			showOrStoreSavedItem(item);
+		}
+	}
+
+	private void showOrStoreSavedItem(HistoryItem item) {
+		// Bitmap isn't used yet -- will be used soon
+		if (handler == null) {
+			savedResultToShow = item;
+		} else {
+			if (item != null) {
+				savedResultToShow = item;
+			}
+
+			if (savedResultToShow != null) {
+				Message message = Message.obtain(handler, R.id.esr_show_history_item, savedResultToShow);
+				handler.sendMessage(message);
+			}
+
+			savedResultToShow = null;
 		}
 	}
 
@@ -673,13 +690,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	}
 
 	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-	}
-
-	/** Sets the necessary language code values for the given OCR language. */
-	private boolean setSourceLanguage(String languageCode) {
-		sourceLanguageCodeOcr = languageCode;
-		sourceLanguageReadable = LanguageCodeHelper.getOcrLanguageName(this, languageCode);
-		return true;
 	}
 
 	/** Finds the proper location on the SD card where we can save files. */
@@ -737,8 +747,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	 * @param languageName Name of the language for OCR, for example, "English"
 	 */
 	private void initOcrEngine(File storageRoot, String languageCode, String languageName) {    
-		isEngineReady = false;
-
 		// Set up the dialog box for the thermometer-style download progress indicator
 		if (dialog != null) {
 			dialog.dismiss();
@@ -757,13 +765,8 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		indeterminateDialog.setCancelable(false);
 		indeterminateDialog.show();
 
-		if (handler != null) {
-			handler.quitSynchronously();     
-		}
-
 		// Start AsyncTask to install language data and init OCR
-		baseApi = new TessBaseAPI();
-		new OcrInitAsyncTask(this, baseApi, dialog, indeterminateDialog, languageCode, languageName, ocrEngineMode)
+		new OcrInitAsyncTask(this, new TessBaseAPI(), dialog, indeterminateDialog, languageCode, languageName, ocrEngineMode)
 		.execute(storageRoot.toString());
 	}
 
@@ -956,7 +959,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	 * 
 	 * @param ocrResult Object representing successful OCR results
 	 */
-	void handleOcrContinuousDecode(OcrResult ocrResult) {
+	void presentOcrDecodeResult(OcrResult ocrResult) {
 
 		// Send an OcrResultText object to the ViewfinderView for text rendering
 		viewfinderView.addResultText(new OcrResultText(ocrResult.getText(), 
@@ -982,7 +985,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	 * 
 	 * @param obj Metadata for the failed OCR request.
 	 */
-	void handleOcrContinuousDecode(OcrResultFailure obj) {
+	void presentOcrDecodeResult(OcrResultFailure obj) {
 		//		lastItem = null;
 		Log.i(TAG, "handleOcrContinuousDecode: set lastItem to null");
 	}
@@ -1147,7 +1150,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	private void retrievePreferences() {
 		// Retrieve from preferences, and set in this Activity, the language preferences
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-		setSourceLanguage(prefs.getString(PreferencesActivity.KEY_SOURCE_LANGUAGE_PREFERENCE, "deu"));
+		sourceLanguageReadable = LanguageCodeHelper.getOcrLanguageName(this, sourceLanguageCodeOcr);
 
 		characterWhitelist = OcrCharacterHelper.getWhitelist(prefs, sourceLanguageCodeOcr);
 
@@ -1216,5 +1219,9 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 				}
 			}
 		}
+	}
+
+	public void setBaseApi(TessBaseAPI baseApi) {
+		this.baseApi = baseApi;
 	}
 }

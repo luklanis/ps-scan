@@ -38,10 +38,12 @@ final class CaptureActivityHandler extends Handler {
 
 	private static final String TAG = CaptureActivityHandler.class.getSimpleName();
 
-	private final CaptureActivity activity;
-	private final DecodeThread decodeThread;
+	private static final long OCR_INIT_DELAY = 200;
+
 	private static State state;
+	private final CaptureActivity activity;
 	private final CameraManager cameraManager;
+	private DecodeThread decodeThread;
 
 	private enum State {
 		PREVIEW,
@@ -49,18 +51,15 @@ final class CaptureActivityHandler extends Handler {
 		DONE
 	}
 
-	CaptureActivityHandler(CaptureActivity activity, CameraManager cameraManager, TessBaseAPI baseApi) {
+	CaptureActivityHandler(CaptureActivity activity, CameraManager cameraManager) {
 		this.activity = activity;
 		this.cameraManager = cameraManager;
 
-		decodeThread = new DecodeThread(activity, 
-				baseApi);
-		decodeThread.start();
+		decodeThread = null;
 
 		state = State.SUCCESS;
 
-		// Start ourselves capturing previews and decoding.
-		cameraManager.startPreview();
+		// Start ourselves capturing previews and decode.
 		restartOcrPreviewAndDecode();
 	}
 
@@ -70,57 +69,70 @@ final class CaptureActivityHandler extends Handler {
 		switch (message.what) {
 		case R.id.restart_decode:
 			Log.d(TAG, "Got restart decode message");
-			DecodeHandler.resetDecodeState();
-			restartOcrPreviewAndDecode();
+			state = State.PREVIEW;
+			requestOcrDecodeWhenThreadReady();
 			break;
 		case R.id.decode_succeeded:
 			Log.d(TAG, "Got decode succeeded message");
-			state = State.SUCCESS;
-			try {
-				activity.handleOcrContinuousDecode((OcrResult) message.obj);
-			} catch (NullPointerException e) {
-				// Continue
+			if (state != State.DONE) {
+				state = State.SUCCESS;
+				try {
+					activity.presentOcrDecodeResult((OcrResult) message.obj);
+				} catch (NullPointerException e) {
+					// Continue
+				}
+				requestOcrDecodeWhenThreadReady();
+				activity.drawViewfinder();  
 			}
-			DecodeHandler.resetDecodeState();
-			restartOcrPreviewAndDecode();
 			break;
 		case R.id.decode_failed:
-			state = State.PREVIEW;
-			DecodeHandler.resetDecodeState();
-			cameraManager.requestOcrDecode(decodeThread.getHandler(), R.id.decode);
+			if (state != State.DONE) {
+				state = State.PREVIEW;
+				requestOcrDecodeWhenThreadReady();
+			}
 			break;
 		case R.id.esr_decode_succeeded:
 			state = State.DONE;
 			PsResult result = (PsResult) message.obj;
 
 			activity.showResult(result);
-			DecodeHandler.resetDecodeState();
 			break;
 		case R.id.esr_show_history_item:
+			state = State.DONE;
 			activity.showResult((HistoryItem) message.obj);
-			DecodeHandler.resetDecodeState();
 			break;
 		}
 	}
 
-	void quitSynchronously() {    
+	public void startDecode(TessBaseAPI baseApi) {
+		if (this.decodeThread == null) {
+			this.decodeThread = new DecodeThread(this.activity, baseApi);
+			this.decodeThread.start();
+		}
+	}
+
+	public void quitSynchronously() {    
 		state = State.DONE;
 		if (cameraManager != null) {
 			cameraManager.stopPreview();
 		}
 
 		try {
+			Message message = Message.obtain(decodeThread.getHandler(), R.id.quit);
+			message.sendToTarget();
+
 			// Wait at most half a second; should be enough time, and onPause() will timeout quickly
 			decodeThread.join(500L);
 		} catch (InterruptedException e) {
 			// continue
 		}
 
+		decodeThread = null;
+
 		// Be absolutely sure we don't send any queued up messages
 		removeMessages(R.id.restart_decode);
 		removeMessages(R.id.decode_failed);
 		removeMessages(R.id.decode_succeeded);
-
 	}
 
 	/**
@@ -128,12 +140,22 @@ final class CaptureActivityHandler extends Handler {
 	 */
 	private void restartOcrPreviewAndDecode() {
 		if (state == State.SUCCESS) {
+			state = State.PREVIEW;
 			// Continue capturing camera frames
 			cameraManager.startPreview();
 
+			requestOcrDecodeWhenThreadReady();
+			activity.drawViewfinder();    
+		}
+	}
+
+	private void requestOcrDecodeWhenThreadReady() {
+		if (this.decodeThread != null) {
 			// Continue requesting decode of images
 			cameraManager.requestOcrDecode(decodeThread.getHandler(), R.id.decode);
-			activity.drawViewfinder();    
+		} else {
+			this.sendEmptyMessageDelayed(R.id.decode_failed, OCR_INIT_DELAY);
+			Log.w(TAG, "Skipping decode because OCR isn't initialized yet");
 		}
 	}
 }

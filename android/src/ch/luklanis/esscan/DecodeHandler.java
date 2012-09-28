@@ -35,57 +35,47 @@ import android.os.Message;
  */
 final class DecodeHandler extends Handler {
 
-  private final CaptureActivity activity;
-  private boolean running = true;
-  private final TessBaseAPI baseApi;
-  private BeepManager beepManager;
-  
-  private static boolean isDecodePending;
+	private final CaptureActivity activity;
+	private boolean running = true;
+	private final TessBaseAPI baseApi;
+	private BeepManager beepManager;
 
-  DecodeHandler(CaptureActivity activity, TessBaseAPI baseApi) {
-    this.activity = activity;
-    this.baseApi = baseApi;
-    
-    beepManager = new BeepManager(activity);
-    beepManager.updatePrefs();
-  }
+	DecodeHandler(CaptureActivity activity, TessBaseAPI baseApi) {
+		this.activity = activity;
+		this.baseApi = baseApi;
 
-  @Override
-  public void handleMessage(Message message) {
-    if (!running) {
-      return;
-    }
-    switch (message.what) {        
-      case R.id.decode:
-        // Only request a decode if a request is not already pending.
-        if (!isDecodePending) {
-          isDecodePending = true;
-          ocrContinuousDecode((byte[]) message.obj, message.arg1, message.arg2);
-        }
-        break;
-      case R.id.quit:
-        running = false;
-        Looper.myLooper().quit();
-        break;
-    }
-  }
-  
-  static void resetDecodeState() {
-    isDecodePending = false;
-  }
-  
-  /**
-   *  Perform an OCR decode for realtime recognition mode.
-   *  
-   * @param data Image data
-   * @param width Image width
-   * @param height Image height
-   */
-  private void ocrContinuousDecode(byte[] data, int width, int height) {
-    // Asyncrhonously launch the OCR process
-    PlanarYUVLuminanceSource source = activity.getCameraManager().buildLuminanceSource(data, width, height);
-    new OcrRecognizeAsyncTask(activity, baseApi, source.renderCroppedGreyscaleBitmap()).execute();
-  }
+		beepManager = new BeepManager(activity);
+		beepManager.updatePrefs();
+	}
+
+	@Override
+	public void handleMessage(Message message) {
+		if (!running) {
+			return;
+		}
+		switch (message.what) {        
+		case R.id.decode:
+			ocrContinuousDecode((byte[]) message.obj, message.arg1, message.arg2);
+			break;
+		case R.id.quit:
+			running = false;
+			Looper.myLooper().quit();
+			break;
+		}
+	}
+
+	/**
+	 *  Perform an OCR decode for realtime recognition mode.
+	 *  
+	 * @param data Image data
+	 * @param width Image width
+	 * @param height Image height
+	 */
+	private void ocrContinuousDecode(byte[] data, int width, int height) {
+		// Asyncrhonously launch the OCR process
+		PlanarYUVLuminanceSource source = activity.getCameraManager().buildLuminanceSource(data, width, height);
+		new OcrRecognizeAsyncTask(activity, baseApi, source.renderCroppedGreyscaleBitmap()).execute();
+	}
 }
 
 
