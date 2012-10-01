@@ -74,7 +74,12 @@
             android:stateNotNeeded="true" >
         </activity>
         
-        <service android:name=".codesend.ESRSender" android:label="Code row send service"></service>
+        <service android:name=".codesend.ESRSender" 
+            android:exported="false" 
+            android:label="Code row send service">
+        </service>
+        
+        <receiver android:process=":remote" android:name=".codesend.StopServiceReceiver"></receiver>
     </application>
 
 </manifest>

@@ -424,10 +424,8 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		}
 
 		if (enableStreamMode) {
-			if (serviceIntent == null) {
-				serviceIntent =  new Intent(this, ESRSender.class);
-				startService(serviceIntent);
-			}
+			serviceIntent =  new Intent(this, ESRSender.class);
+			startService(serviceIntent);
 
 			doBindService(); 
 		}

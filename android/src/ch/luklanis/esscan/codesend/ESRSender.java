@@ -8,8 +8,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Enumeration;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -34,20 +37,62 @@ public class ESRSender extends Service {
 	private ServerSocket server;
 	private Socket socket;
 
+	public ESRSender() {
+		this.socket = null;
+		this.server = null;
+	}
+
 	@Override
-	public IBinder onBind(Intent intent) {
+	public IBinder onBind(Intent intent) {		
 		return this.binder;
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
+
 		super.onStartCommand(intent, flags, startId);
 
-		this.socket = null;
+		if (socket != null) {
+			return START_NOT_STICKY;
+		}
 
 		this.startServer();
 
-		return START_STICKY;
+		return START_NOT_STICKY;
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		stopServer();
+	}
+
+	@Override
+	public boolean onUnbind(Intent intent) {
+
+		Log.i(TAG, "Set up alarm manager");
+
+		Intent alarmIntent = new Intent(this, StopServiceReceiver.class);
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.add(Calendar.MINUTE, 2);
+
+		AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+		am.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+
+		return true;
+	}
+
+	@Override
+	public void onRebind(Intent intent) {
+		Log.i(TAG, "Cancel alarm manager");
+
+		Intent alarmIntent = new Intent(this, StopServiceReceiver.class);
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
+
+		AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+		am.cancel(pendingIntent);
 	}
 
 	public boolean isConnectedLocal() {
@@ -129,20 +174,6 @@ public class ESRSender extends Service {
 		return true;
 	}
 
-	@Override
-	public void onDestroy() {
-		stopServer();
-
-		if (this.socket != null) {
-			try {
-				this.socket.close();
-			} catch (IOException e) {
-			}
-		}
-
-		super.onDestroy();
-	}
-
 	public void stopServer() {
 		try {
 			if (this.server != null && !this.server.isClosed()) {
@@ -152,6 +183,7 @@ public class ESRSender extends Service {
 
 			if (this.socket != null) {
 				this.socket.close();
+				this.socket = null;
 			}
 		} catch (IOException e) {
 		}
