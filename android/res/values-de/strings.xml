@@ -24,6 +24,7 @@
   <string name="button_save">Speichern</string>
   <string name="button_export_again">Nochmal</string>
   <string name="button_change">Andere</string>
+  <string name="detail_title">Details</string>
   <string name="history_clear_text">Alle löschen</string>
   <string name="history_send_dta">DTA</string>
   <string name="history_send">CSV</string>
@@ -58,11 +59,12 @@
   <string name="msg_coderow_sent">Kodierzeile wurde gesendet.</string>
   <string name="msg_coderow_not_sent">Kodierzeile senden nicht möglich. ESR Receiver ist nicht verbunden!</string>
   <string name="msg_red_result_view_not_available">Für rote Einzahlungsscheine können keine Details angezeigt werden!</string>
-  <string name="esr_result_account">Konto</string>
-  <string name="esr_result_address">Empfänger</string>
-  <string name="esr_result_reference_number">Referenznummer</string>
-  <string name="esr_result_amount_not_set">0.00</string>
-  <string name="esr_picture">Ein kleines Bild von einem Orangen Einzahlungsschein</string>
+  <string name="result_account">Konto</string>
+  <string name="result_address">Empfänger</string>
+  <string name="result_reference_number">Referenznummer</string>
+  <string name="result_amount_not_set">0.00</string>
+  <string name="picture">Ein kleines Bild von einem Orangen Einzahlungsschein</string>
+  <string name="result_exported_dta">Payment exported in file</string>
   <string name="button_copy_code_row">Kodierzeile kopieren</string>
   <string name="preferences_only_macro_focus_title">Makrofokus</string>
   <string name="preferences_no_continous_auto_focus_title">Kein fortlaufender Autofokus</string>

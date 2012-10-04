@@ -35,7 +35,6 @@ import ch.luklanis.esscan.history.HistoryActivity;
 import ch.luklanis.esscan.history.HistoryItem;
 import ch.luklanis.esscan.history.HistoryManager;
 import ch.luklanis.esscan.language.LanguageCodeHelper;
-import ch.luklanis.esscan.paymentslip.DTAFileCreator;
 import ch.luklanis.esscan.paymentslip.EsIbanValidation;
 import ch.luklanis.esscan.paymentslip.EsResult;
 import ch.luklanis.esscan.paymentslip.EsrResult;
@@ -57,17 +56,13 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.preference.PreferenceManager;
-//import android.content.ClipboardManager;
-import android.text.ClipboardManager;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.CharacterStyle;
@@ -79,16 +74,11 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This activity opens the camera and does the actual scanning on a background thread. It draws a
@@ -129,10 +119,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	private SurfaceView surfaceView;
 	private SurfaceHolder surfaceHolder;
 	private TextView statusViewBottomLeft;
-	//private TextView statusViewTop;
-	private View statusViewTop;
-	private View resultView;
-	private HistoryItem lastItem;
 	private boolean hasSurface;
 	private BeepManager beepManager;
 	private TessBaseAPI baseApi; // Java interface for the Tesseract OCR engine
@@ -153,6 +139,16 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	private boolean showOcrResult;
 	private boolean enableStreamMode;
 
+	private boolean serviceIsBound;
+
+	private TextView statusViewBottomRight;
+
+	private Intent serviceIntent;
+
+	private NetworkReceiver receiver;
+
+	private PsResult savedCodeRowToSend;
+
 	Handler getHandler() {
 		return handler;
 	}
@@ -165,116 +161,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		return psValidation;
 	}
 
-	private final Button.OnClickListener resultCopyListener = new Button.OnClickListener() {
-		@Override
-		public void onClick(View v) {
-			ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-			clipboardManager.setText(lastItem.getResult().getCompleteCode());
-
-			//        clipboardManager.setPrimaryClip(ClipData.newPlainText("ocrResult", ocrResultView.getText()));
-			//      if (clipboardManager.hasPrimaryClip()) {
-			if (clipboardManager.hasText()) {
-				Toast toast = Toast.makeText(v.getContext(), R.string.msg_copied, Toast.LENGTH_SHORT);
-				toast.setGravity(Gravity.BOTTOM, 0, 0);
-				toast.show();
-			}
-		}
-	};
-
-	private final Button.OnClickListener exportAgainListener = new Button.OnClickListener() {
-		@Override
-		public void onClick(View v) {
-			AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-			builder.setMessage(R.string.msg_sure);
-			builder.setNeutralButton(R.string.button_cancel, null);
-			builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					historyManager.updateHistoryItemFileName(lastItem.getResult().getCompleteCode(), null);
-
-					Button reexportButton = (Button) findViewById(R.id.button_export_again);
-
-					TextView dtaFilenameTextView = (TextView) findViewById(R.id.esr_result_dta_file);
-					dtaFilenameTextView.setText("");
-					reexportButton.setVisibility(View.GONE);
-				}
-			});
-			builder.show();
-		}
-	};
-
-	private final Button.OnClickListener saveListener = new Button.OnClickListener() {
-		public void onClick(View v) {
-			boolean somethingSaved = false;
-
-			EsrResult result = new EsrResult(lastItem.getResult().getAccount());
-
-			if(result.getAmount() == ""){
-				EditText amountEditText = (EditText) findViewById(R.id.esr_result_amount);
-				String newAmount = amountEditText.getText().toString().replace(',', '.');
-				try {
-					float newAmountTemp = Float.parseFloat(newAmount);
-					newAmountTemp *= 100;
-					newAmountTemp -= (newAmountTemp % 5);
-					newAmountTemp /= 100;
-
-					newAmount = String.valueOf(newAmountTemp);
-
-					if(newAmount.indexOf('.') == newAmount.length() - 2){
-						newAmount += "0";
-					}
-
-					if(historyManager == null){
-						Log.e(TAG, "onClick: historyManager is null!");
-						return;
-					}
-
-					historyManager.updateHistoryItemAmount(lastItem.getResult().getCompleteCode(), 
-							newAmount);
-					amountEditText.setText(newAmount);
-
-					somethingSaved = true;
-				} catch (NumberFormatException e) {
-					setOKAlert(v.getContext(), R.string.msg_amount_not_valid);
-				}
-			}
-
-			EditText addressEditText = (EditText) findViewById(R.id.esr_result_address);
-			String address = addressEditText.getText().toString();
-			if(address.length() > 0){
-
-				int error = DTAFileCreator.validateAddress(address);
-				if(error != 0){
-					setOKAlert(v.getContext(), error);
-				}
-
-				if (lastItem.getAddressNumber() == -1) {
-					historyManager.updateHistoryItemAddress(lastItem.getResult().getCompleteCode(), 
-							historyManager.addAddress(lastItem.getResult().getAccount(), address));
-				}
-				else{
-					historyManager.updateAddress(lastItem.getResult().getAccount(), 
-							lastItem.getAddressNumber(), address);
-				}
-
-				somethingSaved = true;
-			}
-
-			if(somethingSaved){
-				Toast toast = Toast.makeText(v.getContext(), R.string.msg_saved, Toast.LENGTH_SHORT);
-				toast.setGravity(Gravity.BOTTOM, 0, 0);
-				toast.show();
-			}
-		}
-	};
-
-	private final Button.OnClickListener addressChangeListener = new Button.OnClickListener() {
-		@Override
-		public void onClick(View v) {
-			showAddressDialog(v.getContext());
-		}
-	};
-
 	private ESRSender boundService;
 
 	private ServiceConnection serviceConnection = new ServiceConnection() {
@@ -284,6 +170,10 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			boundService = ((ESRSender.LocalBinder)service).getService();
 
 			if (boundService.isConnectedLocal()) {
+				if (savedCodeRowToSend != null) {
+					showResult(savedCodeRowToSend, true);
+				}
+				
 				showIPAddresses();
 			} else {
 				clearIPAddresses();
@@ -306,16 +196,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		}
 	};
 
-	private boolean serviceIsBound;
-
-	private TextView statusViewBottomRight;
-
-	private Intent serviceIntent;
-
-	private NetworkReceiver receiver;
-
-	private HistoryItem savedResultToShow;
-
 	@Override
 	public void onCreate(Bundle icicle) {
 		requestWindowFeature(com.actionbarsherlock.view.Window.FEATURE_ACTION_BAR_OVERLAY);
@@ -332,8 +212,8 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 		// Hide Icon in ActionBar
 		getSupportActionBar().setDisplayShowHomeEnabled(false);
-
-		savedResultToShow = null;
+		
+		savedCodeRowToSend = null;
 
 		showOcrResult = false;
 
@@ -343,17 +223,11 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 		beepManager = new BeepManager(this);
 
-		Button resultCopy = (Button)findViewById(R.id.button_copy_code_row);
-		resultCopy.setOnClickListener(resultCopyListener);
-
-		Button exportAgainButton = (Button)findViewById(R.id.button_export_again);
-		exportAgainButton.setOnClickListener(exportAgainListener);
-
-		Button addressChangeButton = (Button)findViewById(R.id.button_address_change);
-		addressChangeButton.setOnClickListener(addressChangeListener);
-
-		Button amountSaveButton = (Button) findViewById(R.id.button_result_save);
-		amountSaveButton.setOnClickListener(saveListener);
+		//		Button resultCopy = (Button)findViewById(R.id.button_copy_code_row);
+		//		resultCopy.setOnClickListener(resultCopyListener);
+		//
+		//		Button amountSaveButton = (Button) findViewById(R.id.button_result_save);
+		//		amountSaveButton.setOnClickListener(saveListener);
 
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -372,8 +246,8 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_view);
 		viewfinderView.setCameraManager(cameraManager);
 
-		resultView = findViewById(R.id.result_view);
-		resultView.setVisibility(View.GONE);
+		//		resultView = findViewById(R.id.result_view);
+		//		resultView.setVisibility(View.GONE);
 
 		statusViewBottomLeft = (TextView) findViewById(R.id.status_view_bottom_left);
 
@@ -433,14 +307,14 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		showHelpOnFirstLaunch();
 	}
 
-	void doBindService() {
+	private void doBindService() {
 		if(!serviceIsBound) {
 			bindService(serviceIntent, serviceConnection, 0);
 			serviceIsBound = true;
 		}
 	}
 
-	void doUnbindService() {
+	private void doUnbindService() {
 		if(serviceIsBound) {		
 			unbindService(serviceConnection);
 			serviceIsBound = false;
@@ -500,7 +374,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	private void initCamera(SurfaceHolder surfaceHolder) {
 		Log.d(TAG, "initCamera()");
 		try {
-
 			// Open and initialize the camera
 			cameraManager.openDriver(surfaceHolder);
 
@@ -512,8 +385,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 					handler.startDecode(baseApi);
 				}
 			}
-
-			showOrStoreSavedItem(null);
 		} catch (IOException ioe) {
 			showErrorMessage("Error", "Could not initialize camera. Please try restarting device.");
 		} catch (RuntimeException e) {
@@ -574,13 +445,8 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		switch (keyCode) { 
 		case KeyEvent.KEYCODE_BACK:
-			// Exit the app if we're not viewing a result.
-			if (lastItem == null) {
-				setResult(RESULT_CANCELED);
-				finish();
-			} else {
-				restartPreviewAfterDelay(0L);
-			}
+			setResult(RESULT_CANCELED);
+			finish();
 			return true;
 			// Use volume up/down to turn on light
 		case KeyEvent.KEYCODE_VOLUME_DOWN:
@@ -606,10 +472,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		} else {
 			ps_switch.setVisible(false);
 		}
-		//		super.onCreateOptionsMenu(menu);
-		//		menu.add(0, SETTINGS_ID, 0, "Settings").setIcon(android.R.drawable.ic_menu_preferences);
-		//		menu.add(0, HISTORY_ID, 0, "History").setIcon(android.R.drawable.ic_menu_recent_history);
-		//		menu.add(0, ABOUT_ID, 0, "About").setIcon(android.R.drawable.ic_menu_info_details);
+
 		return true;
 	}
 
@@ -627,14 +490,12 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			break;
 		}
 		case R.id.menu_history: {
-			intent = new Intent(Intent.ACTION_PICK);
-			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-			intent.setClassName(this, HistoryActivity.class.getName());
+			intent = new Intent(this, HistoryActivity.class);
 			startActivityForResult(intent, HISTORY_REQUEST_CODE);
 			break;
 		}
 		case R.id.menu_settings: {
-			intent = new Intent().setClass(this, PreferencesActivity.class);
+			intent = new Intent(this, PreferencesActivity.class);
 			startActivity(intent);
 			break;
 		}
@@ -657,29 +518,14 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		if(resultCode == RESULT_OK && requestCode == HISTORY_REQUEST_CODE){
-			int position = intent.getIntExtra(Intents.History.ITEM_NUMBER, -1);
 
-			HistoryItem item = historyManager.buildHistoryItem(position);
+			if (intent.hasExtra(Intents.History.ITEM_NUMBER)) {
+				int position = intent.getIntExtra(Intents.History.ITEM_NUMBER, -1);
 
-			showOrStoreSavedItem(item);
-		}
-	}
+				HistoryItem item = historyManager.buildHistoryItem(position);
 
-	private void showOrStoreSavedItem(HistoryItem item) {
-		// Bitmap isn't used yet -- will be used soon
-		if (handler == null) {
-			savedResultToShow = item;
-		} else {
-			if (item != null) {
-				savedResultToShow = item;
+				savedCodeRowToSend = item.getResult();
 			}
-
-			if (savedResultToShow != null) {
-				Message message = Message.obtain(handler, R.id.esr_show_history_item, savedResultToShow);
-				handler.sendMessage(message);
-			}
-
-			savedResultToShow = null;
 		}
 	}
 
@@ -767,188 +613,53 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		new OcrInitAsyncTask(this, new TessBaseAPI(), dialog, indeterminateDialog, languageCode, languageName, ocrEngineMode)
 		.execute(storageRoot.toString());
 	}
-
-	/**
-	 * Displays information relating to the result of OCR, and requests a translation if necessary.
-	 * @param ocrResult Object representing successful OCR results
-	 * @return True if a non-null result was received for OCR
-	 */
-	void showResult(PsResult psResult) {
+	
+	public void showResult(PsResult psResult) {
 		beepManager.playBeepSoundAndVibrate();
-
-		HistoryItem historyItem = historyManager.addHistoryItem(psResult);
-		showResult(historyItem);
+		showResult(psResult, false);
 	}
 
-	/**
-	 * Displays information relating to the result of OCR, and requests a translation if necessary.
-	 * @param fromHistory 
-	 * 
-	 * @param ocrResult Object representing successful OCR results
-	 * @return True if a non-null result was received for OCR
-	 */
-	void showResult(HistoryItem historyItem) {
-		lastItem = historyItem;
-
-		PsResult psResult = historyItem.getResult();
+	public void showResult(PsResult psResult, boolean fromHistory) {
 
 		if(this.serviceIsBound && this.boundService.isConnectedLocal()) {
 			boolean sent = this.boundService.sendToListeners(psResult.getCompleteCode());
 
-			AlertDialog.Builder builder = new AlertDialog.Builder(CaptureActivity.this);
-			builder.setMessage(sent ? R.string.msg_coderow_sent : R.string.msg_coderow_not_sent);
-			builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+			showDialogAndRestartScan(sent ? R.string.msg_coderow_sent : R.string.msg_coderow_not_sent);
 
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					psValidation.gotoBeginning(false);
-					lastValidationStep = psValidation.getCurrentStep();
-					restartPreviewAfterDelay(0L);
-				}
-			});
-			builder.show();
-
+			historyManager.addHistoryItem(psResult);
+			return;
+		}
+		
+		if (fromHistory) {
 			return;
 		}
 
 		if (psResult.getType().equals(EsResult.PS_TYPE_NAME)) {
 
-			AlertDialog.Builder builder = new AlertDialog.Builder(CaptureActivity.this);
-			builder.setMessage(R.string.msg_red_result_view_not_available);
-			builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+			showDialogAndRestartScan(R.string.msg_red_result_view_not_available);
 
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					psValidation.gotoBeginning(false);
-					lastValidationStep = psValidation.getCurrentStep();
-					restartPreviewAfterDelay(0L);
-				}
-			});
-			builder.show();
-
+			historyManager.addHistoryItem(psResult);
 			return;
 		}
 
-		EsrResult result = new EsrResult(psResult.getCompleteCode());
-
-		// Turn off capture-related UI elements
-		statusViewBottomLeft.setVisibility(View.GONE);
-		statusViewBottomRight.setVisibility(View.GONE);
-		statusViewTop.setVisibility(View.GONE);
-		viewfinderView.setVisibility(View.GONE); 
-		resultView.setVisibility(View.VISIBLE);
-
-		ImageView bitmapImageView = (ImageView) findViewById(R.id.image_view);
-		bitmapImageView.setImageBitmap(BitmapFactory.decodeResource(getResources(),
-				R.drawable.ez_or));
-
-		// Display the recognized text
-		//		TextView ocrResultTextView = (TextView) findViewById(R.id.ocr_result_text_view);
-		//		ocrResultTextView.setText(esrResult.getCompleteCode());
-
-		// Crudely scale betweeen 22 and 32 -- bigger font for shorter text
-		//		int scaledSize = Math.max(14, 32 - esrResult.getCompleteCode().length() / 4);
-		//		ocrResultTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledSize);
-
-		TextView accountTextView = (TextView) findViewById(R.id.esr_result_account);
-		accountTextView.setText(result.getAccount());
-
-		EditText amountEditText = (EditText) findViewById(R.id.esr_result_amount);
-		Button amountSaveButton = (Button) findViewById(R.id.button_result_save);
-
-		String amountFromCode = result.getAmount(); 
-		if(amountFromCode != ""){
-			amountEditText.setEnabled(false);
-			amountEditText.setText(amountFromCode);
-		}
-		else{
-			String amountManuel = lastItem.getAmount();
-			if(amountManuel == null || amountManuel == "" || amountManuel.length() == 0){
-				amountEditText.setText(R.string.esr_result_amount_not_set);
-				amountEditText.selectAll();
-			}
-			else{
-				amountEditText.setText(amountManuel);
-			}
-			amountSaveButton.setVisibility(View.VISIBLE);
-		}
-
-		TextView currencyTextView = (TextView) findViewById(R.id.esr_result_currency);
-		currencyTextView.setText(result.getCurrency());
-
-		TextView referenceTextView = (TextView) findViewById(R.id.esr_result_reference_number);
-		referenceTextView.setText(result.getReference());
-
-		String dtaFilename = lastItem.getDTAFilename();
-		Button reexportButton = (Button) findViewById(R.id.button_export_again);
-		TextView dtaFilenameTextView = (TextView) findViewById(R.id.esr_result_dta_file);
-
-		if(dtaFilename != null && dtaFilename != ""){
-			dtaFilenameTextView.setText(lastItem.getDTAFilename());
-			reexportButton.setVisibility(View.VISIBLE);
-		}
-		else{
-			reexportButton.setVisibility(View.GONE);
-			dtaFilenameTextView.setText("");
-		}
-
-		Button addressChangeButton = (Button) findViewById(R.id.button_address_change);
-		addressChangeButton.setVisibility(View.VISIBLE);
-
-		EditText addressEditText = (EditText) findViewById(R.id.esr_result_address);
-		addressEditText.setText("");
-
-		if(lastItem.getAddressNumber() != -1){
-			addressEditText.setText(lastItem.getAddress());
-		}
-		else{
-			showAddressDialog(this);
-		}
-
-		return;
+		Intent intent = new Intent(this, HistoryActivity.class);
+		intent.setAction(HistoryActivity.ACTION_SHOW_RESULT);
+		intent.putExtra(HistoryActivity.EXTRA_CODE_ROW, psResult.getCompleteCode());
+		startActivityForResult(intent, HISTORY_REQUEST_CODE);
 	}
 
-	private void showAddressDialog(Context context) {
-		PsResult result = lastItem.getResult();
-		List<String> addresses = new ArrayList<String>();
-		addresses.addAll(historyManager.getAddresses(result.getAccount()));
-		addresses.add(getResources().getString(R.string.address_new));
-
-		if(addresses.size() <= 1){		
-			Button addressChangeButton = (Button)findViewById(R.id.button_address_change);
-			addressChangeButton.setVisibility(View.GONE);
-			return;
-		}
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(context);
-		builder.setTitle(R.string.address_dialog_title);
-		builder.setItems(addresses.toArray(new String[addresses.size()]), new DialogInterface.OnClickListener() {
+	private void showDialogAndRestartScan(int resourceId) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(CaptureActivity.this);
+		builder.setMessage(resourceId);
+		builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-
-				EditText addressEditText = (EditText) findViewById(R.id.esr_result_address);
-				String address = historyManager.getAddress(lastItem.getResult().getAccount(), which);
-
-				if(address != ""){
-					historyManager.updateHistoryItemAddress(lastItem.getResult().getCompleteCode(), which);
-
-					lastItem.setAddress(address);
-					lastItem.setAddressNumber(which);
-					addressEditText.setText(lastItem.getAddress());
-
-					Toast toast = Toast.makeText(CaptureActivity.this, R.string.msg_saved, Toast.LENGTH_SHORT);
-					toast.setGravity(Gravity.BOTTOM, 0, 0);
-					toast.show();
-				}
-				else{
-					lastItem.setAddress("");
-					lastItem.setAddressNumber(-1);
-					addressEditText.setText(lastItem.getAddress());
-				}
+				psValidation.gotoBeginning(false);
+				lastValidationStep = psValidation.getCurrentStep();
+				restartPreviewAfterDelay(0L);
 			}
 		});
-		builder.setNeutralButton(R.string.button_cancel, null);
 		builder.show();
 	}
 
@@ -957,7 +668,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	 * 
 	 * @param ocrResult Object representing successful OCR results
 	 */
-	void presentOcrDecodeResult(OcrResult ocrResult) {
+	public void presentOcrDecodeResult(OcrResult ocrResult) {
 
 		// Send an OcrResultText object to the ViewfinderView for text rendering
 		viewfinderView.addResultText(new OcrResultText(ocrResult.getText(), 
@@ -976,16 +687,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			beepManager.playBeepSoundAndVibrate();
 			refreshStatusView();
 		}
-	}
-
-	/**
-	 * Version of handleOcrContinuousDecode for failed OCR requests. Displays a failure message.
-	 * 
-	 * @param obj Metadata for the failed OCR request.
-	 */
-	void presentOcrDecodeResult(OcrResultFailure obj) {
-		//		lastItem = null;
-		Log.i(TAG, "handleOcrContinuousDecode: set lastItem to null");
 	}
 
 	/**
@@ -1023,7 +724,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	 * Resets view elements.
 	 */
 	private void resetStatusView() {
-		resultView.setVisibility(View.GONE);
 
 		View orangeStatusView = findViewById(R.id.status_view_top_orange);
 		View redStatusView = findViewById(R.id.status_view_top_red);
@@ -1031,11 +731,9 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		if (this.psValidation.getSpokenType().equals(EsrResult.PS_TYPE_NAME)) {
 			redStatusView.setVisibility(View.GONE);
 			orangeStatusView.setVisibility(View.VISIBLE);
-			statusViewTop = orangeStatusView;
 		} else {
 			orangeStatusView.setVisibility(View.GONE);
 			redStatusView.setVisibility(View.VISIBLE);
-			statusViewTop = redStatusView;
 		}
 
 		psValidation.gotoBeginning(true);
@@ -1050,7 +748,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		viewfinderView.removeResultText();
 		viewfinderView.setVisibility(View.VISIBLE);
 
-		lastItem = null;
 		Log.i(TAG, "resetStatusView: set lastItem to null");
 		viewfinderView.removeResultText();
 	}

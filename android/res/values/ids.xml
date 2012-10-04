@@ -21,8 +21,7 @@
   <item type="id" name="decode"/>
   <item type="id" name="decode_failed"/>
   <item type="id" name="decode_succeeded"/>
-  <item type="id" name="esr_decode_succeeded"/>
+  <item type="id" name="es_decode_succeeded"/>
   
   <item type="id" name="quit"/>
-  <item type="id" name="esr_show_history_item"/>
 </resources>

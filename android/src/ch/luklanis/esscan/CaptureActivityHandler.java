@@ -91,15 +91,11 @@ final class CaptureActivityHandler extends Handler {
 				requestOcrDecodeWhenThreadReady();
 			}
 			break;
-		case R.id.esr_decode_succeeded:
+		case R.id.es_decode_succeeded:
 			state = State.DONE;
 			PsResult result = (PsResult) message.obj;
 
 			activity.showResult(result);
-			break;
-		case R.id.esr_show_history_item:
-			state = State.DONE;
-			activity.showResult((HistoryItem) message.obj);
 			break;
 		}
 	}

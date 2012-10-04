@@ -73,6 +73,11 @@
             android:label="@string/history_title"
             android:stateNotNeeded="true" >
         </activity>
+        <activity
+            android:name=".history.PsDetailActivity"
+            android:label="@string/detail_title"
+            android:stateNotNeeded="true" >
+        </activity>
         
         <service android:name=".codesend.ESRSender" 
             android:exported="false" 

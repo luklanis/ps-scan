@@ -14,4 +14,9 @@
           android:icon="@android:drawable/ic_menu_share"
           android:title="@string/history_send" 
           android:showAsAction="ifRoom|withText" />
+        
+    <item android:id="@+id/button_copy_code_row"
+          android:icon="@drawable/ic_menu_copy"
+          android:title="@string/button_copy_code_row" 
+          android:showAsAction="ifRoom|withText" />
 </menu>

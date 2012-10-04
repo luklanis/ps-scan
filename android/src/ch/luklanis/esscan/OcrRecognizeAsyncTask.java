@@ -131,7 +131,7 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
 				PsResult esrResult = validation.getSpokenType().equals(EsrResult.PS_TYPE_NAME) ? 
 						new EsrResult(completeCode) : new EsResult(completeCode);
 
-				Message message = Message.obtain(handler, R.id.esr_decode_succeeded, esrResult);
+				Message message = Message.obtain(handler, R.id.es_decode_succeeded, esrResult);
 				message.sendToTarget();
 			} 
 

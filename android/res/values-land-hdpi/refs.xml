@@ -1,0 +1,3 @@
+<resources>
+    <item type="layout" name="activity_history">@layout/activity_history_twopane</item>
+</resources>

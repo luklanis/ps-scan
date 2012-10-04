@@ -24,6 +24,7 @@
   <string name="button_save">Save</string>
   <string name="button_export_again">Again</string>
   <string name="button_change">Change</string>
+  <string name="detail_title">Details</string>
   <string name="history_clear_text">Delete all</string>
   <string name="history_send_dta">DTA</string>
   <string name="history_send">CSV</string>
@@ -58,11 +59,12 @@
   <string name="msg_coderow_sent">Code row sent.</string>
   <string name="msg_coderow_not_sent">Unable to send code row. ESR Receiver is not connected!</string>
   <string name="msg_red_result_view_not_available">No details for red payment slips!</string>
-  <string name="esr_result_account">Account</string>
-  <string name="esr_result_address">Recipient</string>
-  <string name="esr_result_reference_number">Reference Number</string>
-  <string name="esr_result_amount_not_set">0.00</string>
-  <string name="esr_picture">A little picture of a orange payment slip</string>
+  <string name="result_account">Account</string>
+  <string name="result_address">Recipient</string>
+  <string name="result_reference_number">Reference Number</string>
+  <string name="result_amount_not_set">0.00</string>
+  <string name="result_exported_dta">Payment exported in file</string>
+  <string name="picture">A little picture of a orange payment slip</string>
   <string name="button_copy_code_row">Copy code row</string>
   <string name="preferences_only_macro_focus_title">Macro focus</string>
   <string name="preferences_no_continous_auto_focus_title">No continues auto focus</string>
