@@ -111,42 +111,44 @@ public class PsDetailFragment extends Fragment {
 
 		PsResult psResult = historyItem.getResult();
 
-		EsrResult result = new EsrResult(psResult.getCompleteCode());
-
 		ImageView bitmapImageView = (ImageView) rootView.findViewById(R.id.image_view);
 		bitmapImageView.setImageBitmap(BitmapFactory.decodeResource(getResources(),
 				R.drawable.ez_or));
 
 		TextView accountTextView = (TextView) rootView.findViewById(R.id.result_account);
-		accountTextView.setText(result.getAccount());
+		accountTextView.setText(psResult.getAccount());
 
-		EditText amountEditText = (EditText) rootView.findViewById(R.id.result_amount_edit);
-		TextView amountTextView = (TextView) rootView.findViewById(R.id.result_amount);
+		if (psResult instanceof EsrResult) {
+			EsrResult result = (EsrResult)psResult;
 
-		String amountFromCode = result.getAmount(); 
-		if(amountFromCode != ""){
-			amountEditText.setVisibility(View.GONE);
-			amountTextView.setVisibility(View.VISIBLE);
-			amountTextView.setText(amountFromCode);
-		}
-		else{
-			amountTextView.setVisibility(View.GONE);
-			amountEditText.setVisibility(View.VISIBLE);
-			String amountManuel = historyItem.getAmount();
-			if(amountManuel == null || amountManuel == "" || amountManuel.length() == 0){
-				amountEditText.setText(R.string.result_amount_not_set);
-				amountEditText.selectAll();
+			EditText amountEditText = (EditText) rootView.findViewById(R.id.result_amount_edit);
+			TextView amountTextView = (TextView) rootView.findViewById(R.id.result_amount);
+
+			String amountFromCode = result.getAmount(); 
+			if(amountFromCode != ""){
+				amountEditText.setVisibility(View.GONE);
+				amountTextView.setVisibility(View.VISIBLE);
+				amountTextView.setText(amountFromCode);
 			}
 			else{
-				amountEditText.setText(amountManuel);
+				amountTextView.setVisibility(View.GONE);
+				amountEditText.setVisibility(View.VISIBLE);
+				String amountManuel = historyItem.getAmount();
+				if(amountManuel == null || amountManuel == "" || amountManuel.length() == 0){
+					amountEditText.setText(R.string.result_amount_not_set);
+					amountEditText.selectAll();
+				}
+				else{
+					amountEditText.setText(amountManuel);
+				}
 			}
+
+			TextView currencyTextView = (TextView) rootView.findViewById(R.id.result_currency);
+			currencyTextView.setText(result.getCurrency());
+
+			TextView referenceTextView = (TextView) rootView.findViewById(R.id.result_reference_number);
+			referenceTextView.setText(result.getReference());
 		}
-
-		TextView currencyTextView = (TextView) rootView.findViewById(R.id.result_currency);
-		currencyTextView.setText(result.getCurrency());
-
-		TextView referenceTextView = (TextView) rootView.findViewById(R.id.result_reference_number);
-		referenceTextView.setText(result.getReference());
 
 		String dtaFilename = historyItem.getDTAFilename();
 
