@@ -35,6 +35,10 @@ public class PsDetailActivity extends SherlockFragmentActivity {
     @Override
 	public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
+            if (!savePaymentSlip(this)) {
+            	return true;
+            }
+            
             NavUtils.navigateUpTo(this, new Intent(this, HistoryActivity.class));
             return true;
         }
@@ -45,12 +49,22 @@ public class PsDetailActivity extends SherlockFragmentActivity {
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
-            PsDetailFragment oldFragment = (PsDetailFragment)getSupportFragmentManager().findFragmentById(R.id.ps_detail_container);
-            if (oldFragment != null && !oldFragment.save()) {
+            if (!savePaymentSlip(this)) {
             	return true;
             }
 		}
 		
 		return super.onKeyDown(keyCode, event);
+	}
+	
+	public static boolean savePaymentSlip(SherlockFragmentActivity activity) {
+		PsDetailFragment oldFragment = (PsDetailFragment)activity.getSupportFragmentManager()
+				.findFragmentById(R.id.ps_detail_container);
+		
+		if (oldFragment != null && oldFragment.save()) {
+			return true;
+		}
+		
+		return false;
 	}
 }

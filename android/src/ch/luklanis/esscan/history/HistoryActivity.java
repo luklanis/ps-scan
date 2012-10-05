@@ -24,6 +24,7 @@ import android.inputmethodservice.Keyboard.Key;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NavUtils;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -68,6 +69,8 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 		super.onCreate(icicle);
 		setContentView(R.layout.activity_history);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 		HistoryFragment historyFragment = ((HistoryFragment) getSupportFragmentManager()
 				.findFragmentById(R.id.history));
 
@@ -75,9 +78,6 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 			mTwoPane = true;
 			historyFragment.setActivateOnItemClick(true);
 		}
-
-		// Hide Icon in ActionBar
-		getSupportActionBar().setDisplayShowHomeEnabled(false);
 
 		this.dtaFileCreator = new DTAFileCreator(this);
 		this.historyManager = new HistoryManager(this);
@@ -174,6 +174,14 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 			builder.show();
 		}
 		break;
+		case android.R.id.home: {
+            if (!PsDetailActivity.savePaymentSlip(this)) {
+            	return true;
+            }
+            
+            NavUtils.navigateUpTo(this, new Intent(this, HistoryActivity.class));
+            return true;
+        }
 		//		case R.id.history_menu_send_dta: {
 		//			Uri dtaFile = getDTAFileUri();
 		//			if (dtaFile != null) {
@@ -235,6 +243,18 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 			setOptionalOKAlert(error);
 		} else {
 		}
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			PsDetailFragment oldFragment = (PsDetailFragment)getSupportFragmentManager().findFragmentById(R.id.ps_detail_container);
+			if (oldFragment != null && !oldFragment.save()) {
+				return true;
+			}
+		}
+
+		return super.onKeyDown(keyCode, event);
 	}
 
 	// Call to update the share intent
@@ -338,17 +358,5 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 
 			return true;
 		}
-	}
-
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			PsDetailFragment oldFragment = (PsDetailFragment)getSupportFragmentManager().findFragmentById(R.id.ps_detail_container);
-			if (oldFragment != null && !oldFragment.save()) {
-				return true;
-			}
-		}
-
-		return super.onKeyDown(keyCode, event);
 	}
 }

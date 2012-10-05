@@ -172,6 +172,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			if (boundService.isConnectedLocal()) {
 				if (savedCodeRowToSend != null) {
 					showResult(savedCodeRowToSend, true);
+					savedCodeRowToSend = null;
 				}
 				
 				showIPAddresses();
@@ -209,9 +210,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 		//Load partially transparent black background
 		//        getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.ab_bg_black));  
-
-		// Hide Icon in ActionBar
-		getSupportActionBar().setDisplayShowHomeEnabled(false);
 		
 		savedCodeRowToSend = null;
 

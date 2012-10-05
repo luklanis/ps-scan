@@ -2,13 +2,13 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_margin="8dp" >
+    android:layout_height="match_parent" >
 
     <LinearLayout
         android:id="@+id/ps_detail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="8dp"
         android:orientation="vertical"
         tools:context=".history.PsDetailFragment" >
 
@@ -45,8 +45,8 @@
             android:id="@+id/result_address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:inputType="textPostalAddress|textMultiLine|textCapWords" />
+            android:inputType="textPostalAddress|textMultiLine|textCapWords"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <TextView
             style="@style/marginNewSection"
