@@ -96,22 +96,16 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 	public static final String EXTERNAL_STORAGE_DIRECTORY = "ESRScan";
 
-	/** Resource to use for data file downloads. */
-	static final String DOWNLOAD_BASE = "http://tesseract-ocr.googlecode.com/files/";
-
-	/** Download filename for orientation and script detection (OSD) data. */
-	static final String OSD_FILENAME = "tesseract-ocr-3.01.osd.tar";
-
-	/** Destination filename for orientation and script detection (OSD) data. */
-	static final String OSD_FILENAME_BASE = "osd.traineddata";
-
 	/** Minimum mean confidence score necessary to not reject single-shot OCR result. Currently unused. */
 	static final int MINIMUM_MEAN_CONFIDENCE = 0; // 0 means don't reject any scored results
 
 	public static final int HISTORY_REQUEST_CODE = 0x0000bacc;
 
 	private static final int ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
-	private static final String sourceLanguageCodeOcr = "deu"; // ISO 639-3 language code
+	private static final String sourceLanguageCodeOcr = "psl"; // ISO 639-3 language code
+	
+	private static final int pageSegmentationMode = TessBaseAPI.PSM_SINGLE_LINE;
+	private static final String characterWhitelist = "0123456789>+";
 
 	private CameraManager cameraManager;
 	private CaptureActivityHandler handler;
@@ -123,8 +117,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	private BeepManager beepManager;
 	private TessBaseAPI baseApi; // Java interface for the Tesseract OCR engine
 	private String sourceLanguageReadable; // Language name, for example, "English"
-	private int pageSegmentationMode = TessBaseAPI.PSM_SINGLE_LINE;
-	private String characterWhitelist;
 
 	private SharedPreferences prefs;
 	private OnSharedPreferenceChangeListener listener;
@@ -844,8 +836,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		// Retrieve from preferences, and set in this Activity, the language preferences
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		sourceLanguageReadable = LanguageCodeHelper.getOcrLanguageName(this, sourceLanguageCodeOcr);
-
-		characterWhitelist = OcrCharacterHelper.getWhitelist(prefs, sourceLanguageCodeOcr);
 
 		prefs.registerOnSharedPreferenceChangeListener(listener);
 

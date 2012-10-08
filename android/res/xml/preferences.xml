@@ -86,10 +86,10 @@
             android:entryValues="@array/iso6393_language_names"
             android:title="Recognize" /> -->
 
-        <EditTextPreference
-            android:defaultValue=">+ 0123456789"
-            android:key="preferences_character_whitelist"
-            android:title="@string/preferences_character_whitelist_title" />
+<!--         <EditTextPreference -->
+<!--             android:defaultValue=">+ 0123456789" -->
+<!--             android:key="preferences_character_whitelist" -->
+<!--             android:title="@string/preferences_character_whitelist_title" /> -->
 
         <CheckBoxPreference
             android:defaultValue="false"
