@@ -95,7 +95,7 @@ public class HistoryFragment extends ListFragment {
 	public boolean onContextItemSelected(android.view.MenuItem item) {
 		int position = item.getItemId();
 		historyManager.deleteHistoryItem(position);
-		adapter.notifyDataSetChanged();
+		loadAdapterFromDatabase();
 		return true;
 	}
 
