@@ -72,7 +72,7 @@ public class PsDetailFragment extends Fragment {
 				public void onClick(DialogInterface dialog, int which) {
 					historyManager.updateHistoryItemFileName(historyItem.getResult().getCompleteCode(), null);
 
-					Button reexportButton = (Button) getView().findViewById(R.id.button_export_again);
+					ImageButton reexportButton = (ImageButton) getView().findViewById(R.id.button_export_again);
 
 					TextView dtaFilenameTextView = (TextView) getView().findViewById(R.id.result_dta_file);
 					dtaFilenameTextView.setText("");

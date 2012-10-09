@@ -2,21 +2,21 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:fillViewport="true" >
 
     <LinearLayout
         android:id="@+id/ps_detail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
         android:orientation="vertical"
+        android:padding="8dp"
         tools:context=".history.PsDetailFragment" >
 
         <ImageView
             android:id="@+id/image_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
             android:contentDescription="@string/picture" />
 
         <RelativeLayout
@@ -104,8 +104,8 @@
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="horizontal" >
 
             <TextView
@@ -121,8 +121,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:contentDescription="@string/button_export_again"
-                android:src="@drawable/ic_delete"
-                android:visibility="gone" />
+                android:src="@drawable/ic_delete" />
         </RelativeLayout>
     </LinearLayout>
 

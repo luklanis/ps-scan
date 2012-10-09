@@ -22,8 +22,8 @@ public class PsDetailActivity extends SherlockFragmentActivity {
 
         if (icicle == null) {
             Bundle arguments = new Bundle();
-            arguments.putString(PsDetailFragment.ARG_POSITION,
-                    getIntent().getStringExtra(PsDetailFragment.ARG_POSITION));
+            arguments.putInt(PsDetailFragment.ARG_POSITION,
+                    getIntent().getIntExtra(PsDetailFragment.ARG_POSITION, 0));
             PsDetailFragment fragment = new PsDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()

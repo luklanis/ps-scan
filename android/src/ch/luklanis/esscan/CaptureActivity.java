@@ -213,12 +213,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 		beepManager = new BeepManager(this);
 
-		//		Button resultCopy = (Button)findViewById(R.id.button_copy_code_row);
-		//		resultCopy.setOnClickListener(resultCopyListener);
-		//
-		//		Button amountSaveButton = (Button) findViewById(R.id.button_result_save);
-		//		amountSaveButton.setOnClickListener(saveListener);
-
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
 		// Registers BroadcastReceiver to track network connection changes.
@@ -235,9 +229,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 		viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_view);
 		viewfinderView.setCameraManager(cameraManager);
-
-		//		resultView = findViewById(R.id.result_view);
-		//		resultView.setVisibility(View.GONE);
 
 		statusViewBottomLeft = (TextView) findViewById(R.id.status_view_bottom_left);
 
