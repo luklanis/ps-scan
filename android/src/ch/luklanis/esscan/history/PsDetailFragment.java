@@ -290,7 +290,16 @@ public class PsDetailFragment extends Fragment {
 	private void setOKAlert(Context context, int id){
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setMessage(id);
-		builder.setPositiveButton(R.string.button_ok, null);
+		builder.setNegativeButton(R.string.button_cancel, null);
+		builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				if (getActivity() instanceof PsDetailActivity) {
+					getActivity().finish();
+				}
+			}
+		});
 		builder.show();
 	}
 }

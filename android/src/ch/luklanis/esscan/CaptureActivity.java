@@ -249,7 +249,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		// Do OCR engine initialization, if necessary
 		if (baseApi == null) {      
 			// Initialize the OCR engine
-			File storageDirectory = getStorageDirectory();
+			File storageDirectory = getFilesDir();
 			if (storageDirectory != null) {
 				initOcrEngine(storageDirectory, sourceLanguageCodeOcr, sourceLanguageReadable);
 			}
@@ -285,7 +285,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			doBindService(); 
 		}
 
-		showHelpOnFirstLaunch();
+		checkAndRunFirstLaunch();
 	}
 
 	private void doBindService() {
@@ -518,7 +518,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	}
 
 	/** Finds the proper location on the SD card where we can save files. */
-	private File getStorageDirectory() {
+	private File getOldTessdataDirectory() {
 		//Log.d(TAG, "getStorageDirectory(): API level is " + Integer.valueOf(android.os.Build.VERSION.SDK_INT));
 
 		String state = null;
@@ -526,41 +526,24 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			state = Environment.getExternalStorageState();
 		} catch (RuntimeException e) {
 			Log.e(TAG, "Is the SD card visible?", e);
-			showErrorMessage("Error", "Required external storage (such as an SD card) is unavailable.");
+			return null;
 		}
 
-		if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+		if (Environment.MEDIA_MOUNTED.equals(state)) {
 
 			// We can read and write the media
 			//    	if (Integer.valueOf(android.os.Build.VERSION.SDK_INT) > 7) {
 			// For Android 2.2 and above
 
 			try {
-				return getExternalFilesDir(Environment.MEDIA_MOUNTED);
+				return getExternalFilesDir(null);
 			} catch (NullPointerException e) {
 				// We get an error here if the SD card is visible, but full
 				Log.e(TAG, "External storage is unavailable");
-				showErrorMessage("Error", "Required external storage (such as an SD card) is full or unavailable.");
+				return null;
 			}
+		} 
 
-			//        } else {
-			//          // For Android 2.1 and below, explicitly give the path as, for example,
-			//          // "/mnt/sdcard/Android/data/ch.luklanis.esscan/files/"
-			//          return new File(Environment.getExternalStorageDirectory().toString() + File.separator + 
-			//                  "Android" + File.separator + "data" + File.separator + getPackageName() + 
-			//                  File.separator + "files" + File.separator);
-			//        }
-
-		} else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-			// We can only read the media
-			Log.e(TAG, "External storage is read-only");
-			showErrorMessage("Error", "Required external storage (such as an SD card) is unavailable for data storage.");
-		} else {
-			// Something else is wrong. It may be one of many other states, but all we need
-			// to know is we can neither read nor write
-			Log.e(TAG, "External storage is unavailable");
-			showErrorMessage("Error", "Required external storage (such as an SD card) is unavailable.");
-		}
 		return null;
 	}
 
@@ -768,16 +751,17 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		}
 	}
 
-	/** Displays a pop-up message showing the name of the current OCR source language. */
-	void showLanguageName() {   
-		Toast toast = Toast.makeText(this, "OCR: " + sourceLanguageReadable, Toast.LENGTH_LONG);
-		toast.setGravity(Gravity.TOP, 0, 0);
-		toast.show();
-	}
-
 	/** Request the viewfinder to be invalidated. */
-	void drawViewfinder() {
+	public void drawViewfinder() {
 		viewfinderView.drawViewfinder();
+	}
+	
+	private void DeleteRecursive(File fileOrDirectory) {
+	    if (fileOrDirectory.isDirectory())
+	        for (File child : fileOrDirectory.listFiles())
+	            DeleteRecursive(child);
+
+	    fileOrDirectory.delete();
 	}
 
 	/**
@@ -785,7 +769,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	 * run. The easiest way to do this is to check android:versionCode from the manifest, and compare
 	 * it to a value stored as a preference.
 	 */
-	private boolean showHelpOnFirstLaunch() {
+	private boolean checkAndRunFirstLaunch() {
 		try {
 			PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), 0);
 			int currentVersion = info.versionCode;
@@ -793,6 +777,12 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			int lastVersion = prefs.getInt(PreferencesActivity.KEY_HELP_VERSION_SHOWN, 0);
 
 			if (currentVersion > lastVersion) {
+				
+				File oldStorage = getOldTessdataDirectory();
+				
+				if (oldStorage != null && oldStorage.exists()) {
+						DeleteRecursive(new File(oldStorage.toString()));
+				}
 
 				// Record the last version for which we last displayed the What's New (Help) page
 				prefs.edit().putInt(PreferencesActivity.KEY_HELP_VERSION_SHOWN, currentVersion).commit();

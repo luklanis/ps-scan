@@ -104,8 +104,8 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
 		String destinationFilenameBase = languageCode + ".traineddata";
 
 		// Check for, and create if necessary, folder to hold model data
-		String destinationDirBase = params[0] + 
-				File.separator + CaptureActivity.EXTERNAL_STORAGE_DIRECTORY; 	// The storage directory, minus the
+		String destinationDirBase = params[0];
+		
 		// "tessdata" subdirectory
 		File tessdataDir = new File(destinationDirBase + 
 				File.separator + "tessdata");
@@ -116,23 +116,11 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
 		}
 
 		// Create a reference to the file to save the download in
-		File downloadFile = new File(tessdataDir, destinationFilenameBase);
-
-		File tesseractTestFile = new File(tessdataDir, languageCode + ".traineddata");
-
-		File tesseractOldFile = new File(tessdataDir, "deu.traineddata");
-		if (tesseractOldFile.exists()) {
-			tesseractOldFile.delete();
-		}
-
-		tesseractOldFile = new File(tessdataDir, "osd.traineddata");
-		if (tesseractOldFile.exists()) {
-			tesseractOldFile.delete();
-		}
+		File destinationFile = new File(tessdataDir, destinationFilenameBase);
 
 		// If language data files are not present, install them
 		boolean installSuccess = false;
-		if (!tesseractTestFile.exists()) {
+		if (!destinationFile.exists()) {
 			Log.d(TAG, "Language data for " + languageCode + " not found in " + tessdataDir.toString());
 
 			// Check assets for language data to install. If not present, download from Internet
@@ -140,8 +128,7 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
 				Log.d(TAG, "Checking for language data (" + destinationFilenameBase
 						+ ".zip) in application assets...");
 				// Check for a file like "eng.traineddata.zip" or "tesseract-ocr-3.01.eng.tar.zip"
-				installSuccess = installFromAssets(destinationFilenameBase + ".zip", tessdataDir, 
-						downloadFile);
+				installSuccess = installFromAssets(destinationFilenameBase + ".zip", tessdataDir);
 			} catch (IOException e) {
 				Log.e(TAG, "IOException", e);
 			} catch (Exception e) {
@@ -175,13 +162,12 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
 	 * @return True if installZipFromAssets returns true
 	 * @throws IOException
 	 */
-	private boolean installFromAssets(String sourceFilename, File modelRoot,
-			File destinationFile) throws IOException {
+	private boolean installFromAssets(String sourceFilename, File modelRoot) throws IOException {
 		String extension = sourceFilename.substring(sourceFilename.lastIndexOf('.'), 
 				sourceFilename.length());
 		try {
 			if (extension.equals(".zip")) {
-				return installZipFromAssets(sourceFilename, modelRoot, destinationFile);
+				return installZipFromAssets(sourceFilename, modelRoot);
 			} else {
 				throw new IllegalArgumentException("Extension " + extension
 						+ " is unsupported.");
@@ -207,7 +193,7 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
 	 * @throws FileNotFoundException
 	 */
 	private boolean installZipFromAssets(String sourceFilename,
-			File destinationDir, File destinationFile) throws IOException,
+			File destinationDir) throws IOException,
 			FileNotFoundException {
 		// Attempt to open the zip archive
 		publishProgress("Uncompressing data for " + languageName + "...", "0");
@@ -216,7 +202,7 @@ final class OcrInitAsyncTask extends AsyncTask<String, String, Boolean> {
 		// Loop through all the files and folders in the zip archive (but there should just be one)
 		for (ZipEntry entry = inputStream.getNextEntry(); entry != null; entry = inputStream
 				.getNextEntry()) {
-			destinationFile = new File(destinationDir, entry.getName());
+			File destinationFile = new File(destinationDir, entry.getName());
 
 			if (entry.isDirectory()) {
 				destinationFile.mkdirs();
