@@ -4,16 +4,18 @@ import java.util.Comparator;
 import java.util.List;
 
 import ch.luklanis.esscan.R;
-import ch.luklanis.esscan.paymentslip.PsResult;
-
 import com.actionbarsherlock.view.Menu;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.SearchView;
+import android.widget.Toast;
+import android.widget.SearchView.OnQueryTextListener;
 
 public class HistoryFragment extends ListFragment {
 
@@ -24,8 +26,8 @@ public class HistoryFragment extends ListFragment {
 
 	public interface HistoryCallbacks {
 
-		public void onItemSelected(int position);
-		public void setOptionalOKAlert(int id);
+		public void onItemSelected(int oldPosition, int newPosition);
+		public void setOptionalOkAlert(int id);
 	}
 
 	private HistoryManager historyManager;
@@ -33,10 +35,10 @@ public class HistoryFragment extends ListFragment {
 
 	private static HistoryCallbacks sDummyCallbacks = new HistoryCallbacks(){
 		@Override
-		public void onItemSelected(int position) {
+		public void onItemSelected(int oldPosition, int newPosition) {
 		}
 		@Override
-		public void setOptionalOKAlert(int id) {
+		public void setOptionalOkAlert(int id) {
 		}
 	};
 
@@ -79,8 +81,11 @@ public class HistoryFragment extends ListFragment {
 	@Override
 	public void onListItemClick(ListView listView, View view, int position, long id) {
 		super.onListItemClick(listView, view, position, id);
+		
+		int oldPosition = mActivatedPosition;
+		mActivatedPosition = position;
 
-		historyCallbacks.onItemSelected(position);
+		historyCallbacks.onItemSelected(oldPosition, position);
 	}
 
 	@Override
@@ -156,10 +161,18 @@ public class HistoryFragment extends ListFragment {
 		loadAdapterFromDatabase();
 
 		setActivatedPosition(0);
-		historyCallbacks.onItemSelected(0);
+		historyCallbacks.onItemSelected(ListView.INVALID_POSITION, 0);
 	}
 
-	private void loadAdapterFromDatabase() {  
+	public void updatePosition(int position, HistoryItem item) {
+		if (adapter != null && adapter.getCount() > position) {
+			adapter.remove(adapter.getItem(position));
+			adapter.insert(item, position);
+			adapter.notifyDataSetChanged();
+		}
+	}
+
+	public void loadAdapterFromDatabase() {  
 
 		List<HistoryItem> items = historyManager.buildAllHistoryItems();
 
@@ -178,5 +191,9 @@ public class HistoryFragment extends ListFragment {
 		}
 
 		adapter.notifyDataSetChanged();
+	}
+
+	public HistoryItemAdapter getAdapter() {
+		return adapter;
 	}
 }

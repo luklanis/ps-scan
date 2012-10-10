@@ -186,7 +186,7 @@ public class PsDetailFragment extends Fragment {
 		return rootView;
 	}
 
-	public boolean save() {
+	public int save() {
 
 		String codeRow = historyItem.getResult().getCompleteCode();
 
@@ -208,7 +208,7 @@ public class PsDetailFragment extends Fragment {
 
 				if(historyManager == null){
 					Log.e(TAG, "onClick: historyManager is null!");
-					return true;
+					return 0;
 				}
 
 				historyManager.updateHistoryItemAmount(historyItem.getResult().getCompleteCode(), 
@@ -216,19 +216,16 @@ public class PsDetailFragment extends Fragment {
 				amountEditText.setText(newAmount);
 
 			} catch (NumberFormatException e) {
-				setOKAlert(getActivity(), R.string.msg_amount_not_valid);
-				return false;
+				return R.string.msg_amount_not_valid;
 			}
 		}
 
+		int status = 0;
 		EditText addressEditText = (EditText) getView().findViewById(R.id.result_address);
 		String address = addressEditText.getText().toString();
 		if(address.length() > 0){
 
-			int error = DTAFileCreator.validateAddress(address);
-			if(error != 0){
-				setOKAlert(getActivity(), error);
-			}
+			status = DTAFileCreator.validateAddress(address);
 
 			if (historyItem.getAddressNumber() == -1) {
 				historyManager.updateHistoryItemAddress(historyItem.getResult().getCompleteCode(), 
@@ -240,7 +237,7 @@ public class PsDetailFragment extends Fragment {
 			}
 		}
 
-		return true;
+		return status;
 	}
 
 	private void showAddressDialog(View view) {
@@ -284,22 +281,6 @@ public class PsDetailFragment extends Fragment {
 			}
 		});
 		builder.setNeutralButton(R.string.button_cancel, null);
-		builder.show();
-	}
-
-	private void setOKAlert(Context context, int id){
-		AlertDialog.Builder builder = new AlertDialog.Builder(context);
-		builder.setMessage(id);
-		builder.setNegativeButton(R.string.button_cancel, null);
-		builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				if (getActivity() instanceof PsDetailActivity) {
-					getActivity().finish();
-				}
-			}
-		});
 		builder.show();
 	}
 }

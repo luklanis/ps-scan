@@ -112,4 +112,11 @@ public final class HistoryItem {
 	public void setAddress(String address) {
 		this.address = address;
 	}
+	
+	@Override
+	public String toString() {
+		return address.replaceAll("[\\r\\n]+", ", ")
+				+ ", " + result.toString()
+				+ (!TextUtils.isEmpty(dtaFile) ? (", " + dtaFile) : ""); 
+	}
 }
