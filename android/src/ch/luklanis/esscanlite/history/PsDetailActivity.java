@@ -1,16 +1,12 @@
 package ch.luklanis.esscanlite.history;
 
-import ch.luklanis.esscanlite.CaptureActivity;
+import ch.luklanis.esscan.paymentslip.PsResult;
 import ch.luklanis.esscanlite.Intents;
 import ch.luklanis.esscanlite.R;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.widget.SearchView;
-import com.actionbarsherlock.widget.ShareActionProvider;
-import com.actionbarsherlock.widget.ShareActionProvider.OnShareTargetSelectedListener;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
