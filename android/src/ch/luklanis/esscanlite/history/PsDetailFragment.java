@@ -9,7 +9,6 @@ import ch.luklanis.esscan.paymentslip.EsrResult;
 import ch.luklanis.esscan.paymentslip.PsResult;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -184,6 +183,10 @@ public class PsDetailFragment extends Fragment {
 		}
 
 		return rootView;
+	}
+	
+	public HistoryItem getHistoryItem() {
+		return historyItem;
 	}
 
 	public int save() {

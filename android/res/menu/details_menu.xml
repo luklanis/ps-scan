@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/details_menu_copy_code_row"
+        android:icon="@drawable/ic_menu_copy"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/button_copy_code_row"/>
+
+</menu>

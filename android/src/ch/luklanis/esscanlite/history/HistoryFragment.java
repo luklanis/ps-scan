@@ -8,21 +8,18 @@ import com.actionbarsherlock.view.Menu;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.SearchView;
-import android.widget.Toast;
-import android.widget.SearchView.OnQueryTextListener;
+import android.widget.TextView;
 
 public class HistoryFragment extends ListFragment {
 
 	private static final String STATE_ACTIVATED_POSITION = "activated_position";
 
 	private HistoryCallbacks historyCallbacks;
-	private int mActivatedPosition = ListView.INVALID_POSITION;
+	private int activatedPosition = ListView.INVALID_POSITION;
 
 	public interface HistoryCallbacks {
 
@@ -32,6 +29,8 @@ public class HistoryFragment extends ListFragment {
 
 	private HistoryManager historyManager;
 	private HistoryItemAdapter adapter;
+
+	private boolean listIsEmpty;
 
 	private static HistoryCallbacks sDummyCallbacks = new HistoryCallbacks(){
 		@Override
@@ -63,6 +62,7 @@ public class HistoryFragment extends ListFragment {
 	};
 
 	public HistoryFragment() {
+		listIsEmpty = true;
 	}
 
 	@Override
@@ -80,10 +80,15 @@ public class HistoryFragment extends ListFragment {
 
 	@Override
 	public void onListItemClick(ListView listView, View view, int position, long id) {
+		
+		if (listIsEmpty) {
+			return;
+		}
+		
 		super.onListItemClick(listView, view, position, id);
 		
-		int oldPosition = mActivatedPosition;
-		mActivatedPosition = position;
+		int oldPosition = activatedPosition;
+		activatedPosition = position;
 
 		historyCallbacks.onItemSelected(oldPosition, position);
 	}
@@ -136,8 +141,8 @@ public class HistoryFragment extends ListFragment {
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		if (mActivatedPosition != ListView.INVALID_POSITION) {
-			outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);
+		if (activatedPosition != ListView.INVALID_POSITION) {
+			outState.putInt(STATE_ACTIVATED_POSITION, activatedPosition);
 		}
 	}
 
@@ -149,12 +154,12 @@ public class HistoryFragment extends ListFragment {
 
 	public void setActivatedPosition(int position) {
 		if (position == ListView.INVALID_POSITION) {
-			getListView().setItemChecked(mActivatedPosition, false);
+			getListView().setItemChecked(activatedPosition, false);
 		} else {
 			getListView().setItemChecked(position, true);
 		}
 
-		mActivatedPosition = position;
+		activatedPosition = position;
 	}
 
 	public void showPaymentSlipDetail() {
@@ -187,7 +192,10 @@ public class HistoryFragment extends ListFragment {
 		}
 		
 		if (adapter.isEmpty()) {
+			listIsEmpty = true;
 			adapter.add(new HistoryItem(null));
+		} else {
+			listIsEmpty = false;
 		}
 
 		adapter.notifyDataSetChanged();
@@ -195,5 +203,9 @@ public class HistoryFragment extends ListFragment {
 
 	public HistoryItemAdapter getAdapter() {
 		return adapter;
+	}
+
+	public int getActivatedPosition() {
+		return activatedPosition;
 	}
 }

@@ -3,7 +3,7 @@
 
     <item
         android:id="@+id/history_menu_search"
-        android:actionViewClass="android.widget.SearchView"
+        android:actionViewClass="com.actionbarsherlock.widget.SearchView"
         android:icon="@android:drawable/ic_menu_search"
         android:showAsAction="ifRoom|collapseActionView"
         android:title="@string/menu_search"/>
@@ -23,7 +23,7 @@
         android:showAsAction="ifRoom|withText"
         android:title="@string/history_send"/>
     <item
-        android:id="@+id/button_copy_code_row"
+        android:id="@+id/history_menu_copy_code_row"
         android:icon="@drawable/ic_menu_copy"
         android:showAsAction="ifRoom|withText"
         android:title="@string/button_copy_code_row"/>

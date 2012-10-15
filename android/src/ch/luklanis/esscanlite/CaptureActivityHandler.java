@@ -119,7 +119,7 @@ final class CaptureActivityHandler extends Handler {
 				message.sendToTarget();
 
 				// Wait at most half a second; should be enough time, and onPause() will timeout quickly
-				decodeThread.join(500L); 
+				decodeThread.join(500L);
 			} catch (InterruptedException e) {
 				// continue
 			}
