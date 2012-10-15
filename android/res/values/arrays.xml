@@ -17,82 +17,12 @@
 <resources>
 	<!-- The elements in this array must match to the iso6393 array. -->
 	<string-array name="language_names">
-		<item>Arabic</item>
-		<item>Bulgarian</item>
-		<item>Catalan</item>
-		<item>Chinese (Simplified)</item>
-		<item>Chinese (Traditional)</item>
-		<item>Czech</item>
-		<item>Danish</item>
-		<item>Dutch</item>
-		<item>English</item>
-		<item>Finnish</item>
-		<item>French</item>
-		<item>German</item>
-		<item>Greek</item>
-		<item>Hindi</item>
-		<item>Hungarian</item>
-		<item>Indonesian</item>
-		<item>Italian</item>
-		<item>Japanese</item>
-		<item>Korean</item>
-		<item>Latvian</item>
-		<item>Lithuanian</item>
-		<item>Norwegian</item>
-		<item>Polish</item>
-		<item>Portuguese</item>
-		<item>Romanian</item>
-		<item>Russian</item>
-		<item>Serbian (Latin)</item>
-		<item>Slovak</item>
-		<item>Slovenian</item>
-		<item>Spanish</item>
-		<item>Swedish</item>
-		<item>Tagalog</item>
-		<item>Thai</item>
-		<item>Turkish</item>
-		<item>Ukrainian</item>
-		<item>Vietnamese</item>
+		<item>payment slip</item>
 	</string-array>
 
 	<!-- The elements in this array must match to the languagenames array. -->
 	<string-array name="iso6393_language_names">
-		<item>ara</item> <!-- Arabic -->
-		<item>bul</item> <!-- Bulgarian -->
-		<item>cat</item> <!-- Catalan -->
-		<item>chi_sim</item> <!-- Chinese (Simplified) -->
-		<item>chi_tra</item> <!-- Chinese (Traditional) -->
-		<item>ces</item> <!-- Czech -->
-		<item>dan</item> <!-- Danish -->
-		<item>nld</item> <!-- Dutch -->
-		<item>eng</item> <!-- English -->
-		<item>fin</item> <!-- Finnish -->
-		<item>fra</item> <!-- French -->
 		<item>deu</item> <!-- German -->
-		<item>ell</item> <!-- Greek -->
-		<item>hin</item> <!-- Hindi -->
-		<item>hun</item> <!-- Hungarian -->
-		<item>ind</item> <!-- Indonesian -->
-		<item>ita</item> <!-- Italian -->
-		<item>jpn</item> <!-- Japanese -->
-		<item>kor</item> <!-- Korean -->
-		<item>lav</item> <!-- Latvian -->
-		<item>lit</item> <!-- Lithuanian -->
-		<item>nor</item> <!-- Norwegian -->
-		<item>pol</item> <!-- Polish -->
-		<item>por</item> <!-- Portuguese -->
-		<item>ron</item> <!-- Romanian -->
-		<item>rus</item> <!-- Russian -->
-		<item>srp</item> <!-- Serbian (Latin) -->
-		<item>slk</item> <!-- Slovak -->
-		<item>slv</item> <!-- Slovenian -->
-		<item>spa</item> <!-- Spanish -->
-		<item>swe</item> <!-- Swedish -->
-		<item>tgl</item> <!-- Tagalog -->
-		<item>tha</item> <!-- Thai -->
-		<item>tur</item> <!-- Turkish -->
-		<item>ukr</item> <!-- Ukrainian -->
-		<item>vie</item> <!-- Vietnamese -->
 	</string-array>
 	
 	<string-array name="execution_day">

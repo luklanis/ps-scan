@@ -16,10 +16,10 @@
 -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    android:installLocation="preferExternal"
+    android:installLocation="auto"
     package="ch.luklanis.esscanlite"
-    android:versionCode="20"
-    android:versionName="0.7.1" >
+    android:versionCode="21"
+    android:versionName="0.7.2" >
 
     <uses-sdk
         android:minSdkVersion="10"
@@ -70,8 +70,11 @@
             android:label="@string/history_title"
             android:stateNotNeeded="true" >
         </activity>
-        
-        <service android:name=".codesend.ESRSender" android:label="Code row send service"></service>
+        <activity
+            android:name=".history.PsDetailActivity"
+            android:label="@string/detail_title"
+            android:stateNotNeeded="true" >
+        </activity>
     </application>
 
 </manifest>

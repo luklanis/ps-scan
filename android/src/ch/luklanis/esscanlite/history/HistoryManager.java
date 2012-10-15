@@ -101,7 +101,7 @@ public final class HistoryManager {
 		return buildHistoryItems(true);
 	}
 
-	public List<HistoryItem> buildHistoryItemsForCSV() {
+	public List<HistoryItem> buildAllHistoryItems() {
 		return buildHistoryItems(false);
 	}
 
@@ -257,6 +257,14 @@ public final class HistoryManager {
 				{
 					item.setAddress(getAddress(result.getAccount(), addressNumber));
 				}
+
+				ContentValues values = new ContentValues();
+				values.put(DBHelper.HISTORY_TIMESTAMP_COL, result.getTimestamp());
+				
+				// Update timestamp
+				db.update(DBHelper.HISTORY_TABLE_NAME, values, 
+						DBHelper.HISTORY_CODE_ROW_COL + "=?",
+						new String[] { result.getCompleteCode() });
 
 				return item;
 			}

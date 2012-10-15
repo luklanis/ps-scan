@@ -69,6 +69,12 @@
             android:title="@string/preferences_only_macro_focus_title" />
             
         <CheckBoxPreference
+            android:key="preferences_no_continous_auto_focus"
+            android:defaultValue="true"
+            android:title="@string/preferences_no_continous_auto_focus_title"
+            android:summary="@string/preferences_no_continous_auto_focus_summary" />
+            
+        <CheckBoxPreference
             android:key="preferences_enable_torch"
             android:defaultValue="false"
             android:title="@string/preferences_enable_torch_title" />
@@ -80,10 +86,10 @@
             android:entryValues="@array/iso6393_language_names"
             android:title="Recognize" /> -->
 
-        <EditTextPreference
-            android:defaultValue=">+ 0123456789"
-            android:key="preferences_character_whitelist"
-            android:title="@string/preferences_character_whitelist_title" />
+<!--         <EditTextPreference -->
+<!--             android:defaultValue=">+ 0123456789" -->
+<!--             android:key="preferences_character_whitelist" -->
+<!--             android:title="@string/preferences_character_whitelist_title" /> -->
 
         <CheckBoxPreference
             android:defaultValue="false"

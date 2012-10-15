@@ -87,7 +87,6 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
 
 			try {
 				baseApi.clear();
-				activity.stopHandler();
 			} catch (NullPointerException e1) {
 				// Continue
 			}
@@ -132,7 +131,7 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
 				PsResult esrResult = validation.getSpokenType().equals(EsrResult.PS_TYPE_NAME) ? 
 						new EsrResult(completeCode) : new EsResult(completeCode);
 
-				Message message = Message.obtain(handler, R.id.esr_decode_succeeded, esrResult);
+				Message message = Message.obtain(handler, R.id.es_decode_succeeded, esrResult);
 				message.sendToTarget();
 			} 
 
@@ -144,18 +143,18 @@ final class OcrRecognizeAsyncTask extends AsyncTask<String, String, Boolean> {
 			if (result) {
 				try {
 					// Send the result to CaptureActivityHandler
-					Message message = Message.obtain(handler, R.id.ocr_continuous_decode_succeeded, ocrResult);
+					Message message = Message.obtain(handler, R.id.decode_succeeded, ocrResult);
 					message.sendToTarget();
 				} catch (NullPointerException e) {
-					activity.stopHandler();
+					// continue
 				}
 			} else {
 				bitmap.recycle();
 				try {
-					Message message = Message.obtain(handler, R.id.ocr_continuous_decode_failed, ocrResultFailure);
+					Message message = Message.obtain(handler, R.id.decode_failed, ocrResultFailure);
 					message.sendToTarget();
 				} catch (NullPointerException e) {
-					activity.stopHandler();
+					// continue
 				}
 			}
 		}

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <style name="activated" parent="style/Theme.Sherlock">
+    <item name="android:background">?attr/activatedBackgroundIndicator</item>
+  </style>
+  <style name="marginNewSection">
+      <item name="android:layout_marginTop">8dip</item>
+  </style>
+</resources>

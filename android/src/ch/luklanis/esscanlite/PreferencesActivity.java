@@ -59,8 +59,8 @@ OnSharedPreferenceChangeListener {
 
 	// Preference keys not carried over from ZXing project
 	public static final String KEY_SOURCE_LANGUAGE_PREFERENCE = "preferences_source_language";
-	public static final String KEY_CHARACTER_WHITELIST = "preferences_character_whitelist";
 	public static final String KEY_ONLY_MACRO_FOCUS = "preferences_only_macro_focus";
+	public static final String KEY_NO_CONTINUES_AUTO_FOCUS = "preferences_no_continous_auto_focus";
 	public static final String KEY_ENABLE_TORCH = "preferences_enable_torch";
 	public static final String KEY_ADDRESS = "preferences_address";
 	public static final String KEY_IBAN = "preferences_iban";
@@ -105,9 +105,6 @@ OnSharedPreferenceChangeListener {
 		addPreferencesFromResource(R.xml.preferences);
 
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
-		//    listPreferenceSourceLanguage = (ListPreference) getPreferenceScreen().findPreference(KEY_SOURCE_LANGUAGE_PREFERENCE);
-		editTextPreferenceCharacterWhitelist = (EditTextPreference) getPreferenceScreen().findPreference(KEY_CHARACTER_WHITELIST);
 		
 		Preference backupButton = (Preference)findPreference(KEY_BUTTON_BACKUP);
 		backupButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -166,17 +163,7 @@ OnSharedPreferenceChangeListener {
 		//      // Set the summary text
 		//      editTextPreferenceCharacterWhitelist.setSummary(sharedPreferences.getString(key, OcrCharacterHelper.getDefaultWhitelist(listPreferenceSourceLanguage.getValue())));
 
-		if (key.equals(KEY_CHARACTER_WHITELIST)) {
-
-			// Save a separate, language-specific character blacklist for this language
-			OcrCharacterHelper.setWhitelist(sharedPreferences, 
-					"deu", 
-					sharedPreferences.getString(key, OcrCharacterHelper.getDefaultWhitelist("deu")));
-
-			// Set the summary text
-			editTextPreferenceCharacterWhitelist.setSummary(sharedPreferences.getString(key, OcrCharacterHelper.getDefaultWhitelist("deu")));
-
-		} else if (key.equals(KEY_IBAN)){
+		if (key.equals(KEY_IBAN)){
 			String iban = sharedPreferences.getString(key, "").toUpperCase();
 			sharedPreferences.edit().putString(key, iban).commit();
 
@@ -184,13 +171,16 @@ OnSharedPreferenceChangeListener {
 			if (warning != 0){
 				setOKAlert(warning);
 			}
-		}else if (key.equals(KEY_ADDRESS)){
+		} else if (key.equals(KEY_ADDRESS)){
 			String address = sharedPreferences.getString(key, "");
 
 			int warning = DTAFileCreator.validateAddress(address);
 			if (warning != 0){
 				setOKAlert(warning);
 			}
+		} else if (key.equals(KEY_ONLY_MACRO_FOCUS)) {
+			Preference continuesFocusPref = findPreference(KEY_NO_CONTINUES_AUTO_FOCUS);
+			continuesFocusPref.setEnabled(!sharedPreferences.getBoolean(KEY_ONLY_MACRO_FOCUS, false));
 		}
 	}
 
@@ -201,9 +191,6 @@ OnSharedPreferenceChangeListener {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		// Set up the initial summary values
-		//    listPreferenceSourceLanguage.setSummary(LanguageCodeHelper.getOcrLanguageName(getBaseContext(), sharedPreferences.getString(KEY_SOURCE_LANGUAGE_PREFERENCE, "deu")));
-		editTextPreferenceCharacterWhitelist.setSummary(sharedPreferences.getString(KEY_CHARACTER_WHITELIST, OcrCharacterHelper.getDefaultWhitelist("deu")));
 
 		// Set up a listener whenever a key changes
 		PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);

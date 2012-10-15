@@ -1,5 +1,4 @@
 /*
- * Copyright 2012 ZXing authors
  * Copyright 2012 Lukas Landis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,106 +20,130 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.inputmethodservice.Keyboard.Key;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.view.ContextMenu;
+import android.support.v4.app.NavUtils;
+import android.text.TextUtils;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.CheckBox;
+import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.Toast;
+import android.widget.SearchView.OnQueryTextListener;
 import ch.luklanis.esscanlite.R;
-import ch.luklanis.esscan.paymentslip.DTAFileCreator;
 import ch.luklanis.esscanlite.CaptureActivity;
 import ch.luklanis.esscanlite.Intents;
 import ch.luklanis.esscanlite.PreferencesActivity;
+import ch.luklanis.esscan.paymentslip.DTAFileCreator;
+import ch.luklanis.esscan.paymentslip.EsResult;
+import ch.luklanis.esscan.paymentslip.EsrResult;
+import ch.luklanis.esscan.paymentslip.PsResult;
 
 import java.util.List;
 
-import com.actionbarsherlock.app.SherlockListActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.widget.ShareActionProvider;
 import com.actionbarsherlock.widget.ShareActionProvider.OnShareTargetSelectedListener;
 
-public final class HistoryActivity extends SherlockListActivity {
+public final class HistoryActivity extends SherlockFragmentActivity implements HistoryFragment.HistoryCallbacks {
+
+	public static final String ACTION_SHOW_RESULT = "action_show_result";
+
+	public static final String EXTRA_CODE_ROW = "extra_code_row";
+
+	private static final int DETAILS_REQUEST_CODE = 0;
+
+	private boolean mTwoPane;
 
 	private HistoryManager historyManager;
-	private HistoryItemAdapter adapter;
 	private ShareActionProvider mShareActionProvider;
 	private int lastAlertId;
-	private CheckBox dontShowAgainCheckBox;
 	private DTAFileCreator dtaFileCreator;
+	private CheckBox dontShowAgainCheckBox;
+
+	private boolean streamModeEnabled;
+
+	private int newPosition;
+
+	private int oldPosition;
+
+	final private OnQueryTextListener queryListener = new OnQueryTextListener() {       
+
+		@Override
+		public boolean onQueryTextChange(String newText) {
+			if (TextUtils.isEmpty(newText)) {
+				getActionBar().setSubtitle("History");
+			} else {
+				getActionBar().setSubtitle("History - Searching for: " + newText);
+			}
+
+			HistoryFragment historyFragment = ((HistoryFragment) getSupportFragmentManager()
+					.findFragmentById(R.id.history));
+			
+			HistoryItemAdapter adapter = historyFragment.getAdapter();
+			
+			if (adapter != null) {
+				adapter.getFilter().filter(newText); 
+			}
+			return true;
+		}
+
+		@Override
+		public boolean onQueryTextSubmit(String query) {            
+			Toast.makeText(getApplication(), "Searching for: " + query + "...", Toast.LENGTH_SHORT).show();
+			return true;
+		}
+	};
 
 	@Override
 	protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
+		setContentView(R.layout.activity_history);
 
-		// Hide Icon in ActionBar
-		getSupportActionBar().setDisplayShowHomeEnabled(false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-		this.historyManager = new HistoryManager(this);  
-		adapter = new HistoryItemAdapter(this);
-		setListAdapter(adapter);
-		ListView listview = getListView();
-		registerForContextMenu(listview);
+		HistoryFragment historyFragment = ((HistoryFragment) getSupportFragmentManager()
+				.findFragmentById(R.id.history));
 
-		this.dtaFileCreator = new DTAFileCreator(getApplicationContext());
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-		List<HistoryItem> items = historyManager.buildHistoryItemsForCSV();
-		adapter.clear();
-		for (HistoryItem item : items) {
-			adapter.add(item);
+		if (findViewById(R.id.ps_detail_container) != null) {
+			mTwoPane = true;
+			historyFragment.setActivateOnItemClick(true);
 		}
-		if (adapter.isEmpty()) {
-			adapter.add(new HistoryItem(null));
+		
+		oldPosition = ListView.INVALID_POSITION;
+		newPosition = ListView.INVALID_POSITION;
+
+		dtaFileCreator = new DTAFileCreator(this);
+		historyManager = new HistoryManager(this);
+
+		Intent intent = getIntent();
+
+		if (intent.getAction() != null && intent.getAction().equals(ACTION_SHOW_RESULT)){
+			String codeRow = intent.getStringExtra(EXTRA_CODE_ROW);
+			PsResult psResult = PsResult.getCoderowType(codeRow).equals(EsResult.PS_TYPE_NAME) 
+					? new EsResult(codeRow) : new EsrResult(codeRow);
+
+			historyManager.addHistoryItem(psResult);
+			historyFragment.showPaymentSlipDetail();
+			intent.setAction(null);
 		}
-
-		int error = dtaFileCreator.getFirstErrorId();
-
-		if(error != 0){
-			setOptionalOKAlert(error);
-		} else {
-		}
-	}
-
-	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id) {
-		if (adapter.getItem(position).getResult() != null) {
-			Intent intent = new Intent(this, CaptureActivity.class);
-			intent.putExtra(Intents.History.ITEM_NUMBER, position);
-			setResult(Activity.RESULT_OK, intent);
-			finish();
-		}
-	}
-
-	@Override
-	public void onCreateContextMenu(ContextMenu menu,
-			View v,
-			ContextMenu.ContextMenuInfo menuInfo) {
-		int position = ((AdapterView.AdapterContextMenuInfo) menuInfo).position;
-		menu.add(Menu.NONE, position, position, R.string.history_clear_one_history_text);
-	}
-
-	@Override
-	public boolean onContextItemSelected(android.view.MenuItem item) {
-		int position = item.getItemId();
-		historyManager.deleteHistoryItem(position);
-		reload();
-		return true;
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		if (historyManager.hasHistoryItems()) {
 			getSupportMenuInflater().inflate(R.menu.history_menu, menu);
+			
+			SearchView searchView = (SearchView) menu.findItem(R.id.history_menu_search).getActionView();
+			searchView.setOnQueryTextListener(queryListener);
 
 			// Locate MenuItem with ShareActionProvider
 			MenuItem item = menu.findItem(R.id.history_menu_send_dta);
@@ -128,7 +151,7 @@ public final class HistoryActivity extends SherlockListActivity {
 			if(dtaFileCreator.getFirstErrorId() == 0) {
 				// Fetch and store ShareActionProvider
 				mShareActionProvider = (ShareActionProvider) item.getActionProvider();
-				
+
 				mShareActionProvider.setShareHistoryFileName(ShareActionProvider.DEFAULT_SHARE_HISTORY_FILE_NAME);
 
 				mShareActionProvider.setOnShareTargetSelectedListener(new OnShareTargetSelectedListener() {
@@ -166,7 +189,7 @@ public final class HistoryActivity extends SherlockListActivity {
 					.getString(PreferencesActivity.KEY_EMAIL_ADDRESS, "")};
 
 			if (historyFile == null) {
-				setOKAlert(R.string.msg_unmount_usb);
+				setOkAlert(R.string.msg_unmount_usb);
 			} else {
 				Intent intent = new Intent(Intent.ACTION_SEND, Uri.parse("mailto:"));
 				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
@@ -196,6 +219,14 @@ public final class HistoryActivity extends SherlockListActivity {
 			builder.show();
 		}
 		break;
+		case android.R.id.home: {
+            if (!PsDetailActivity.savePaymentSlip(this)) {
+            	return true;
+            }
+            
+            NavUtils.navigateUpTo(this, new Intent(this, CaptureActivity.class));
+            return true;
+        }
 		//		case R.id.history_menu_send_dta: {
 		//			Uri dtaFile = getDTAFileUri();
 		//			if (dtaFile != null) {
@@ -211,37 +242,108 @@ public final class HistoryActivity extends SherlockListActivity {
 		return true;
 	}
 
-	private boolean createDTAFile() {
-		List<HistoryItem> historyItems = historyManager.buildHistoryItemsForDTA();
-		String error = dtaFileCreator.getFirstError(historyItems);
+	@Override
+	public void onItemSelected(int oldPosition, int newPosition) {
+		
+		if (streamModeEnabled) {
+			Intent intent = new Intent(this, CaptureActivity.class);
+			intent.putExtra(Intents.History.ITEM_NUMBER, newPosition);
+			setResult(Activity.RESULT_OK, intent);
+			finish();
+			return;
+		}
+		
+		if (mTwoPane) {
+			this.newPosition = ListView.INVALID_POSITION;
+			this.oldPosition = ListView.INVALID_POSITION;
+			PsDetailFragment oldFragment = (PsDetailFragment)getSupportFragmentManager().findFragmentById(R.id.ps_detail_container);
+			if (oldFragment != null) {
+				int error = oldFragment.save();
 
-		if(error != ""){
-			setOKAlert(error);
-			return false;
+				HistoryItem item = historyManager.buildHistoryItem(oldPosition);
+				HistoryFragment fragment = (HistoryFragment)getSupportFragmentManager().findFragmentById(R.id.history);
+				fragment.updatePosition(oldPosition, item);
+
+				if (error > 0) {
+					this.newPosition = newPosition;
+					this.oldPosition = oldPosition;
+					setCancelOkAlert(error, false);
+					return;
+				}
+			}
+
+			setNewDetails(newPosition);
+
+		} else {
+			Intent detailIntent = new Intent(this, PsDetailActivity.class);
+			detailIntent.putExtra(PsDetailFragment.ARG_POSITION, newPosition);
+			startActivityForResult(detailIntent, DETAILS_REQUEST_CODE);
+		}
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		if(resultCode == RESULT_OK && requestCode == DETAILS_REQUEST_CODE){
+
+			if (intent.hasExtra(Intents.History.ITEM_NUMBER)) {
+				int position = intent.getIntExtra(Intents.History.ITEM_NUMBER, -1);
+
+				HistoryItem item = historyManager.buildHistoryItem(position);
+
+				HistoryFragment fragment = (HistoryFragment)getSupportFragmentManager().findFragmentById(R.id.history);
+				fragment.updatePosition(position, item);
+			}
+		}
+	}
+
+	private void setNewDetails(int position) {
+		Bundle arguments = new Bundle();
+		arguments.putInt(PsDetailFragment.ARG_POSITION, position);
+		PsDetailFragment fragment = new PsDetailFragment();
+		fragment.setArguments(arguments);
+
+		getSupportFragmentManager()
+		.beginTransaction()
+		.replace(R.id.ps_detail_container, fragment)
+		.commit();
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		
+		streamModeEnabled = PreferenceManager.getDefaultSharedPreferences(this)
+				.getBoolean(PreferencesActivity.KEY_ENABLE_STREAM_MODE, false);
+
+		int error = dtaFileCreator.getFirstErrorId();
+
+		if(error != 0){
+			setOptionalOkAlert(error);
+		} else {
+		}
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			PsDetailFragment oldFragment = (PsDetailFragment)getSupportFragmentManager().findFragmentById(R.id.ps_detail_container);
+			if (oldFragment != null) {
+				int error = oldFragment.save();
+				
+				if (error > 0) {
+					setCancelOkAlert(error, true);
+					return true;
+				}
+			}
 		}
 
-		CharSequence dta = dtaFileCreator.buildDTA(historyItems);
+		return super.onKeyDown(keyCode, event);
+	}
 
-		if (!dtaFileCreator.saveDTAFile(dta.toString())) {
-			setOKAlert(R.string.msg_unmount_usb);
-			return false;
-		} else {
-			Uri dtaFileUri = dtaFileCreator.getDTAFileUri();
-			String dtaFileName = dtaFileUri.getLastPathSegment();
-
-			new HistoryExportUpdateAsyncTask(historyManager, dtaFileName)
-			.execute(historyItems.toArray(new HistoryItem[historyItems.size()]));
-			
-			this.dtaFileCreator = new DTAFileCreator(getApplicationContext());
-			
-			Toast toast = Toast.makeText(this, 
-					getResources().getString(R.string.msg_dta_saved, 
-							dtaFileUri.getPath()), 
-							Toast.LENGTH_LONG);
-			toast.setGravity(Gravity.BOTTOM, 0, 0);
-			toast.show();
-
-			return true;
+	// Call to update the share intent
+	private void setShareIntent(Intent shareIntent) {
+		if (mShareActionProvider != null) {
+			mShareActionProvider.setShareIntent(shareIntent);
 		}
 	}
 
@@ -261,11 +363,8 @@ public final class HistoryActivity extends SherlockListActivity {
 		return intent;
 	}
 
-	// Call to update the share intent
-	private void setShareIntent(Intent shareIntent) {
-		if (mShareActionProvider != null) {
-			mShareActionProvider.setShareIntent(shareIntent);
-		}
+	private void setOkAlert(int id){
+		setOKAlert(getResources().getString(id));
 	}
 
 	private void setOKAlert(String message){
@@ -275,8 +374,49 @@ public final class HistoryActivity extends SherlockListActivity {
 		builder.show();
 	}
 
-	private void setOptionalOKAlert(int id) {
-		int dontShow = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt(PreferencesActivity.KEY_NOT_SHOW_ALERT + String.valueOf(id), 0);
+	private void setCancelOkAlert(int id, boolean finish){
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		
+		builder.setMessage(id)
+		.setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				HistoryFragment fragment = (HistoryFragment)getSupportFragmentManager().findFragmentById(R.id.history);
+				fragment.setActivatedPosition(oldPosition);
+				
+				oldPosition = ListView.INVALID_POSITION;
+				newPosition = ListView.INVALID_POSITION;
+			}
+		});
+
+		if (finish) {
+			builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					finish();
+				}
+			});
+		} else {
+			builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					setNewDetails(newPosition);
+					
+					newPosition = ListView.INVALID_POSITION;
+					oldPosition = ListView.INVALID_POSITION;
+				}
+			});
+		}
+		
+		builder.show();
+	}
+
+	public void setOptionalOkAlert(int id) {
+		int dontShow = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+				.getInt(PreferencesActivity.KEY_NOT_SHOW_ALERT + String.valueOf(id), 0);
 
 		if (dontShow == 0) {
 			lastAlertId = id;
@@ -293,7 +433,7 @@ public final class HistoryActivity extends SherlockListActivity {
 
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					if (dontShowAgainCheckBox.isChecked()){
+					if (dontShowAgainCheckBox.isChecked()) {
 						PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
 						.edit()
 						.putInt(PreferencesActivity.KEY_NOT_SHOW_ALERT + String.valueOf(lastAlertId), 1)
@@ -306,15 +446,37 @@ public final class HistoryActivity extends SherlockListActivity {
 		}
 	}
 
-	private void setOKAlert(int id){
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(id);
-		builder.setPositiveButton(R.string.button_ok, null);
-		builder.show();
-	}
+	private boolean createDTAFile() {
+		List<HistoryItem> historyItems = historyManager.buildHistoryItemsForDTA();
+		String error = dtaFileCreator.getFirstError(historyItems);
 
-	private void reload(){
-		startActivity(getIntent()); 
-		finish();
+		if(error != ""){
+			setOKAlert(error);
+			return false;
+		}
+
+		CharSequence dta = dtaFileCreator.buildDTA(historyItems);
+
+		if (!dtaFileCreator.saveDTAFile(dta.toString())) {
+			setOkAlert(R.string.msg_unmount_usb);
+			return false;
+		} else {
+			Uri dtaFileUri = dtaFileCreator.getDTAFileUri();
+			String dtaFileName = dtaFileUri.getLastPathSegment();
+
+			new HistoryExportUpdateAsyncTask(historyManager, dtaFileName)
+			.execute(historyItems.toArray(new HistoryItem[historyItems.size()]));
+
+			this.dtaFileCreator = new DTAFileCreator(getApplicationContext());
+
+			Toast toast = Toast.makeText(this, 
+					getResources().getString(R.string.msg_dta_saved, 
+							dtaFileUri.getPath()), 
+							Toast.LENGTH_LONG);
+			toast.setGravity(Gravity.BOTTOM, 0, 0);
+			toast.show();
+
+			return true;
+		}
 	}
 }
