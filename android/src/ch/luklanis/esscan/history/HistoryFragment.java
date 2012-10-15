@@ -12,6 +12,7 @@ import android.view.ContextMenu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 public class HistoryFragment extends ListFragment {
 
@@ -28,6 +29,8 @@ public class HistoryFragment extends ListFragment {
 
 	private HistoryManager historyManager;
 	private HistoryItemAdapter adapter;
+
+	private boolean listIsEmpty;
 
 	private static HistoryCallbacks sDummyCallbacks = new HistoryCallbacks(){
 		@Override
@@ -59,6 +62,7 @@ public class HistoryFragment extends ListFragment {
 	};
 
 	public HistoryFragment() {
+		listIsEmpty = true;
 	}
 
 	@Override
@@ -76,6 +80,11 @@ public class HistoryFragment extends ListFragment {
 
 	@Override
 	public void onListItemClick(ListView listView, View view, int position, long id) {
+		
+		if (listIsEmpty) {
+			return;
+		}
+		
 		super.onListItemClick(listView, view, position, id);
 		
 		int oldPosition = activatedPosition;
@@ -183,7 +192,10 @@ public class HistoryFragment extends ListFragment {
 		}
 		
 		if (adapter.isEmpty()) {
+			listIsEmpty = true;
 			adapter.add(new HistoryItem(null));
+		} else {
+			listIsEmpty = false;
 		}
 
 		adapter.notifyDataSetChanged();
