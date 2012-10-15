@@ -103,7 +103,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 	private static final int ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
 	private static final String sourceLanguageCodeOcr = "psl"; // ISO 639-3 language code
-	
+
 	private static final int pageSegmentationMode = TessBaseAPI.PSM_SINGLE_LINE;
 	private static final String characterWhitelist = "0123456789>+";
 
@@ -166,7 +166,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 					showResult(savedCodeRowToSend, true);
 					savedCodeRowToSend = null;
 				}
-				
+
 				showIPAddresses();
 			} else {
 				clearIPAddresses();
@@ -202,7 +202,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 		//Load partially transparent black background
 		//        getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.ab_bg_black));  
-		
+
 		savedCodeRowToSend = null;
 
 		showOcrResult = false;
@@ -565,11 +565,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		indeterminateDialog = new ProgressDialog(this);
 		indeterminateDialog.setTitle("Please wait");
 		String ocrEngineModeName = getOcrEngineModeName();
-		if (ocrEngineModeName.equals("Both")) {
-			indeterminateDialog.setMessage("Initializing Cube and Tesseract OCR engines for " + languageName + "...");
-		} else {
-			indeterminateDialog.setMessage("Initializing " + ocrEngineModeName + " OCR engine for " + languageName + "...");
-		}
+		indeterminateDialog.setMessage("Initializing " + ocrEngineModeName + " OCR engine for " + languageName + "...");
 		indeterminateDialog.setCancelable(false);
 		indeterminateDialog.show();
 
@@ -577,7 +573,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		new OcrInitAsyncTask(this, new TessBaseAPI(), dialog, indeterminateDialog, languageCode, languageName, ocrEngineMode)
 		.execute(storageRoot.toString());
 	}
-	
+
 	public void showResult(PsResult psResult) {
 		beepManager.playBeepSoundAndVibrate();
 		showResult(psResult, false);
@@ -593,7 +589,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			historyManager.addHistoryItem(psResult);
 			return;
 		}
-		
+
 		if (fromHistory) {
 			return;
 		}
@@ -755,13 +751,13 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	public void drawViewfinder() {
 		viewfinderView.drawViewfinder();
 	}
-	
-	private void DeleteRecursive(File fileOrDirectory) {
-	    if (fileOrDirectory.isDirectory())
-	        for (File child : fileOrDirectory.listFiles())
-	            DeleteRecursive(child);
 
-	    fileOrDirectory.delete();
+	private void DeleteRecursive(File fileOrDirectory) {
+		if (fileOrDirectory.isDirectory())
+			for (File child : fileOrDirectory.listFiles())
+				DeleteRecursive(child);
+
+		fileOrDirectory.delete();
 	}
 
 	/**
@@ -777,11 +773,11 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			int lastVersion = prefs.getInt(PreferencesActivity.KEY_HELP_VERSION_SHOWN, 0);
 
 			if (currentVersion > lastVersion) {
-				
+
 				File oldStorage = getOldTessdataDirectory();
-				
+
 				if (oldStorage != null && oldStorage.exists()) {
-						DeleteRecursive(new File(oldStorage.toString()));
+					DeleteRecursive(new File(oldStorage.toString()));
 				}
 
 				// Record the last version for which we last displayed the What's New (Help) page

@@ -20,22 +20,19 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.inputmethodservice.Keyboard.Key;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NavUtils;
+import android.text.ClipboardManager;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SearchView;
 import android.widget.Toast;
-import android.widget.SearchView.OnQueryTextListener;
 import ch.luklanis.esscan.CaptureActivity;
 import ch.luklanis.esscan.Intents;
 import ch.luklanis.esscan.PreferencesActivity;
@@ -50,6 +47,8 @@ import java.util.List;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.widget.SearchView;
+import com.actionbarsherlock.widget.SearchView.OnQueryTextListener;
 import com.actionbarsherlock.widget.ShareActionProvider;
 import com.actionbarsherlock.widget.ShareActionProvider.OnShareTargetSelectedListener;
 
@@ -61,10 +60,10 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 
 	private static final int DETAILS_REQUEST_CODE = 0;
 
-	private boolean mTwoPane;
+	private boolean twoPane;
 
 	private HistoryManager historyManager;
-	private ShareActionProvider mShareActionProvider;
+	private ShareActionProvider shareActionProvider;
 	private int lastAlertId;
 	private DTAFileCreator dtaFileCreator;
 	private CheckBox dontShowAgainCheckBox;
@@ -80,9 +79,9 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 		@Override
 		public boolean onQueryTextChange(String newText) {
 			if (TextUtils.isEmpty(newText)) {
-				getActionBar().setSubtitle("History");
+				getSupportActionBar().setSubtitle("History");
 			} else {
-				getActionBar().setSubtitle("History - Searching for: " + newText);
+				getSupportActionBar().setSubtitle("History - Searching for: " + newText);
 			}
 
 			HistoryFragment historyFragment = ((HistoryFragment) getSupportFragmentManager()
@@ -114,7 +113,7 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 				.findFragmentById(R.id.history));
 
 		if (findViewById(R.id.ps_detail_container) != null) {
-			mTwoPane = true;
+			twoPane = true;
 			historyFragment.setActivateOnItemClick(true);
 		}
 		
@@ -145,16 +144,23 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 			SearchView searchView = (SearchView) menu.findItem(R.id.history_menu_search).getActionView();
 			searchView.setOnQueryTextListener(queryListener);
 
+			MenuItem item = menu.findItem(R.id.history_menu_copy_code_row);
+			
+			if (twoPane) {
+				item.setVisible(true);
+			} else {
+				item.setVisible(false);
+			}
+
 			// Locate MenuItem with ShareActionProvider
-			MenuItem item = menu.findItem(R.id.history_menu_send_dta);
+			item = menu.findItem(R.id.history_menu_send_dta);
 
 			if(dtaFileCreator.getFirstErrorId() == 0) {
 				// Fetch and store ShareActionProvider
-				mShareActionProvider = (ShareActionProvider) item.getActionProvider();
+				shareActionProvider = (ShareActionProvider) item.getActionProvider();
+				shareActionProvider.setShareHistoryFileName(ShareActionProvider.DEFAULT_SHARE_HISTORY_FILE_NAME);
 
-				mShareActionProvider.setShareHistoryFileName(ShareActionProvider.DEFAULT_SHARE_HISTORY_FILE_NAME);
-
-				mShareActionProvider.setOnShareTargetSelectedListener(new OnShareTargetSelectedListener() {
+				shareActionProvider.setOnShareTargetSelectedListener(new OnShareTargetSelectedListener() {
 
 					@Override
 					public boolean onShareTargetSelected(ShareActionProvider source,
@@ -227,15 +233,29 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
             NavUtils.navigateUpTo(this, new Intent(this, CaptureActivity.class));
             return true;
         }
-		//		case R.id.history_menu_send_dta: {
-		//			Uri dtaFile = getDTAFileUri();
-		//			if (dtaFile != null) {
-		//				Intent intent = createShareIntent();
-		//				intent.putExtra(Intent.EXTRA_STREAM, dtaFile);
-		//				startActivity(intent);
-		//			}
-		//		}
-		//		break;
+		case R.id.history_menu_copy_code_row:
+		{
+			HistoryFragment historyFragment = ((HistoryFragment) getSupportFragmentManager()
+					.findFragmentById(R.id.history));
+
+			int position = historyFragment == null ? ListView.INVALID_POSITION : historyFragment.getActivatedPosition();
+
+			if (position != ListView.INVALID_POSITION) {
+				PsResult result = historyFragment.getAdapter().getItem(position).getResult();
+
+				ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+				clipboardManager.setText(result.getCompleteCode());
+
+				//        clipboardManager.setPrimaryClip(ClipData.newPlainText("ocrResult", ocrResultView.getText()));
+				//      if (clipboardManager.hasPrimaryClip()) {
+				if (clipboardManager.hasText()) {
+					Toast toast = Toast.makeText(getApplicationContext(), R.string.msg_copied, Toast.LENGTH_SHORT);
+					toast.setGravity(Gravity.BOTTOM, 0, 0);
+					toast.show();
+				}
+			}
+		}
+		break;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -253,7 +273,7 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 			return;
 		}
 		
-		if (mTwoPane) {
+		if (twoPane) {
 			this.newPosition = ListView.INVALID_POSITION;
 			this.oldPosition = ListView.INVALID_POSITION;
 			PsDetailFragment oldFragment = (PsDetailFragment)getSupportFragmentManager().findFragmentById(R.id.ps_detail_container);
@@ -342,8 +362,8 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 
 	// Call to update the share intent
 	private void setShareIntent(Intent shareIntent) {
-		if (mShareActionProvider != null) {
-			mShareActionProvider.setShareIntent(shareIntent);
+		if (shareActionProvider != null) {
+			shareActionProvider.setShareIntent(shareIntent);
 		}
 	}
 
