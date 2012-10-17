@@ -581,7 +581,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 	public void showResult(PsResult psResult, boolean fromHistory) {
 
-		if(this.serviceIsBound && this.boundService.isConnectedLocal()) {
+		if(this.serviceIsBound && this.boundService != null && this.boundService.isConnectedLocal()) {
 			boolean sent = this.boundService.sendToListeners(psResult.getCompleteCode());
 
 			showDialogAndRestartScan(sent ? R.string.msg_coderow_sent : R.string.msg_coderow_not_sent);
@@ -696,7 +696,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			redStatusView.setVisibility(View.VISIBLE);
 		}
 
-		psValidation.gotoBeginning(true);
 		refreshStatusView();
 
 		statusViewBottomLeft.setText("");
