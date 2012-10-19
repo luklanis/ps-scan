@@ -551,7 +551,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			redStatusView.setVisibility(View.VISIBLE);
 		}
 
-		psValidation.gotoBeginning(true);
 		refreshStatusView();
 
 		statusViewBottomLeft.setText("");
