@@ -6,13 +6,13 @@ import java.util.List;
 import ch.luklanis.esscanlite.R;
 import com.actionbarsherlock.view.Menu;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.view.ContextMenu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 public class HistoryFragment extends ListFragment {
 
@@ -57,7 +57,8 @@ public class HistoryFragment extends ListFragment {
 				return -1;
 			}
 
-			return (new Long(rhs.getResult().getTimestamp())).compareTo(lhs.getResult().getTimestamp());
+			return (Long.valueOf(rhs.getResult().getTimestamp()))
+					.compareTo(lhs.getResult().getTimestamp());
 		}
 	};
 
@@ -74,39 +75,23 @@ public class HistoryFragment extends ListFragment {
 		adapter = null;
 
 		loadAdapterFromDatabase();
-		
+
 		setListAdapter(adapter);
 	}
 
 	@Override
 	public void onListItemClick(ListView listView, View view, int position, long id) {
-		
+
 		if (listIsEmpty) {
 			return;
 		}
-		
+
 		super.onListItemClick(listView, view, position, id);
-		
+
 		int oldPosition = activatedPosition;
 		activatedPosition = position;
 
 		historyCallbacks.onItemSelected(oldPosition, position);
-	}
-
-	@Override
-	public void onCreateContextMenu(ContextMenu menu,
-			View v,
-			ContextMenu.ContextMenuInfo menuInfo) {
-		int position = ((AdapterView.AdapterContextMenuInfo) menuInfo).position;
-		menu.add(Menu.NONE, position, position, R.string.history_clear_one_history_text);
-	}
-
-	@Override
-	public boolean onContextItemSelected(android.view.MenuItem item) {
-		int position = item.getItemId();
-		historyManager.deleteHistoryItem(position);
-		loadAdapterFromDatabase();
-		return true;
 	}
 
 	@Override
@@ -120,6 +105,31 @@ public class HistoryFragment extends ListFragment {
 
 		ListView listview = getListView();
 		registerForContextMenu(listview);
+		listview.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+			@Override
+			public boolean onItemLongClick(AdapterView<?> adapterView, View view,
+					int position, long id) {
+				
+				activatedPosition = position;
+				
+				AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+				.setTitle(R.string.msg_confirm_delete_title)
+				.setMessage(R.string.msg_confirm_delete_message)
+				.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						historyManager.deleteHistoryItem(activatedPosition);
+						loadAdapterFromDatabase();
+					}
+				})
+				.setNegativeButton(R.string.button_cancel, null);
+
+				builder.show();
+				return true;
+			}
+		});
 	}
 
 	@Override
@@ -190,7 +200,7 @@ public class HistoryFragment extends ListFragment {
 		for (HistoryItem item : items) {
 			adapter.add(item);
 		}
-		
+
 		if (adapter.isEmpty()) {
 			listIsEmpty = true;
 			adapter.add(new HistoryItem(null));

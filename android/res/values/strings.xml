@@ -58,6 +58,8 @@
     <string name="msg_own_iban_is_not_valid">IBAN is not valid. It has to be from switzerland.</string>
     <string name="msg_own_address_is_not_set">To create DTA files your own address is needed. Please write it down in Settings.</string>
     <string name="msg_red_result_view_not_available">No details for red payment slips!</string>
+    <string name="msg_confirm_delete_title">Delete payment</string>
+    <string name="msg_confirm_delete_message">You are about to delete the payment, OK to proceed?</string>
     <string name="result_account">Account</string>
     <string name="result_address">Recipient</string>
     <string name="result_reference_number">Reference Number</string>
