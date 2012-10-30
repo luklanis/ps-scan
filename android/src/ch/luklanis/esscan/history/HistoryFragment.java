@@ -3,21 +3,15 @@ package ch.luklanis.esscan.history;
 import java.util.Comparator;
 import java.util.List;
 
-import ch.luklanis.esscan.PreferencesActivity;
 import ch.luklanis.esscan.R;
-import com.actionbarsherlock.view.Menu;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.ListFragment;
-import android.view.ContextMenu;
 import android.view.View;
-import android.view.View.OnLongClickListener;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 public class HistoryFragment extends ListFragment {
 
@@ -62,7 +56,8 @@ public class HistoryFragment extends ListFragment {
 				return -1;
 			}
 
-			return (new Long(rhs.getResult().getTimestamp())).compareTo(lhs.getResult().getTimestamp());
+			return (Long.valueOf(rhs.getResult().getTimestamp()))
+					.compareTo(lhs.getResult().getTimestamp());
 		}
 	};
 
