@@ -61,6 +61,8 @@
     <string name="msg_coderow_sent">Kodierzeile wurde gesendet.</string>
     <string name="msg_coderow_not_sent">Kodierzeile senden nicht möglich. ESR Receiver ist nicht verbunden!</string>
     <string name="msg_red_result_view_not_available">Für rote Einzahlungsscheine können keine Details angezeigt werden!</string>
+    <string name="msg_confirm_delete_title">Lösche Zahlung</string>
+    <string name="msg_confirm_delete_message">Soll die Zahlung gelöscht werden?</string>
     <string name="result_account">Konto</string>
     <string name="result_address">Empfänger</string>
     <string name="result_reference_number">Referenznummer</string>

@@ -61,6 +61,8 @@
     <string name="msg_coderow_sent">Code row sent.</string>
     <string name="msg_coderow_not_sent">Unable to send code row. ESR Receiver is not connected!</string>
     <string name="msg_red_result_view_not_available">No details for red payment slips!</string>
+    <string name="msg_confirm_delete_title">Delete payment</string>
+    <string name="msg_confirm_delete_message">You are about to delete the payment, OK to proceed?</string>
     <string name="result_account">Account</string>
     <string name="result_address">Recipient</string>
     <string name="result_reference_number">Reference Number</string>
