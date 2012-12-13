@@ -426,6 +426,12 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		switch (keyCode) { 
 		case KeyEvent.KEYCODE_BACK:
+			if (this.psValidation.getCurrentStep() > 1) {
+				resetStatusView();
+				psValidation.gotoBeginning(true);
+				this.lastValidationStep = psValidation.getCurrentStep();
+				return true;
+			}
 			setResult(RESULT_CANCELED);
 			finish();
 			return true;
