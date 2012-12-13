@@ -28,9 +28,16 @@
     <string name="detail_title">Details</string>
     <string name="history_clear_text">Delete all</string>
     <string name="history_send_dta">DTA</string>
+    <string name="history_send_dta_wlan">wlan</string>
+    <string name="history_send_dta_email">email</string>
+    <string name="history_send_dta_other">other&#8230;</string>
+    <string name="history_send_dta_save">just save</string>
     <string name="history_send">CSV</string>
     <string name="history_email_title">ESR Scanner history</string>
-    <string name="history_email_as_dta_title">DTA file from ESR Scanner</string>
+    <string name="history_share_as_dta_title">DTA file from ESR Scanner</string>
+    <string name="history_share_as_dta_summary">DTA should be attached.
+        If there is no attachment, the email app didn\'t support it.
+        So please, can you add the file \"%s\" manually.</string>
     <string name="history_title">History</string>
     <string name="history_clear_one_history_text">Delete payment</string>
     <string name="history_empty">Empty</string>
@@ -52,6 +59,7 @@
     <string name="msg_database_restored">Data successfully restored!</string>
     <string name="msg_copied">Successfully copied</string>
     <string name="msg_nothing_to_export">No payment to export.</string>
+    <string name="msg_no_email_client">No email client found</string>
     <string name="msg_amount_not_valid">Amount is not valid.</string>
     <string name="msg_amount_is_empty">Please set the amount for the transfer to %s first.</string>
     <string name="msg_own_iban_is_not_set">To create DTA files your own IBAN is needed. Please write it down in Settings.</string>

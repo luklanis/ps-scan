@@ -41,12 +41,16 @@ public class DTAFileCreator {
 		File bsRoot = new File(Environment.getExternalStorageDirectory(), CaptureActivity.EXTERNAL_STORAGE_DIRECTORY);
 		
 		historyRoot = new File(bsRoot, "DTA");
-		fileName = "DTA-" + System.currentTimeMillis() + ".001";
+		fileName = "DTA-" + System.currentTimeMillis() + ".txt";
 		historyFile = new File(historyRoot, fileName);
 	}
 	
+	public String getDTAFilePath() {
+		return historyFile.getAbsolutePath();
+	}
+	
 	public Uri getDTAFileUri() {
-		return Uri.parse("file://" + historyFile.getAbsolutePath());
+		return Uri.fromFile(historyFile);
 	}
 
 	/**

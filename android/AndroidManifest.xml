@@ -16,19 +16,19 @@
 -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    android:installLocation="auto"
     package="ch.luklanis.esscan"
-    android:versionCode="22"
-    android:versionName="0.7.3" >
+    android:installLocation="auto"
+    android:versionCode="23"
+    android:versionName="0.7.4" >
 
     <uses-sdk
         android:minSdkVersion="10"
-        android:targetSdkVersion="16" />
+        android:targetSdkVersion="17" />
 
     <supports-screens
-        android:smallScreens="false"
-        android:normalScreens="true"
         android:largeScreens="true"
+        android:normalScreens="true"
+        android:smallScreens="false"
         android:xlargeScreens="true" />
 
     <uses-feature
@@ -44,8 +44,8 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.INTERNET"/>
-<!--     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /> -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /> -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
@@ -71,20 +71,26 @@
         <activity
             android:name=".history.HistoryActivity"
             android:label="@string/history_title"
-            android:stateNotNeeded="true" >
+            android:stateNotNeeded="true"
+            android:uiOptions="splitActionBarWhenNarrow" >
         </activity>
         <activity
             android:name=".history.PsDetailActivity"
             android:label="@string/detail_title"
-            android:stateNotNeeded="true" >
+            android:stateNotNeeded="true"
+            android:uiOptions="splitActionBarWhenNarrow" >
         </activity>
-        
-        <service android:name=".codesend.ESRSender" 
-            android:exported="false" 
-            android:label="Code row send service">
+
+        <service
+            android:name=".codesend.ESRSender"
+            android:exported="false"
+            android:label="Code row send service" >
         </service>
-        
-        <receiver android:process=":remote" android:name=".codesend.StopServiceReceiver"></receiver>
+
+        <receiver
+            android:name=".codesend.StopServiceReceiver"
+            android:process=":remote" >
+        </receiver>
     </application>
 
 </manifest>

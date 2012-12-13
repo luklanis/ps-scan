@@ -28,9 +28,16 @@
     <string name="detail_title">Details</string>
     <string name="history_clear_text">Alle löschen</string>
     <string name="history_send_dta">DTA</string>
+    <string name="history_send_dta_wlan">wlan</string>
+    <string name="history_send_dta_email">email</string>
+    <string name="history_send_dta_other">andere&#8230;</string>
+    <string name="history_send_dta_save">nur speichern</string>
     <string name="history_send">CSV</string>
     <string name="history_email_title">ESR Scanner Verlauf</string>
-    <string name="history_email_as_dta_title">Zahlungsauftrag gesendet von ESR Scanner</string>
+    <string name="history_share_as_dta_title">Zahlungsauftrag gesendet von ESR Scanner</string>
+    <string name="history_share_as_dta_summary">DTA sollte im Anhang sein. 
+        Wenn dies nicht der Fall ist, dann wird das von der email app nicht unterstützt. 
+        Bitte fügen Sie dann die Datei \"%s\" manuell hinzu.</string>
     <string name="history_title">Verlauf</string>
     <string name="history_clear_one_history_text">Einzahlungsschein löschen</string>
     <string name="history_empty">Leer</string>
@@ -53,6 +60,7 @@
     <string name="msg_copied">Erfolgreich kopiert!</string>
     <string name="msg_nothing_to_export">Alle Zahlungen wurden schon mal exportiert.</string>
     <string name="msg_amount_not_valid">Betrag ist ungültig.</string>
+    <string name="msg_no_email_client">Keine Email App gefunden</string>
     <string name="msg_amount_is_empty">Bitte fülle noch den Betrag für %s aus.</string>
     <string name="msg_own_iban_is_not_set">Um ein Zahlungsauftrag zu erstellen, wird deine eigene IBAN benötigt. Du kannst sie in den Einstellungen angeben.</string>
     <string name="msg_own_iban_is_not_valid">Die IBAN ist ungültig. Sie muss aus der Schweiz sein und die Prüfziffer muss stimmen.</string>
