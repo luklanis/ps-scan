@@ -21,7 +21,6 @@ import com.googlecode.tesseract.android.TessBaseAPI;
 import ch.luklanis.esscan.CaptureActivity;
 import ch.luklanis.esscan.R;
 import ch.luklanis.esscan.camera.CameraManager;
-import ch.luklanis.esscan.history.HistoryItem;
 import ch.luklanis.esscan.paymentslip.PsResult;
 import ch.luklanis.esscan.OcrResult;
 

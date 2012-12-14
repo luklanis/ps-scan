@@ -49,8 +49,6 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.widget.SearchView;
 import com.actionbarsherlock.widget.SearchView.OnQueryTextListener;
-import com.actionbarsherlock.widget.ShareActionProvider;
-import com.actionbarsherlock.widget.ShareActionProvider.OnShareTargetSelectedListener;
 
 public final class HistoryActivity extends SherlockFragmentActivity implements HistoryFragment.HistoryCallbacks {
 
@@ -63,7 +61,6 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 	private boolean twoPane;
 
 	private HistoryManager historyManager;
-	private ShareActionProvider shareActionProvider;
 	private int lastAlertId;
 	private DTAFileCreator dtaFileCreator;
 	private CheckBox dontShowAgainCheckBox;
