@@ -72,8 +72,12 @@ import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.CheckBox;
+import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -168,11 +172,17 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 				}
 
 				showIPAddresses();
+				
+				invalidateOptionsMenu();
 			} else {
-				clearIPAddresses();
+				enableStreamMode = false;
+				prefs.edit().putBoolean(PreferencesActivity.KEY_ENABLE_STREAM_MODE, enableStreamMode)
+				.apply();
+				
+				boundService.stopServer();
+				
+				setOKAlert(R.string.msg_stream_mode_not_available);
 			}
-
-			invalidateOptionsMenu();
 		}
 
 		@Override
@@ -181,11 +191,15 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			// unexpectedly disconnected -- that is, its process crashed.
 			// Because it is running in our same process, we should never
 			// see this happen.
-			boundService = null;
-
+			enableStreamMode = false;
+			prefs.edit().putBoolean(PreferencesActivity.KEY_ENABLE_STREAM_MODE, enableStreamMode)
+			.apply();
+			
+			boundService.stopServer();
+			
+			setOKAlert(R.string.msg_stream_mode_not_available);
+			
 			clearIPAddresses();
-
-			invalidateOptionsMenu();
 		}
 	};
 
@@ -271,12 +285,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		}
 
-		boolean enabledBefore = enableStreamMode;
 		enableStreamMode = this.prefs.getBoolean(PreferencesActivity.KEY_ENABLE_STREAM_MODE, false);
-
-		if (enabledBefore != enableStreamMode) {
-			invalidateOptionsMenu();
-		}
 
 		if (enableStreamMode) {
 			serviceIntent =  new Intent(this, ESRSender.class);
@@ -383,7 +392,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	private void clearIPAddresses() {
 		statusViewBottomRight.setText("");
 		statusViewBottomRight.setVisibility(View.GONE);
-		setOKAlert(R.string.msg_stream_mode_not_available);
 	}
 
 	@Override
@@ -452,12 +460,15 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 		MenuInflater inflater = getSupportMenuInflater();
 		inflater.inflate(R.menu.capture_menu, menu);
 
-		MenuItem ps_switch = menu.findItem(R.id.menu_switch_ps);
+		MenuItem psSwitch = menu.findItem(R.id.menu_switch_ps);
+		MenuItem showHistory = menu.findItem(R.id.menu_history);
 
-		if (enableStreamMode && boundService != null && boundService.isConnectedLocal()) {
-			ps_switch.setVisible(true);
+		if (enableStreamMode) {
+			psSwitch.setVisible(true);
+			showHistory.setVisible(false);
 		} else {
-			ps_switch.setVisible(false);
+			psSwitch.setVisible(false);
+			showHistory.setVisible(true);
 		}
 
 		return true;
@@ -474,6 +485,37 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 				this.psValidation = new EsrValidation();
 			}
 			resetStatusView();
+			break;
+		}
+		case R.id.menu_switch_mode: {
+			if (enableStreamMode) {
+				enableStreamMode = false;
+				prefs.edit().putBoolean(PreferencesActivity.KEY_ENABLE_STREAM_MODE, enableStreamMode)
+				.apply();
+
+				doUnbindService();
+
+				if (boundService != null) {
+					boundService.stopServer();
+				}
+
+				clearIPAddresses();
+				if (psValidation.getSpokenType().equals(EsResult.PS_TYPE_NAME)) {
+					psValidation = new EsrValidation();
+				} 
+				resetStatusView();
+				
+				invalidateOptionsMenu();
+			} else {
+				enableStreamMode = true;
+				prefs.edit().putBoolean(PreferencesActivity.KEY_ENABLE_STREAM_MODE, enableStreamMode)
+				.apply();
+
+				serviceIntent =  new Intent(getApplicationContext(), ESRSender.class);
+				startService(serviceIntent);
+
+				doBindService(); 
+			}
 			break;
 		}
 		case R.id.menu_history: {
@@ -592,7 +634,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 
 			showDialogAndRestartScan(sent ? R.string.msg_coderow_sent : R.string.msg_coderow_not_sent);
 
-			historyManager.addHistoryItem(psResult);
+//			historyManager.addHistoryItem(psResult);
 			return;
 		}
 
@@ -861,26 +903,23 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 					context.getSystemService(Context.CONNECTIVITY_SERVICE);
 			NetworkInfo networkInfo = conn.getActiveNetworkInfo();
 
-			if (networkInfo != null && networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+			if (networkInfo == null || networkInfo.getType() != ConnectivityManager.TYPE_WIFI) {
 				if (enableStreamMode) {
-					if (boundService != null) {
-						boundService.startServer();
-						showIPAddresses();
-						invalidateOptionsMenu();
-					}
-				}
-			} else {
-				if (boundService != null) {
-					boundService.stopServer();
+					enableStreamMode = false;
+					prefs.edit().putBoolean(PreferencesActivity.KEY_ENABLE_STREAM_MODE, enableStreamMode)
+					.apply();
 
-					if (!TextUtils.isEmpty(statusViewBottomRight.getText())) {
-						clearIPAddresses();
-						invalidateOptionsMenu();
-						if (psValidation.getSpokenType().equals(EsResult.PS_TYPE_NAME)) {
-							psValidation = new EsrValidation();
-						} 
-						resetStatusView();
+					if (boundService != null) {
+						boundService.stopServer();
 					}
+
+					setOKAlert(R.string.msg_stream_mode_not_available);
+					
+					clearIPAddresses();
+					if (psValidation.getSpokenType().equals(EsResult.PS_TYPE_NAME)) {
+						psValidation = new EsrValidation();
+					} 
+					resetStatusView();
 				}
 			}
 		}

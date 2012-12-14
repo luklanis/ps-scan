@@ -28,7 +28,7 @@
     <string name="detail_title">Details</string>
     <string name="history_clear_text">Alle löschen</string>
     <string name="history_send_dta">DTA</string>
-    <string name="history_send_dta_wlan">wlan</string>
+    <string name="history_send_dta_wlan">ESR Receiver</string>
     <string name="history_send_dta_email">email</string>
     <string name="history_send_dta_other">andere&#8230;</string>
     <string name="history_send_dta_save">nur speichern</string>
@@ -48,6 +48,7 @@
     <string name="menu_settings">Einstellungen</string>
     <string name="menu_search">Suche</string>
     <string name="menu_switch_ps">Typ des Einzahlungsscheins wechseln</string>
+    <string name="menu_switch_stream_mode">Belegleser</string>
     <string name="alert_title_information">Information</string>
     <string name="alert_dont_show_again">Nicht nochmal zeigen</string>
     <string name="msg_sure">Bist du sicher?</string>

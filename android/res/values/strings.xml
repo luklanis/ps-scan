@@ -28,7 +28,7 @@
     <string name="detail_title">Details</string>
     <string name="history_clear_text">Delete all</string>
     <string name="history_send_dta">DTA</string>
-    <string name="history_send_dta_wlan">wlan</string>
+    <string name="history_send_dta_wlan">ESR Receiver</string>
     <string name="history_send_dta_email">email</string>
     <string name="history_send_dta_other">other&#8230;</string>
     <string name="history_send_dta_save">just save</string>
@@ -48,6 +48,7 @@
     <string name="menu_settings">Settings</string>
     <string name="menu_search">Search</string>
     <string name="menu_switch_ps">Switch type of payment slip</string>
+    <string name="menu_switch_stream_mode">Stream mode</string>
     <string name="alert_title_information">Information</string>
     <string name="alert_dont_show_again">Don\'t show again!</string>
     <string name="msg_sure">Are you sure?</string>
