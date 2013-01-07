@@ -79,6 +79,7 @@
     <string name="result_exported_dta">Payment exported in file</string>
     <string name="picture">A little picture of a orange payment slip</string>
     <string name="button_copy_code_row">Copy code row</string>
+    <string name="button_send_code_row">Send code row</string>
     <string name="preferences_only_macro_focus_title">Macro focus</string>
     <string name="preferences_no_continous_auto_focus_title">No continues auto focus</string>
     <string name="preferences_no_continous_auto_focus_summary">Use standard auto focus only</string>

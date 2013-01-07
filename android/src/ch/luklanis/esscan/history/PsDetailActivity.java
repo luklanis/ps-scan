@@ -2,6 +2,7 @@ package ch.luklanis.esscan.history;
 
 import ch.luklanis.esscan.Intents;
 import ch.luklanis.esscan.R;
+import ch.luklanis.esscan.codesend.ESRSender;
 import ch.luklanis.esscan.paymentslip.PsResult;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -9,9 +10,12 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v4.app.NavUtils;
 import android.text.ClipboardManager;
 import android.view.Gravity;
@@ -22,6 +26,26 @@ import android.widget.Toast;
 public class PsDetailActivity extends SherlockFragmentActivity {
 
 	private static SherlockFragmentActivity callerActivity;
+	private Intent serviceIntent;
+	private boolean serviceIsBound;
+
+	private ESRSender boundService;
+
+	private ServiceConnection serviceConnection = new ServiceConnection() {
+
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			boundService = ((ESRSender.LocalBinder)service).getService();
+		}
+
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+			// This is called when the connection with the service has been
+			// unexpectedly disconnected -- that is, its process crashed.
+			// Because it is running in our same process, we should never
+			// see this happen.
+		}
+	};
 
 	@Override
 	protected void onCreate(Bundle icicle) {
@@ -50,6 +74,35 @@ public class PsDetailActivity extends SherlockFragmentActivity {
 		intent.putExtra(Intents.History.ITEM_NUMBER, 
 				getIntent().getIntExtra(PsDetailFragment.ARG_POSITION, ListView.INVALID_POSITION));
 		setResult(Activity.RESULT_OK, intent);
+
+		if (ESRSender.EXISTS) {
+			serviceIntent =  new Intent(this, ESRSender.class);
+			startService(serviceIntent);
+			
+			doBindService();
+		}
+	}
+
+	@Override
+	protected void onPause() {
+
+		doUnbindService();
+		
+		super.onPause();
+	}
+
+	private void doBindService() {
+		if (!serviceIsBound) {
+			bindService(serviceIntent, serviceConnection, 0);
+			serviceIsBound = true;
+		}
+	}
+
+	private void doUnbindService() {
+		if (serviceIsBound) {		
+			unbindService(serviceConnection);
+			serviceIsBound = false;
+		}
 	}
 
 	@Override
@@ -85,6 +138,32 @@ public class PsDetailActivity extends SherlockFragmentActivity {
 				//      if (clipboardManager.hasPrimaryClip()) {
 				if (clipboardManager.hasText()) {
 					Toast toast = Toast.makeText(getApplicationContext(), R.string.msg_copied, Toast.LENGTH_SHORT);
+					toast.setGravity(Gravity.BOTTOM, 0, 0);
+					toast.show();
+				}
+			}
+		}
+		break;
+		case R.id.details_menu_send_code_row:
+		{
+			PsDetailFragment oldFragment = (PsDetailFragment)getSupportFragmentManager()
+					.findFragmentById(R.id.ps_detail_container);
+
+			if (oldFragment != null) {
+				PsResult result = oldFragment.getHistoryItem().getResult();
+				
+				int msgId = 0;
+
+				if (boundService != null && boundService.isConnectedLocal()) {
+					boolean sent = this.boundService.sendToListeners(result.getCompleteCode());
+
+					msgId = (sent ? R.string.msg_coderow_sent : R.string.msg_coderow_not_sent);
+				} else if (boundService != null) { 
+					msgId = R.string.msg_stream_mode_not_available;
+				}
+				
+				if (msgId != 0) {
+					Toast toast = Toast.makeText(getApplicationContext(), msgId, Toast.LENGTH_SHORT);
 					toast.setGravity(Gravity.BOTTOM, 0, 0);
 					toast.show();
 				}

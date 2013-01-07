@@ -16,12 +16,14 @@
 
 package ch.luklanis.esscan.history;
 
-import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NavUtils;
 import android.text.ClipboardManager;
@@ -37,6 +39,7 @@ import ch.luklanis.esscan.CaptureActivity;
 import ch.luklanis.esscan.Intents;
 import ch.luklanis.esscan.PreferencesActivity;
 import ch.luklanis.esscan.R;
+import ch.luklanis.esscan.codesend.ESRSender;
 import ch.luklanis.esscan.paymentslip.DTAFileCreator;
 import ch.luklanis.esscan.paymentslip.EsResult;
 import ch.luklanis.esscan.paymentslip.EsrResult;
@@ -64,8 +67,6 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 	private int lastAlertId;
 	private DTAFileCreator dtaFileCreator;
 	private CheckBox dontShowAgainCheckBox;
-
-	private boolean streamModeEnabled;
 
 	private int newPosition;
 
@@ -96,6 +97,28 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 		public boolean onQueryTextSubmit(String query) {            
 			Toast.makeText(getApplication(), "Searching for: " + query + "...", Toast.LENGTH_SHORT).show();
 			return true;
+		}
+	};
+
+	private Intent serviceIntent;
+
+	private boolean serviceIsBound;
+
+	private ESRSender boundService;
+
+	private ServiceConnection serviceConnection = new ServiceConnection() {
+
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			boundService = ((ESRSender.LocalBinder)service).getService();
+		}
+
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+			// This is called when the connection with the service has been
+			// unexpectedly disconnected -- that is, its process crashed.
+			// Because it is running in our same process, we should never
+			// see this happen.
 		}
 	};
 
@@ -141,15 +164,23 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 			SearchView searchView = (SearchView) menu.findItem(R.id.history_menu_search).getActionView();
 			searchView.setOnQueryTextListener(queryListener);
 
-			MenuItem item = menu.findItem(R.id.history_menu_copy_code_row);
+			MenuItem copyItem = menu.findItem(R.id.history_menu_copy_code_row);
+			MenuItem sendItem = menu.findItem(R.id.history_menu_send_code_row);
+			
+			PsDetailFragment fragment = (PsDetailFragment)getSupportFragmentManager().findFragmentById(R.id.ps_detail_container);
 
-			if (twoPane) {
-				item.setVisible(true);
+			if (fragment != null) {
+				copyItem.setVisible(true);
+				
+				if (ESRSender.EXISTS) {
+					sendItem.setVisible(true);
+				}
 			} else {
-				item.setVisible(false);
+				copyItem.setVisible(false);
+				sendItem.setVisible(false);
 			}
 
-			item = menu.findItem(R.id.history_menu_send_dta);
+			MenuItem item = menu.findItem(R.id.history_menu_send_dta);
 
 			if(dtaFileCreator.getFirstErrorId() != 0) {
 				item.setVisible(false);
@@ -259,6 +290,34 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 			}
 		}
 		break;
+		case R.id.history_menu_send_code_row:
+		{
+			HistoryFragment historyFragment = ((HistoryFragment) getSupportFragmentManager()
+					.findFragmentById(R.id.history));
+
+			int position = historyFragment == null ? ListView.INVALID_POSITION : historyFragment.getActivatedPosition();
+
+			if (position != ListView.INVALID_POSITION) {
+				PsResult result = historyFragment.getAdapter().getItem(position).getResult();
+				
+				int msgId = 0;
+
+				if (boundService != null && boundService.isConnectedLocal()) {
+					boolean sent = this.boundService.sendToListeners(result.getCompleteCode());
+
+					msgId = (sent ? R.string.msg_coderow_sent : R.string.msg_coderow_not_sent);
+				} else if (boundService != null) { 
+					msgId = R.string.msg_stream_mode_not_available;
+				}
+				
+				if (msgId != 0) {
+					Toast toast = Toast.makeText(getApplicationContext(), msgId, Toast.LENGTH_SHORT);
+					toast.setGravity(Gravity.BOTTOM, 0, 0);
+					toast.show();
+				}
+			}
+		}
+		break;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -267,14 +326,6 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 
 	@Override
 	public void onItemSelected(int oldPosition, int newPosition) {
-
-		if (streamModeEnabled) {
-			Intent intent = new Intent(this, CaptureActivity.class);
-			intent.putExtra(Intents.History.ITEM_NUMBER, newPosition);
-			setResult(Activity.RESULT_OK, intent);
-			finish();
-			return;
-		}
 
 		if (twoPane) {
 			this.newPosition = ListView.INVALID_POSITION;
@@ -293,6 +344,8 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 					setCancelOkAlert(error, false);
 					return;
 				}
+			} else {
+				invalidateOptionsMenu();
 			}
 
 			setNewDetails(newPosition);
@@ -335,8 +388,12 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 	protected void onResume() {
 		super.onResume();
 
-		streamModeEnabled = PreferenceManager.getDefaultSharedPreferences(this)
-				.getBoolean(PreferencesActivity.KEY_ENABLE_STREAM_MODE, false);
+		if (ESRSender.EXISTS && twoPane) {
+			serviceIntent =  new Intent(this, ESRSender.class);
+			startService(serviceIntent);
+			
+			doBindService();
+		}
 
 		int error = dtaFileCreator.getFirstErrorId();
 
@@ -344,6 +401,14 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 			setOptionalOkAlert(error);
 		} else {
 		}
+	}
+
+	@Override
+	protected void onPause() {
+
+		doUnbindService();
+		
+		super.onPause();
 	}
 
 	@Override
@@ -361,6 +426,20 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 		}
 
 		return super.onKeyDown(keyCode, event);
+	}
+
+	private void doBindService() {
+		if (!serviceIsBound) {
+			bindService(serviceIntent, serviceConnection, 0);
+			serviceIsBound = true;
+		}
+	}
+
+	private void doUnbindService() {
+		if (serviceIsBound) {		
+			unbindService(serviceConnection);
+			serviceIsBound = false;
+		}
 	}
 
 	private Intent createShareIntent() {
@@ -392,10 +471,10 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 	}
 
 	private void setOkAlert(int id){
-		setOKAlert(getResources().getString(id));
+		setOkAlert(getResources().getString(id));
 	}
 
-	private void setOKAlert(String message){
+	private void setOkAlert(String message){
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage(message);
 		builder.setPositiveButton(R.string.button_ok, null);
@@ -479,7 +558,7 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 		String error = dtaFileCreator.getFirstError(historyItems);
 
 		if(error != ""){
-			setOKAlert(error);
+			setOkAlert(error);
 			return false;
 		}
 

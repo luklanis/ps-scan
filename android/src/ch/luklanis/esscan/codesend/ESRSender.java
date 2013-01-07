@@ -29,6 +29,8 @@ public class ESRSender extends Service {
 			return ESRSender.this;
 		}
 	}
+	
+	public static final boolean EXISTS = true;
 
 	private static final int SERVER_PORT = 8765;
 	private static final String TAG = ESRSender.class.getName();
@@ -76,7 +78,7 @@ public class ESRSender extends Service {
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
 
 		Calendar calendar = Calendar.getInstance();
-		calendar.add(Calendar.MINUTE, 2);
+		calendar.add(Calendar.MINUTE, 5);
 
 		AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
 		am.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);

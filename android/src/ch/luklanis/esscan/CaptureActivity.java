@@ -100,7 +100,7 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 	private static final int ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
 	private static final String sourceLanguageCodeOcr = "psl"; // ISO 639-3 language code
 
-	private static final int pageSegmentationMode = TessBaseAPI.PSM_SINGLE_LINE;
+	private static final int pageSegmentationMode = TessBaseAPI.PageSegMode.PSM_SINGLE_LINE;
 	private static final String characterWhitelist = "0123456789>+";
 
 	private CameraManager cameraManager;
@@ -186,8 +186,6 @@ public final class CaptureActivity extends SherlockActivity implements SurfaceHo
 			enableStreamMode = false;
 			prefs.edit().putBoolean(PreferencesActivity.KEY_ENABLE_STREAM_MODE, enableStreamMode)
 			.apply();
-			
-			boundService.stopServer();
 			
 			setOKAlert(R.string.msg_stream_mode_not_available);
 			
