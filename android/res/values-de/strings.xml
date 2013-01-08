@@ -27,6 +27,7 @@
     <string name="button_change">Andere</string>
     <string name="detail_title">Details</string>
     <string name="history_clear_text">Alle löschen</string>
+    <string name="history_item_sent">Gesendet per WLAN</string>
     <string name="history_send_dta">DTA</string>
     <string name="history_send_dta_wlan">ESR Receiver</string>
     <string name="history_send_dta_email">email</string>

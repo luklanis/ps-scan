@@ -68,9 +68,7 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 	private DTAFileCreator dtaFileCreator;
 	private CheckBox dontShowAgainCheckBox;
 
-	private int newPosition;
-
-	private int oldPosition;
+	private int[] tmpPositions;
 
 	final private OnQueryTextListener queryListener = new OnQueryTextListener() {       
 
@@ -81,9 +79,6 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 			} else {
 				getSupportActionBar().setSubtitle("History - Searching for: " + newText);
 			}
-
-			HistoryFragment historyFragment = ((HistoryFragment) getSupportFragmentManager()
-					.findFragmentById(R.id.history));
 
 			HistoryItemAdapter adapter = historyFragment.getAdapter();
 
@@ -122,6 +117,8 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 		}
 	};
 
+	private HistoryFragment historyFragment;
+
 	@Override
 	protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
@@ -129,16 +126,17 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-		HistoryFragment historyFragment = ((HistoryFragment) getSupportFragmentManager()
+		this.historyFragment = ((HistoryFragment) getSupportFragmentManager()
 				.findFragmentById(R.id.history));
 
 		if (findViewById(R.id.ps_detail_container) != null) {
 			twoPane = true;
-			historyFragment.setActivateOnItemClick(true);
+			this.historyFragment.setActivateOnItemClick(true);
 		}
 
-		oldPosition = ListView.INVALID_POSITION;
-		newPosition = ListView.INVALID_POSITION;
+		tmpPositions = new int[2];
+		tmpPositions[0] = ListView.INVALID_POSITION;	// old position
+		tmpPositions[1] = ListView.INVALID_POSITION;	// new position
 
 		dtaFileCreator = new DTAFileCreator(this);
 		historyManager = new HistoryManager(this);
@@ -150,8 +148,8 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 			PsResult psResult = PsResult.getCoderowType(codeRow).equals(EsResult.PS_TYPE_NAME) 
 					? new EsResult(codeRow) : new EsrResult(codeRow);
 
-					historyManager.addHistoryItem(psResult);
-					historyFragment.showPaymentSlipDetail();
+					this.historyManager.addHistoryItem(psResult);
+					this.historyFragment.showPaymentSlipDetail();
 					intent.setAction(null);
 		}
 	}
@@ -166,10 +164,8 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 
 			MenuItem copyItem = menu.findItem(R.id.history_menu_copy_code_row);
 			MenuItem sendItem = menu.findItem(R.id.history_menu_send_code_row);
-			
-			PsDetailFragment fragment = (PsDetailFragment)getSupportFragmentManager().findFragmentById(R.id.ps_detail_container);
 
-			if (fragment != null) {
+			if (twoPane && this.historyFragment.getActivatedPosition() != ListView.INVALID_POSITION) {
 				copyItem.setVisible(true);
 				
 				if (ESRSender.EXISTS) {
@@ -269,16 +265,14 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 		}
 		case R.id.history_menu_copy_code_row:
 		{
-			HistoryFragment historyFragment = ((HistoryFragment) getSupportFragmentManager()
-					.findFragmentById(R.id.history));
+			PsDetailFragment fragment = (PsDetailFragment)getSupportFragmentManager()
+					.findFragmentById(R.id.ps_detail_container);
 
-			int position = historyFragment == null ? ListView.INVALID_POSITION : historyFragment.getActivatedPosition();
-
-			if (position != ListView.INVALID_POSITION) {
-				PsResult result = historyFragment.getAdapter().getItem(position).getResult();
+			if (fragment != null) {
+				String completeCode = fragment.getHistoryItem().getResult().getCompleteCode();
 
 				ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-				clipboardManager.setText(result.getCompleteCode());
+				clipboardManager.setText(completeCode);
 
 				//        clipboardManager.setPrimaryClip(ClipData.newPlainText("ocrResult", ocrResultView.getText()));
 				//      if (clipboardManager.hasPrimaryClip()) {
@@ -292,20 +286,30 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 		break;
 		case R.id.history_menu_send_code_row:
 		{
-			HistoryFragment historyFragment = ((HistoryFragment) getSupportFragmentManager()
-					.findFragmentById(R.id.history));
+			PsDetailFragment fragment = (PsDetailFragment)getSupportFragmentManager()
+					.findFragmentById(R.id.ps_detail_container);
 
-			int position = historyFragment == null ? ListView.INVALID_POSITION : historyFragment.getActivatedPosition();
-
-			if (position != ListView.INVALID_POSITION) {
-				PsResult result = historyFragment.getAdapter().getItem(position).getResult();
+			if (fragment != null) {
+				String completeCode = fragment.getHistoryItem().getResult().getCompleteCode();
 				
 				int msgId = 0;
 
 				if (boundService != null && boundService.isConnectedLocal()) {
-					boolean sent = this.boundService.sendToListeners(result.getCompleteCode());
+					boolean sent = this.boundService.sendToListeners(completeCode);
 
-					msgId = (sent ? R.string.msg_coderow_sent : R.string.msg_coderow_not_sent);
+					if (sent) {
+						String msg = getResources().getString(R.string.history_item_sent);
+						historyManager.updateHistoryItemFileName(completeCode, msg);
+
+						int position = this.historyFragment.getActivatedPosition();
+						
+						HistoryItem historyItem = historyManager.buildHistoryItem(position);
+						this.historyFragment.updatePosition(position, historyItem);
+						
+						msgId = R.string.msg_coderow_sent;
+					} else {
+						msgId = R.string.msg_coderow_not_sent;
+					}
 				} else if (boundService != null) { 
 					msgId = R.string.msg_stream_mode_not_available;
 				}
@@ -328,19 +332,18 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 	public void onItemSelected(int oldPosition, int newPosition) {
 
 		if (twoPane) {
-			this.newPosition = ListView.INVALID_POSITION;
-			this.oldPosition = ListView.INVALID_POSITION;
+			tmpPositions[0] = ListView.INVALID_POSITION;
+			tmpPositions[1] = ListView.INVALID_POSITION;
 			PsDetailFragment oldFragment = (PsDetailFragment)getSupportFragmentManager().findFragmentById(R.id.ps_detail_container);
 			if (oldFragment != null) {
 				int error = oldFragment.save();
 
 				HistoryItem item = historyManager.buildHistoryItem(oldPosition);
-				HistoryFragment fragment = (HistoryFragment)getSupportFragmentManager().findFragmentById(R.id.history);
-				fragment.updatePosition(oldPosition, item);
+				this.historyFragment.updatePosition(oldPosition, item);
 
 				if (error > 0) {
-					this.newPosition = newPosition;
-					this.oldPosition = oldPosition;
+					tmpPositions[0] = oldPosition;
+					tmpPositions[1] = newPosition;
 					setCancelOkAlert(error, false);
 					return;
 				}
@@ -366,8 +369,7 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 
 				HistoryItem item = historyManager.buildHistoryItem(position);
 
-				HistoryFragment fragment = (HistoryFragment)getSupportFragmentManager().findFragmentById(R.id.history);
-				fragment.updatePosition(position, item);
+				this.historyFragment.updatePosition(position, item);
 			}
 		}
 	}
@@ -489,11 +491,10 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				HistoryFragment fragment = (HistoryFragment)getSupportFragmentManager().findFragmentById(R.id.history);
-				fragment.setActivatedPosition(oldPosition);
-
-				oldPosition = ListView.INVALID_POSITION;
-				newPosition = ListView.INVALID_POSITION;
+				historyFragment.setActivatedPosition(tmpPositions[0]);
+				
+				tmpPositions[0] = ListView.INVALID_POSITION;
+				tmpPositions[1] = ListView.INVALID_POSITION;
 			}
 		});
 
@@ -510,10 +511,10 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					setNewDetails(newPosition);
-
-					newPosition = ListView.INVALID_POSITION;
-					oldPosition = ListView.INVALID_POSITION;
+					setNewDetails(tmpPositions[1]);
+					
+					tmpPositions[0] = ListView.INVALID_POSITION;
+					tmpPositions[1] = ListView.INVALID_POSITION;
 				}
 			});
 		}

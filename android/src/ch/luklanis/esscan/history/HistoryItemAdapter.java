@@ -18,6 +18,7 @@ package ch.luklanis.esscan.history;
 
 import android.app.Activity;
 import android.content.res.Resources;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,7 +57,12 @@ final class HistoryItemAdapter extends ArrayAdapter<HistoryItem> {
     String address;
     if (result != null) {
       title = result.toString() + " " + item.getAmount();
-      address = item.getAddress().replaceAll("[\\r\\n]+", ", ");      
+      address = item.getAddress().replaceAll("[\\r\\n]+", ", ");   
+      
+      String status = item.getDTAFilename();
+      if (!TextUtils.isEmpty(status)) {
+    	  address += TextUtils.isEmpty(address) ? status : "\r\n" + status;
+      }
     } else {
       Resources resources = getContext().getResources();
       title = resources.getString(R.string.history_empty);

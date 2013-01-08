@@ -26,6 +26,8 @@ import android.widget.Toast;
 public class PsDetailActivity extends SherlockFragmentActivity {
 
 	private static SherlockFragmentActivity callerActivity;
+	
+	private HistoryManager historyManager;
 	private Intent serviceIntent;
 	private boolean serviceIsBound;
 
@@ -64,6 +66,8 @@ public class PsDetailActivity extends SherlockFragmentActivity {
 			.add(R.id.ps_detail_container, fragment)
 			.commit();
 		}
+
+		historyManager = new HistoryManager(this);
 	}
 
 	@Override
@@ -125,14 +129,14 @@ public class PsDetailActivity extends SherlockFragmentActivity {
 		}
 		case R.id.details_menu_copy_code_row:
 		{
-			PsDetailFragment oldFragment = (PsDetailFragment)getSupportFragmentManager()
+			PsDetailFragment fragment = (PsDetailFragment)getSupportFragmentManager()
 					.findFragmentById(R.id.ps_detail_container);
 
-			if (oldFragment != null) {
-				PsResult result = oldFragment.getHistoryItem().getResult();
+			if (fragment != null) {
+				String completeCode = fragment.getHistoryItem().getResult().getCompleteCode();
 
 				ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-				clipboardManager.setText(result.getCompleteCode());
+				clipboardManager.setText(completeCode);
 
 				//        clipboardManager.setPrimaryClip(ClipData.newPlainText("ocrResult", ocrResultView.getText()));
 				//      if (clipboardManager.hasPrimaryClip()) {
@@ -146,18 +150,23 @@ public class PsDetailActivity extends SherlockFragmentActivity {
 		break;
 		case R.id.details_menu_send_code_row:
 		{
-			PsDetailFragment oldFragment = (PsDetailFragment)getSupportFragmentManager()
+			PsDetailFragment fragment = (PsDetailFragment)getSupportFragmentManager()
 					.findFragmentById(R.id.ps_detail_container);
 
-			if (oldFragment != null) {
-				PsResult result = oldFragment.getHistoryItem().getResult();
+			if (fragment != null) {
+				String completeCode = fragment.getHistoryItem().getResult().getCompleteCode();
 				
 				int msgId = 0;
 
 				if (boundService != null && boundService.isConnectedLocal()) {
-					boolean sent = this.boundService.sendToListeners(result.getCompleteCode());
+					boolean sent = this.boundService.sendToListeners(completeCode);
 
-					msgId = (sent ? R.string.msg_coderow_sent : R.string.msg_coderow_not_sent);
+					if (sent) {
+						historyManager.updateHistoryItemFileName(completeCode, getResources().getString(R.string.history_item_sent));
+						msgId = R.string.msg_coderow_sent;
+					} else {
+						msgId = R.string.msg_coderow_not_sent;
+					}
 				} else if (boundService != null) { 
 					msgId = R.string.msg_stream_mode_not_available;
 				}

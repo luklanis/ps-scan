@@ -175,7 +175,7 @@ public class PsDetailFragment extends Fragment {
 		EditText addressEditText = (EditText) rootView.findViewById(R.id.result_address);
 		addressEditText.setText("");
 
-		if(historyItem.getAddressNumber() != -1){
+		if(historyItem.getAddressId() != -1){
 			addressEditText.setText(historyItem.getAddress());
 		}
 		else{
@@ -230,13 +230,13 @@ public class PsDetailFragment extends Fragment {
 
 			status = DTAFileCreator.validateAddress(address);
 
-			if (historyItem.getAddressNumber() == -1) {
+			if (historyItem.getAddressId() == -1) {
 				historyManager.updateHistoryItemAddress(historyItem.getResult().getCompleteCode(), 
 						historyManager.addAddress(historyItem.getResult().getAccount(), address));
 			}
 			else{
 				historyManager.updateAddress(historyItem.getResult().getAccount(), 
-						historyItem.getAddressNumber(), address);
+						historyItem.getAddressId(), address);
 			}
 		}
 
@@ -263,13 +263,13 @@ public class PsDetailFragment extends Fragment {
 			public void onClick(DialogInterface dialog, int which) {
 
 				EditText addressEditText = (EditText) getView().findViewById(R.id.result_address);
-				String address = historyManager.getAddress(historyItem.getResult().getAccount(), which);
+				String address = historyManager.getAddressId(historyItem.getResult().getAccount(), which);
 
 				if(address != ""){
 					historyManager.updateHistoryItemAddress(historyItem.getResult().getCompleteCode(), which);
 
 					historyItem.setAddress(address);
-					historyItem.setAddressNumber(which);
+					historyItem.setAddressId(which);
 					addressEditText.setText(historyItem.getAddress());
 
 					Toast toast = Toast.makeText(getActivity(), R.string.msg_saved, Toast.LENGTH_SHORT);
@@ -278,7 +278,7 @@ public class PsDetailFragment extends Fragment {
 				}
 				else{
 					historyItem.setAddress("");
-					historyItem.setAddressNumber(-1);
+					historyItem.setAddressId(-1);
 					addressEditText.setText(historyItem.getAddress());
 				}
 			}
