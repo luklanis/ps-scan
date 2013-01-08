@@ -110,7 +110,7 @@ public final class HistoryItem {
 	}
 
 	public void setAddress(String address) {
-		this.address = address;
+		this.address = address == null ? "" : address;
 	}
 	
 	@Override

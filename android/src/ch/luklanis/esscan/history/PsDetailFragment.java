@@ -82,6 +82,8 @@ public class PsDetailFragment extends Fragment {
 		}
 	};
 
+	private int listPosition;
+
 	public PsDetailFragment() {
 	}
 
@@ -92,7 +94,8 @@ public class PsDetailFragment extends Fragment {
 		historyManager = new HistoryManager(getActivity());
 
 		if (getArguments().containsKey(ARG_POSITION)) {
-			historyItem = historyManager.buildHistoryItem(getArguments().getInt(ARG_POSITION));
+			listPosition = getArguments().getInt(ARG_POSITION);
+			historyItem = historyManager.buildHistoryItem(listPosition);
 		} else {
 			historyItem = null;
 		}
@@ -188,6 +191,10 @@ public class PsDetailFragment extends Fragment {
 	public HistoryItem getHistoryItem() {
 		return historyItem;
 	}
+	
+	public int getListPosition() {
+		return listPosition;
+	}
 
 	public int save() {
 
@@ -231,12 +238,12 @@ public class PsDetailFragment extends Fragment {
 			status = DTAFileCreator.validateAddress(address);
 
 			if (historyItem.getAddressId() == -1) {
-				historyManager.updateHistoryItemAddress(historyItem.getResult().getCompleteCode(), 
-						historyManager.addAddress(historyItem.getResult().getAccount(), address));
+				String account = historyItem.getResult().getAccount();
+				int addressId = historyManager.getAddressId(account, historyManager.addAddress(historyItem.getResult().getAccount(), address));
+				historyManager.updateHistoryItemAddressId(historyItem.getResult().getCompleteCode(), addressId);
 			}
 			else{
-				historyManager.updateAddress(historyItem.getResult().getAccount(), 
-						historyItem.getAddressId(), address);
+				historyManager.updateAddress(historyItem.getAddressId(), address);
 			}
 		}
 
@@ -263,10 +270,11 @@ public class PsDetailFragment extends Fragment {
 			public void onClick(DialogInterface dialog, int which) {
 
 				EditText addressEditText = (EditText) getView().findViewById(R.id.result_address);
-				String address = historyManager.getAddressId(historyItem.getResult().getAccount(), which);
+				int addressId = historyManager.getAddressId(historyItem.getResult().getAccount(), which);
+				String address = historyManager.getAddress(addressId);
 
 				if(address != ""){
-					historyManager.updateHistoryItemAddress(historyItem.getResult().getCompleteCode(), which);
+					historyManager.updateHistoryItemAddressId(historyItem.getResult().getCompleteCode(), addressId);
 
 					historyItem.setAddress(address);
 					historyItem.setAddressId(which);

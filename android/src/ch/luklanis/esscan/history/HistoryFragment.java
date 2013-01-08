@@ -21,8 +21,8 @@ public class HistoryFragment extends ListFragment {
 	private int activatedPosition = ListView.INVALID_POSITION;
 
 	public interface HistoryCallbacks {
-
 		public void onItemSelected(int oldPosition, int newPosition);
+		public int activatePosition();
 		public void setOptionalOkAlert(int id);
 	}
 
@@ -31,12 +31,18 @@ public class HistoryFragment extends ListFragment {
 
 	private boolean listIsEmpty;
 
+	private HistoryFragment self;
+
 	private static HistoryCallbacks sDummyCallbacks = new HistoryCallbacks(){
 		@Override
 		public void onItemSelected(int oldPosition, int newPosition) {
 		}
 		@Override
 		public void setOptionalOkAlert(int id) {
+		}
+		@Override
+		public int activatePosition() {
+			return -1;
 		}
 	};
 
@@ -70,12 +76,12 @@ public class HistoryFragment extends ListFragment {
 		super.onCreate(savedInstanceState);
 
 		historyManager = new HistoryManager(getActivity());
-
+		self = this;
+		
 		adapter = null;
-
-		loadAdapterFromDatabase();
-
-		setListAdapter(adapter);
+		
+		GetHistoryAsyncTask async = new GetHistoryAsyncTask(this, historyManager);
+		async.execute();
 	}
 
 	@Override
@@ -120,7 +126,9 @@ public class HistoryFragment extends ListFragment {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						historyManager.deleteHistoryItem(activatedPosition);
-						loadAdapterFromDatabase();
+						historyCallbacks.onItemSelected(ListView.INVALID_POSITION, 0);
+						GetHistoryAsyncTask async = new GetHistoryAsyncTask(self, historyManager);
+						async.execute();
 					}
 				})
 				.setNegativeButton(R.string.button_cancel, null);
@@ -171,13 +179,6 @@ public class HistoryFragment extends ListFragment {
 		activatedPosition = position;
 	}
 
-	public void showPaymentSlipDetail() {
-		loadAdapterFromDatabase();
-
-		setActivatedPosition(0);
-		historyCallbacks.onItemSelected(ListView.INVALID_POSITION, 0);
-	}
-
 	public void updatePosition(int position, HistoryItem item) {
 		if (adapter != null && adapter.getCount() > position) {
 			adapter.remove(adapter.getItem(position));
@@ -185,29 +186,23 @@ public class HistoryFragment extends ListFragment {
 			adapter.notifyDataSetChanged();
 		}
 	}
-
-	public void loadAdapterFromDatabase() {  
-
-		List<HistoryItem> items = historyManager.buildAllHistoryItems();
-
-		if (adapter == null) {
-			adapter = new HistoryItemAdapter(getActivity());
-		}
-
-		adapter.clear();
-
-		for (HistoryItem item : items) {
-			adapter.add(item);
-		}
-
+	
+	public void setAdapter(HistoryItemAdapter adapter) {
 		if (adapter.isEmpty()) {
 			listIsEmpty = true;
 			adapter.add(new HistoryItem(null));
 		} else {
 			listIsEmpty = false;
 		}
+		
+		this.adapter = adapter;
 
-		adapter.notifyDataSetChanged();
+		setListAdapter(this.adapter);
+		
+		setListShown(true);
+		
+		int position = historyCallbacks.activatePosition();
+		setActivatedPosition(position);
 	}
 
 	public HistoryItemAdapter getAdapter() {

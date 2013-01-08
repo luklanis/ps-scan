@@ -149,7 +149,7 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 					? new EsResult(codeRow) : new EsrResult(codeRow);
 
 					this.historyManager.addHistoryItem(psResult);
-					this.historyFragment.showPaymentSlipDetail();
+					setNewDetails(0);
 					intent.setAction(null);
 		}
 	}
@@ -335,7 +335,7 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 			tmpPositions[0] = ListView.INVALID_POSITION;
 			tmpPositions[1] = ListView.INVALID_POSITION;
 			PsDetailFragment oldFragment = (PsDetailFragment)getSupportFragmentManager().findFragmentById(R.id.ps_detail_container);
-			if (oldFragment != null) {
+			if (oldPosition != ListView.INVALID_POSITION && oldFragment != null) {
 				int error = oldFragment.save();
 
 				HistoryItem item = historyManager.buildHistoryItem(oldPosition);
@@ -358,6 +358,16 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 			detailIntent.putExtra(PsDetailFragment.ARG_POSITION, newPosition);
 			startActivityForResult(detailIntent, DETAILS_REQUEST_CODE);
 		}
+	}
+
+	@Override
+	public int activatePosition() {
+		PsDetailFragment fragment = (PsDetailFragment)getSupportFragmentManager().findFragmentById(R.id.ps_detail_container);
+		if (fragment != null) {
+			return fragment.getListPosition();
+		}
+		
+		return -1;
 	}
 
 	@Override
