@@ -101,7 +101,7 @@ public final class HistoryManager {
 			"FROM " + DBHelper.HISTORY_TABLE_NAME + " AS hi " +
 			"LEFT OUTER JOIN " + DBHelper.ADDRESS_TABLE_NAME + " AS ad " +
 					"ON hi." + DBHelper.HISTORY_ADDRESS_ID_COL + " = ad.id " +
-			"WHERE hi." + DBHelper.HISTORY_FILE_NAME_COL + " IS NULL" +
+			"WHERE hi." + DBHelper.HISTORY_FILE_NAME_COL + " IS NULL " +
 			"ORDER BY hi." + DBHelper.HISTORY_TIMESTAMP_COL + " DESC";
 
 	private static final String[] COUNT_COLUMN = { "COUNT(1)" };
