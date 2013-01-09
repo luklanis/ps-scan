@@ -105,7 +105,9 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
-			boundService = ((ESRSender.LocalBinder)service).getService();
+			if (ESRSender.EXISTS) {
+				boundService = ((ESRSender.LocalBinder)service).getService();
+			}
 		}
 
 		@Override
@@ -167,7 +169,7 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 
 			if (twoPane && this.historyFragment.getActivatedPosition() != ListView.INVALID_POSITION) {
 				copyItem.setVisible(true);
-				
+
 				if (ESRSender.EXISTS) {
 					sendItem.setVisible(true);
 				}
@@ -291,33 +293,35 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 
 			if (fragment != null) {
 				String completeCode = fragment.getHistoryItem().getResult().getCompleteCode();
-				
+
 				int msgId = 0;
 
-				if (boundService != null && boundService.isConnectedLocal()) {
-					boolean sent = this.boundService.sendToListeners(completeCode);
+				if (ESRSender.EXISTS) {
+					if (boundService != null && boundService.isConnectedLocal()) {
+						boolean sent = this.boundService.sendToListeners(completeCode);
 
-					if (sent) {
-						String msg = getResources().getString(R.string.history_item_sent);
-						historyManager.updateHistoryItemFileName(completeCode, msg);
+						if (sent) {
+							String msg = getResources().getString(R.string.history_item_sent);
+							historyManager.updateHistoryItemFileName(completeCode, msg);
 
-						int position = this.historyFragment.getActivatedPosition();
-						
-						HistoryItem historyItem = historyManager.buildHistoryItem(position);
-						this.historyFragment.updatePosition(position, historyItem);
-						
-						msgId = R.string.msg_coderow_sent;
-					} else {
-						msgId = R.string.msg_coderow_not_sent;
+							int position = this.historyFragment.getActivatedPosition();
+
+							HistoryItem historyItem = historyManager.buildHistoryItem(position);
+							this.historyFragment.updatePosition(position, historyItem);
+
+							msgId = R.string.msg_coderow_sent;
+						} else {
+							msgId = R.string.msg_coderow_not_sent;
+						}
+					} else if (boundService != null) { 
+						msgId = R.string.msg_stream_mode_not_available;
 					}
-				} else if (boundService != null) { 
-					msgId = R.string.msg_stream_mode_not_available;
-				}
-				
-				if (msgId != 0) {
-					Toast toast = Toast.makeText(getApplicationContext(), msgId, Toast.LENGTH_SHORT);
-					toast.setGravity(Gravity.BOTTOM, 0, 0);
-					toast.show();
+
+					if (msgId != 0) {
+						Toast toast = Toast.makeText(getApplicationContext(), msgId, Toast.LENGTH_SHORT);
+						toast.setGravity(Gravity.BOTTOM, 0, 0);
+						toast.show();
+					}
 				}
 			}
 		}
@@ -366,7 +370,7 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 		if (fragment != null) {
 			return fragment.getListPosition();
 		}
-		
+
 		return -1;
 	}
 
@@ -403,7 +407,7 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 		if (ESRSender.EXISTS && twoPane) {
 			serviceIntent =  new Intent(this, ESRSender.class);
 			startService(serviceIntent);
-			
+
 			doBindService();
 		}
 
@@ -419,7 +423,7 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 	protected void onPause() {
 
 		doUnbindService();
-		
+
 		super.onPause();
 	}
 
@@ -502,7 +506,7 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				historyFragment.setActivatedPosition(tmpPositions[0]);
-				
+
 				tmpPositions[0] = ListView.INVALID_POSITION;
 				tmpPositions[1] = ListView.INVALID_POSITION;
 			}
@@ -522,7 +526,7 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					setNewDetails(tmpPositions[1]);
-					
+
 					tmpPositions[0] = ListView.INVALID_POSITION;
 					tmpPositions[1] = ListView.INVALID_POSITION;
 				}
