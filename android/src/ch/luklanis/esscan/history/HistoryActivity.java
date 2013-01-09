@@ -121,8 +121,6 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 
 	private HistoryFragment historyFragment;
 
-	private String dtaFilePath;
-
 	@Override
 	protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
@@ -195,14 +193,16 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.history_menu_send_dta_wlan: {
-			if (createDTAFile()) {
+			Uri dtaFileUri = createDTAFile();
+			if (dtaFileUri != null) {
 			}
 		}
 		break;
 		case R.id.history_menu_send_dta_email: {
-			if (createDTAFile()) {
+			Uri dtaFileUri = createDTAFile();
+			if (dtaFileUri != null) {
 				try {
-					startActivity(createMailIntent());
+					startActivity(createMailIntent(dtaFileUri));
 				} catch (Exception ex) {
 					Toast toast = Toast.makeText(getApplicationContext(), R.string.msg_no_email_client, Toast.LENGTH_SHORT);
 					toast.setGravity(Gravity.BOTTOM, 0, 0);
@@ -212,8 +212,9 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 		}
 		break;
 		case R.id.history_menu_send_dta_other: {
-			if (createDTAFile()) {
-				startActivity(Intent.createChooser(createShareIntent(), "Send with..."));
+			Uri dtaFileUri = createDTAFile();
+			if (dtaFileUri != null) {
+				startActivity(Intent.createChooser(createShareIntent(dtaFileUri), "Send with..."));
 			}
 		}
 		break;
@@ -460,20 +461,20 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 		}
 	}
 
-	private Intent createShareIntent() {
-		return createShareIntent("text/plain");
+	private Intent createShareIntent(Uri dtaFileUri) {
+		return createShareIntent("text/plain", dtaFileUri);
 	}
 
-	private Intent createMailIntent() {		
-		return createShareIntent("message/rfc822");
+	private Intent createMailIntent(Uri dtaFileUri) {		
+		return createShareIntent("message/rfc822", dtaFileUri);
 	}
 
-	private Intent createShareIntent(String mime) {
+	private Intent createShareIntent(String mime, Uri dtaFileUri) {
 		String[] recipients = new String[]{PreferenceManager.getDefaultSharedPreferences(this)
 				.getString(PreferencesActivity.KEY_EMAIL_ADDRESS, "")};
 		String subject = getResources().getString(R.string.history_share_as_dta_title);
 		String text = String.format(getResources().getString(R.string.history_share_as_dta_summary), 
-				this.dtaFileCreator.getDTAFilePath());
+				dtaFileUri.getPath());
 
 		Intent intent = new Intent(Intent.ACTION_SEND, Uri.parse("mailto:"));
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
@@ -483,7 +484,7 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 		intent.putExtra(Intent.EXTRA_SUBJECT, subject);
 		intent.putExtra(Intent.EXTRA_TEXT, text);
 
-		intent.putExtra(Intent.EXTRA_STREAM, this.dtaFileCreator.getDTAFileUri());
+		intent.putExtra(Intent.EXTRA_STREAM, dtaFileUri);
 
 		return intent;
 	}
@@ -570,28 +571,26 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 		}
 	}
 
-	private boolean createDTAFile() {
+	private Uri createDTAFile() {
 		List<HistoryItem> historyItems = historyManager.buildHistoryItemsForDTA();
 		String error = dtaFileCreator.getFirstError(historyItems);
 
 		if(error != ""){
 			setOkAlert(error);
-			return false;
+			return null;
 		}
 
 		CharSequence dta = dtaFileCreator.buildDTA(historyItems);
 
 		if (!dtaFileCreator.saveDTAFile(dta.toString())) {
 			setOkAlert(R.string.msg_unmount_usb);
-			return false;
+			return null;
 		} else {
 			Uri dtaFileUri = dtaFileCreator.getDTAFileUri();
 			String dtaFileName = dtaFileUri.getLastPathSegment();
 
 			new HistoryExportUpdateAsyncTask(historyManager, dtaFileName)
 			.execute(historyItems.toArray(new HistoryItem[historyItems.size()]));
-			
-			dtaFilePath = dtaFileCreator.getDTAFilePath();
 
 			this.dtaFileCreator = new DTAFileCreator(getApplicationContext());
 
@@ -602,7 +601,7 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 			toast.setGravity(Gravity.BOTTOM, 0, 0);
 			toast.show();
 
-			return true;
+			return dtaFileUri;
 		}
 	}
 }

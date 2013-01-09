@@ -45,10 +45,6 @@ public class DTAFileCreator {
 		historyFile = new File(historyRoot, fileName);
 	}
 	
-	public String getDTAFilePath() {
-		return historyFile.getAbsolutePath();
-	}
-	
 	public Uri getDTAFileUri() {
 		return Uri.fromFile(historyFile);
 	}
