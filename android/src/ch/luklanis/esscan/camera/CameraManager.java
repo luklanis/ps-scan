@@ -26,8 +26,8 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.view.SurfaceHolder;
-import ch.luklanis.esscanlite.PlanarYUVLuminanceSource;
-import ch.luklanis.esscanlite.PreferencesActivity;
+import ch.luklanis.esscan.PlanarYUVLuminanceSource;
+import ch.luklanis.esscan.PreferencesActivity;
 import ch.luklanis.esscan.camera.open.OpenCameraManager;
 
 import java.io.IOException;

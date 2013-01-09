@@ -26,7 +26,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import ch.luklanis.esscanlite.PreferencesActivity;
+import ch.luklanis.esscan.PreferencesActivity;
 import ch.luklanis.android.common.executor.AsyncTaskExecInterface;
 import ch.luklanis.android.common.executor.AsyncTaskExecManager;
 

@@ -32,8 +32,8 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 
 import ch.luklanis.esscanlite.R;
-import ch.luklanis.esscanlite.PreferencesActivity;
-import ch.luklanis.esscanlite.ViewfinderView;
+import ch.luklanis.esscan.PreferencesActivity;
+import ch.luklanis.esscan.ViewfinderView;
 import ch.luklanis.esscan.camera.exposure.ExposureInterface;
 import ch.luklanis.esscan.camera.exposure.ExposureManager;
 

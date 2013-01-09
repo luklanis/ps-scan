@@ -79,18 +79,6 @@
             android:defaultValue="false"
             android:title="@string/preferences_enable_torch_title" />
 
-        <!-- <ListPreference
-            android:key="preferences_source_language"
-            android:defaultValue="deu"
-            android:entries="@array/language_names"
-            android:entryValues="@array/iso6393_language_names"
-            android:title="Recognize" /> -->
-
-<!--         <EditTextPreference -->
-<!--             android:defaultValue=">+ 0123456789" -->
-<!--             android:key="preferences_character_whitelist" -->
-<!--             android:title="@string/preferences_character_whitelist_title" /> -->
-
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="preferences_reverse_image"
@@ -101,13 +89,6 @@
             android:defaultValue="false"
             android:key="preferences_show_ocr_result"
             android:title="@string/preferences_show_ocr_result_title" />
-            
-        <CheckBoxPreference
-            android:key="preferences_enable_stream_mode"
-            android:defaultValue="false"
-            android:enabled="false"
-            android:title="@string/preferences_enable_stream_mode_title"
-            android:summary="@string/preferences_enable_stream_mode_summary" />
     </PreferenceCategory>
 
     <!-- ADVANCED SETTINGS -->

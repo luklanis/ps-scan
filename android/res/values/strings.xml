@@ -14,6 +14,7 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
+
 -->
 <resources>
 
@@ -27,10 +28,18 @@
     <string name="button_change">Change</string>
     <string name="detail_title">Details</string>
     <string name="history_clear_text">Delete all</string>
+    <string name="history_item_sent">Sent over Wifi</string>
     <string name="history_send_dta">DTA</string>
+    <string name="history_send_dta_wlan">ESR Receiver</string>
+    <string name="history_send_dta_email">email</string>
+    <string name="history_send_dta_other">other&#8230;</string>
+    <string name="history_send_dta_save">just save</string>
     <string name="history_send">CSV</string>
     <string name="history_email_title">ESR Scanner history</string>
-    <string name="history_email_as_dta_title">DTA file from ESR Scanner</string>
+    <string name="history_share_as_dta_title">DTA file from ESR Scanner</string>
+    <string name="history_share_as_dta_summary">DTA should be attached.
+        If there is no attachment, the email app didn\'t support it.
+        So please, can you add the file \"%s\" manually.</string>
     <string name="history_title">History</string>
     <string name="history_clear_one_history_text">Delete payment</string>
     <string name="history_empty">Empty</string>
@@ -41,6 +50,7 @@
     <string name="menu_settings">Settings</string>
     <string name="menu_search">Search</string>
     <string name="menu_switch_ps">Switch type of payment slip</string>
+    <string name="menu_switch_stream_mode">Stream mode</string>
     <string name="alert_title_information">Information</string>
     <string name="alert_dont_show_again">Don\'t show again!</string>
     <string name="msg_sure">Are you sure?</string>
@@ -52,11 +62,15 @@
     <string name="msg_database_restored">Data successfully restored!</string>
     <string name="msg_copied">Successfully copied</string>
     <string name="msg_nothing_to_export">No payment to export.</string>
+    <string name="msg_no_email_client">No email client found</string>
     <string name="msg_amount_not_valid">Amount is not valid.</string>
     <string name="msg_amount_is_empty">Please set the amount for the transfer to %s first.</string>
     <string name="msg_own_iban_is_not_set">To create DTA files your own IBAN is needed. Please write it down in Settings.</string>
     <string name="msg_own_iban_is_not_valid">IBAN is not valid. It has to be from switzerland.</string>
     <string name="msg_own_address_is_not_set">To create DTA files your own address is needed. Please write it down in Settings.</string>
+    <string name="msg_stream_mode_not_available">Slip-reader mode only available if Wifi is connected.</string>
+    <string name="msg_coderow_sent">Code row sent.</string>
+    <string name="msg_coderow_not_sent">Unable to send code row. ESR Receiver is not connected!</string>
     <string name="msg_red_result_view_not_available">No details for red payment slips!</string>
     <string name="msg_confirm_delete_title">Delete payment</string>
     <string name="msg_confirm_delete_message">You are about to delete the payment, OK to proceed?</string>
@@ -67,6 +81,7 @@
     <string name="result_exported_dta">Payment exported in file</string>
     <string name="picture">A little picture of a orange payment slip</string>
     <string name="button_copy_code_row">Copy code row</string>
+    <string name="button_send_code_row">Send code row</string>
     <string name="preferences_only_macro_focus_title">Macro focus</string>
     <string name="preferences_no_continous_auto_focus_title">No continues auto focus</string>
     <string name="preferences_no_continous_auto_focus_summary">Use standard auto focus only</string>
@@ -87,7 +102,7 @@
     <string name="preferences_email_address_title">Default email address</string>
     <string name="preferences_email_address_summary"></string>
     <string name="preferences_enable_stream_mode_title">Enable slip-reader mode</string>
-    <string name="preferences_enable_stream_mode_summary">Sends the recognized code row to your pc (only available on paid version)</string>
+    <string name="preferences_enable_stream_mode_summary">Sends the recognized code row to your pc</string>
     <string name="preferences_backup_restore_title">Backup/Restore</string>
     <string name="preferences_backup_title">Backup</string>
     <string name="preferences_backup_summary">Tab to create backup of database and preferences on external storage.</string>
@@ -95,5 +110,6 @@
     <string name="preferences_restore_summary">Tab to restore a previous backup. Existing data will be overwritten.</string>
     <string name="help_button_done">Done</string>
     <string name="help_button_back">Back</string>
+    <string name="status_view_ip_address">IP Address(es):%s</string>
 
 </resources>

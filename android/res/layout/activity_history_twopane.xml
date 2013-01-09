@@ -9,7 +9,7 @@
     android:showDividers="middle"
     tools:context=".history.HistoryActivity">
 
-    <fragment android:name="ch.luklanis.esscanlite.history.HistoryFragment"
+    <fragment android:name="ch.luklanis.esscan.history.HistoryFragment"
         android:id="@+id/history"
         android:layout_width="0dp"
         android:layout_height="match_parent"
