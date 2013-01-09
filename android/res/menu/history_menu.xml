@@ -10,13 +10,13 @@
     <item
         android:id="@+id/history_menu_send_code_row"
         android:icon="@drawable/ic_menu_send"
-        android:showAsAction="always|withText"
+        android:showAsAction="always"
         android:title="@string/button_send_code_row"
         android:visible="false"/>
     <item
         android:id="@+id/history_menu_send_dta"
         android:icon="@drawable/tax"
-        android:showAsAction="ifRoom|withText"
+        android:showAsAction="always|withText"
         android:title="@string/history_send_dta">
         <menu>
             <item
@@ -35,11 +35,6 @@
         </menu>
     </item>
     <item
-        android:id="@+id/history_menu_clear"
-        android:icon="@drawable/trash_can"
-        android:showAsAction="ifRoom|withText"
-        android:title="@string/history_clear_text"/>
-    <item
         android:id="@+id/history_menu_send_csv"
         android:icon="@drawable/list2"
         android:showAsAction="ifRoom|withText"
@@ -50,5 +45,10 @@
         android:showAsAction="ifRoom|withText"
         android:title="@string/button_copy_code_row"
         android:visible="false"/>
+    <item
+        android:id="@+id/history_menu_clear"
+        android:icon="@drawable/trash_can"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/history_clear_text"/>
 
 </menu>
