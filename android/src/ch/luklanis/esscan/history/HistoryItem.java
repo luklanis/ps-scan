@@ -22,10 +22,10 @@ import ch.luklanis.esscan.paymentslip.PsResult;
 
 public final class HistoryItem {
 
-	private final PsResult result;
+	private PsResult result;
 	private int addressId;
 	private String amount;
-	private final String dtaFile;
+	private String dtaFile;
 	private boolean exported;
 	private String address;
 
@@ -37,22 +37,6 @@ public final class HistoryItem {
 		this.exported = false;
 		this.address = "";
 	}
-
-//	HistoryItem(EsrResult result, String amount) {
-//		this.result = result;
-//		this.addressNumber = -1;
-//		this.amount = amount;
-//		this.dtaFile = null;
-//		this.exported = false;
-//	}
-//
-//	HistoryItem(EsrResult result, String amount, int addressNumber) {
-//		this.result = result;
-//		this.addressNumber = addressNumber;
-//		this.amount = amount;
-//		this.dtaFile = null;
-//		this.exported = false;
-//	}
 
 	HistoryItem(PsResult result, String amount, int addressId, String dtaFile) {
 		this.result = result;
@@ -111,6 +95,15 @@ public final class HistoryItem {
 
 	public void setAddress(String address) {
 		this.address = address == null ? "" : address;
+	}
+
+	public void update(HistoryItem item) {
+		this.result = item.getResult();
+		this.addressId = item.getAddressId();
+		this.amount = item.getAmount();
+		this.dtaFile = item.getDTAFilename();
+		this.exported = item.getExported();
+		this.address = item.getAddress();
 	}
 	
 	@Override

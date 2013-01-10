@@ -1,5 +1,6 @@
 package ch.luklanis.esscan.history;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.os.AsyncTask;
@@ -14,11 +15,10 @@ public class GetHistoryAsyncTask extends AsyncTask<Void, Void, Boolean> {
 		this.historyFragment = historyFragment;
 		this.historyManager = historyManager;
 		
-		adapter = historyFragment.getAdapter();
+		historyFragment.setListShown(false);
+		historyFragment.setListAdapter(null);
 
 		adapter = new HistoryItemAdapter(historyFragment.getActivity());
-
-		adapter.clear();
 	}
 
 	@Override
@@ -36,8 +36,7 @@ public class GetHistoryAsyncTask extends AsyncTask<Void, Void, Boolean> {
 	@Override
 	protected void onPostExecute(Boolean result) {
 		if (result) {
-			historyFragment.setAdapter(adapter);
-			adapter.notifyDataSetChanged();
+			historyFragment.setHistoryItemAdapter(adapter);
 		}
 	}
 }
