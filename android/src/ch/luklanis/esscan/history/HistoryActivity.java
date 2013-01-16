@@ -80,7 +80,7 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 				getSupportActionBar().setSubtitle("History - Searching for: " + newText);
 			}
 
-			HistoryItemAdapter adapter = historyFragment.getAdapter();
+			HistoryItemAdapter adapter = historyFragment.getHistoryItemAdapter();
 
 			if (adapter != null) {
 				adapter.getFilter().filter(newText); 
@@ -336,6 +336,13 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 	}
 
 	@Override
+	public void selectTopInTwoPane() {
+		if (twoPane) {
+			onItemSelected(ListView.INVALID_POSITION, 0);
+		}
+	}
+
+	@Override
 	public void onItemSelected(int oldPosition, int newPosition) {
 
 		if (twoPane) {
@@ -368,9 +375,9 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 	}
 
 	@Override
-	public int activatePosition() {
+	public int getPositionToActivate() {
 		PsDetailFragment fragment = (PsDetailFragment)getSupportFragmentManager().findFragmentById(R.id.ps_detail_container);
-		if (fragment != null) {
+		if (fragment != null && fragment.isInLayout()) {
 			return fragment.getListPosition();
 		}
 

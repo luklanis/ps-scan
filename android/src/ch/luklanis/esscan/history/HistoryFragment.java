@@ -1,5 +1,6 @@
 package ch.luklanis.esscan.history;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -22,17 +23,18 @@ public class HistoryFragment extends ListFragment {
 	private int activatedPosition = ListView.INVALID_POSITION;
 
 	public interface HistoryCallbacks {
+		public void selectTopInTwoPane();
 		public void onItemSelected(int oldPosition, int newPosition);
-		public int activatePosition();
+		public int getPositionToActivate();
 		public void setOptionalOkAlert(int id);
 	}
 
 	private HistoryManager historyManager;
 	private HistoryItemAdapter adapter;
 
-	private boolean listIsEmpty;
-
 	private HistoryFragment self;
+
+	private boolean listIsEmpty;
 
 	private static HistoryCallbacks sDummyCallbacks = new HistoryCallbacks(){
 		@Override
@@ -42,8 +44,11 @@ public class HistoryFragment extends ListFragment {
 		public void setOptionalOkAlert(int id) {
 		}
 		@Override
-		public int activatePosition() {
+		public int getPositionToActivate() {
 			return -1;
+		}
+		@Override
+		public void selectTopInTwoPane() {
 		}
 	};
 
@@ -78,11 +83,8 @@ public class HistoryFragment extends ListFragment {
 
 		historyManager = new HistoryManager(getActivity());
 		self = this;
-		
+
 		adapter = null;
-		
-		GetHistoryAsyncTask async = new GetHistoryAsyncTask(this, historyManager);
-		async.execute();
 	}
 
 	@Override
@@ -116,9 +118,9 @@ public class HistoryFragment extends ListFragment {
 			@Override
 			public boolean onItemLongClick(AdapterView<?> adapterView, View view,
 					int position, long id) {
-				
+
 				activatedPosition = position;
-				
+
 				AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
 				.setTitle(R.string.msg_confirm_delete_title)
 				.setMessage(R.string.msg_confirm_delete_message)
@@ -127,7 +129,8 @@ public class HistoryFragment extends ListFragment {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						historyManager.deleteHistoryItem(activatedPosition);
-						historyCallbacks.onItemSelected(ListView.INVALID_POSITION, 0);
+						historyCallbacks.selectTopInTwoPane();
+
 						GetHistoryAsyncTask async = new GetHistoryAsyncTask(self, historyManager);
 						async.execute();
 					}
@@ -138,6 +141,14 @@ public class HistoryFragment extends ListFragment {
 				return true;
 			}
 		});
+	}
+
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+
+		GetHistoryAsyncTask async = new GetHistoryAsyncTask(this, historyManager);
+		async.execute();
 	}
 
 	@Override
@@ -181,32 +192,41 @@ public class HistoryFragment extends ListFragment {
 	}
 
 	public void updatePosition(int position, HistoryItem item) {
+
 		if (adapter != null && adapter.getCount() > position) {
-			adapter.remove(adapter.getItem(position));
-			adapter.insert(item, position);
-			adapter.notifyDataSetChanged();
+			HistoryItem listItem = adapter.getItem(position);
+			listItem.update(item);
 		}
+
+		getActivity().runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				adapter.notifyDataSetChanged();
+			}
+		});
 	}
-	
-	public void setAdapter(HistoryItemAdapter adapter) {
+
+	public void setHistoryItemAdapter(HistoryItemAdapter adapter) {
+
 		if (adapter.isEmpty()) {
-			listIsEmpty = true;
 			adapter.add(new HistoryItem(null));
+			listIsEmpty = true;
 		} else {
 			listIsEmpty = false;
 		}
-		
-		this.adapter = adapter;
 
+		this.adapter = adapter;
 		setListAdapter(this.adapter);
-		
 		setListShown(true);
-		
-		int position = historyCallbacks.activatePosition();
+
+		this.adapter.notifyDataSetInvalidated();
+
+		int position = historyCallbacks.getPositionToActivate();
 		setActivatedPosition(position);
 	}
 
-	public HistoryItemAdapter getAdapter() {
+	public HistoryItemAdapter getHistoryItemAdapter() {
 		return adapter;
 	}
 
