@@ -144,8 +144,8 @@ public class HistoryFragment extends ListFragment {
 	}
 
 	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
+	public void onResume() {
+		super.onResume();
 
 		GetHistoryAsyncTask async = new GetHistoryAsyncTask(this, historyManager);
 		async.execute();
