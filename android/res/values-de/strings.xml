@@ -87,7 +87,6 @@
     <string name="preferences_enable_torch_title">Frontleuchte</string>
     <string name="preferences_dta_format_title">DTA Einstellungen</string>
     <string name="preferences_advanced_title">Erweiterte Einstellungen</string>
-    <string name="preferences_database_title">Sichern/Wiederherstellen der Datenbank</string>
     <string name="preferences_play_beep_title">Beepton abspielen</string>
     <string name="preferences_character_whitelist_title">Zeichen Whitelist</string>
     <string name="preferences_reverse_image_title">Kamerabild umdrehen</string>
