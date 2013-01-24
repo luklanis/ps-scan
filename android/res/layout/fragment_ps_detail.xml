@@ -8,6 +8,8 @@
         android:id="@+id/ps_detail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:orientation="vertical"
         android:padding="8dp"
         tools:context=".history.PsDetailFragment" >
@@ -45,6 +47,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPostalAddress|textMultiLine|textCapWords"
+            android:nextFocusLeft="@id/result_address"
+            android:nextFocusUp="@id/result_address"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <TextView
