@@ -150,9 +150,15 @@ public final class HistoryActivity extends SherlockFragmentActivity implements H
 			PsResult psResult = PsResult.getCoderowType(codeRow).equals(EsResult.PS_TYPE_NAME) 
 					? new EsResult(codeRow) : new EsrResult(codeRow);
 
-					this.historyManager.addHistoryItem(psResult);
-					setNewDetails(0);
-					intent.setAction(null);
+					if (twoPane) {
+						this.historyManager.addHistoryItem(psResult);
+						setNewDetails(0);
+						intent.setAction(null);
+					} else {
+						Intent detailIntent = new Intent(this, PsDetailActivity.class);
+						detailIntent.putExtra(PsDetailFragment.ARG_POSITION, 0);
+						startActivityForResult(detailIntent, DETAILS_REQUEST_CODE);
+					}
 		}
 	}
 
